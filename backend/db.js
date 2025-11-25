@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE,
   password TEXT,
   information TEXT,
-  avatar TEXT,
+  avatar TEXT
 );
 `);
 

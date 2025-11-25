@@ -1,5 +1,23 @@
-const fastify = require('fastify')({ logger: true });
+const fastify = require('fastify')({ logger: true })
+const swagger = require('@fastify/swagger')
+const swaggerUI = require('@fastify/swagger-ui')
 const db = require('./db')
+
+fastify.register(swagger, {
+   openapi: {
+    info: {
+      title: 'Transcendance API',
+      description: 'Routes documentation with Swagger',
+      version: '1.0.0'
+    }
+  }
+})
+
+fastify.register(swaggerUI, {
+  routePrefix: '/docs',
+  uiConfig: { docExpansion: 'full' }
+})
+
 
 fastify.get("/", async () => {
   return { message: "API running!" };
@@ -20,15 +38,11 @@ fastify.post('/users', (req, reply) => {
     INSERT INTO users (username, password)
     VALUES (?, ?)
   `);
-
   const result = insert.run(username, password);
-
-
   reply.send({ id: result.lastInsertRowid, username });
 });
 
 console.log(fastify.printRoutes());
-
 
 fastify.listen({ port: 3000, host: "0.0.0.0" });
 
