@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE,
   email TEXT UNIQUE,
   password TEXT,
+  alias TEXT,
   information TEXT,
   avatar TEXT
 );
