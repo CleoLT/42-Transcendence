@@ -31,7 +31,8 @@ const postUser = {
       required: ['username', 'password'],
       properties: {
         username: { type: 'string', minLength: 3 },
-        password: { type: 'string', minLength: 6 }
+        password: { type: 'string', minLength: 6 },
+        email: { type: 'string', minLength: 6 }
       }
     },
 

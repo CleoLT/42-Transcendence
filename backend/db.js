@@ -14,9 +14,12 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE,
   email TEXT UNIQUE,
   password TEXT,
-  alias TEXT,
-  information TEXT,
-  avatar TEXT
+  alias TEXT UNIQUE,
+  bio TEXT,
+  avatar TEXT,
+  online_status BOOLEAN DEFAULT 0,
+	created_at TIMESTAMP,
+	playing_time TIME
 );
 `);
 
