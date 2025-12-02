@@ -13,8 +13,8 @@ const getAllUsers = {
                 username: { type: 'string' },
                 email: { type: 'string' },
                 alias: { type: 'string' },
-                information: { type: 'string' },
-                avatar: { type: 'string' }
+                bio: { type: 'string' },
+                created_at: { type: 'string' }
             }
             }
         }
@@ -48,7 +48,45 @@ const postUser = {
     }
 }
 
+const getUserById = {
+  description: 'Get user by id',
+  tags: ['Users'],
+  summary: 'User info',
+
+  // 👇 Validación del parámetro de la ruta
+  params: {
+    type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+  },
+
+  // 👇 Validación de la respuesta
+  response: {
+    200: {
+      description: 'user info',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        alias: { type: 'string' },
+        bio: { type: 'string' },
+        avatar: { type: 'string' },
+        online_status: { type: 'boolean' },
+        created_at: { type: 'string' },
+        playing_time: { type: 'number' }
+      }//,
+      //required: ['id', 'username']
+    }
+  }
+};
+
+
 module.exports = {
     getAllUsers,
-    postUser
+    postUser,
+    getUserById
 }
+

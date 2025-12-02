@@ -13,4 +13,9 @@ function addUser(username, password, email) {
     return insert.run(username, password, email)
 }
 
-module.exports = { addUser }
+function getUserById(userId) {
+    const statment = db.prepare('SELECT * FROM users WHERE id = ?')
+    return statment.get(userId)
+}
+
+module.exports = { getAllUsers, addUser, getUserById }
