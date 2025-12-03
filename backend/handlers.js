@@ -30,6 +30,18 @@ function getUserById(req, reply) {
     }) 
 }
 
+function updateUserById(req, reply) {
+    const modifiedData = req.body; //TODO EL OBJETO
+    const { userId } = req.params;
 
+    const result = query.updateUserById(userId, modifiedData)
 
-module.exports = { getAllUsers, postUser, getUserById }
+    reply.code(201).send(result);
+}    
+
+module.exports = { 
+    getAllUsers, 
+    postUser, 
+    getUserById,
+    updateUserById
+}

@@ -28,12 +28,13 @@ const postUser = {
 
     body: {
       type: 'object',
-      required: ['username', 'password'],
+      required: ['username', 'password', 'email'],
       properties: {
         username: { type: 'string', minLength: 3 },
         password: { type: 'string', minLength: 6 },
         email: { type: 'string', minLength: 6 }
-      }
+      },
+      additionalProperties: false
     },
 
     response: {
@@ -77,16 +78,61 @@ const getUserById = {
         online_status: { type: 'boolean' },
         created_at: { type: 'string' },
         playing_time: { type: 'number' }
-      }//,
-      //required: ['id', 'username']
+      }
+    }
+  }
+};
+
+const updateUserById = {
+  description: 'Partially update user by id',
+  tags: ['Users'],
+  summary: 'update user info',
+
+  body: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', minLength: 3 },
+        password: { type: 'string', minLength: 6 },
+        email: { type: 'string', minLength: 6 },
+        alias: { type: 'string', minLength: 3 },
+        bio: { type: 'string', minLength: 3, maxLength: 200 }
+      },
+      additionalProperties: false
+    },
+    
+  params: {
+    type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+  },
+
+  response: {
+    200: {
+      description: 'user updated',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        alias: { type: 'string' },
+        bio: { type: 'string' },
+        avatar: { type: 'string' },
+        online_status: { type: 'boolean' },
+        created_at: { type: 'string' },
+        playing_time: { type: 'number' }
+      }
     }
   }
 };
 
 
+
 module.exports = {
     getAllUsers,
     postUser,
-    getUserById
+    getUserById,
+    updateUserById
 }
 
