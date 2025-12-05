@@ -2,6 +2,8 @@ const fastify = require('fastify')({ logger: true })
 const swagger = require('@fastify/swagger')
 const swaggerUI = require('@fastify/swagger-ui')
 const multipart = require('@fastify/multipart')
+const static = require('@fastify/static') //for index.html
+const path = require('node:path') //for index.html
 const routes = require('./routes')
 
 fastify.register(multipart, {
@@ -32,10 +34,16 @@ fastify.register(swaggerUI, {
   uiConfig: { docExpansion: 'list' }
 })
 
-fastify.get("/", async () => {
-  return { message: "API running!" };
+// Servir archivos estáticos desde /public
+fastify.register(static, {
+  root: path.join(__dirname, 'public'),
+  prefix: '/', // la URL base (ej: /index.html)
 });
 
+// Ruta por defecto para servir index.html
+fastify.get('/', async (req, reply) => {
+  return reply.sendFile('index.html'); // archivo dentro de /public
+});
 
 fastify.register(routes)
 
