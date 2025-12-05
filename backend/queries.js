@@ -33,12 +33,26 @@ function updateUserById(userId, modifiedData) {
     stmt.run(values, userId)
 
     return getUserById(userId)
+}
 
+function deleteUserById(userId) {
+    const stmt = db.prepare('DELETE FROM users WHERE id = ?')
+    stmt.run(userId)
+}
+
+function uploadAvatar(userId, filepath) {
+    const stmt = db.prepare('UPDATE users SET avatar = ? WHERE id = ?')
+    stmt.run(filepath, userId)
+
+    return getUserById(userId)
+    
 }
 
 module.exports = { 
     getAllUsers, 
     addUser, 
     getUserById,
-    updateUserById 
+    updateUserById,
+    deleteUserById,
+    uploadAvatar 
 }

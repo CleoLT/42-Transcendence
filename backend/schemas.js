@@ -14,6 +14,8 @@ const getAllUsers = {
                 email: { type: 'string' },
                 alias: { type: 'string' },
                 bio: { type: 'string' },
+                avatar: { type: 'string' },
+                online_status: { type: 'boolean' },
                 created_at: { type: 'string' }
             }
             }
@@ -118,10 +120,61 @@ const updateUserById = {
         email: { type: 'string' },
         alias: { type: 'string' },
         bio: { type: 'string' },
+        avatar: { type: 'string' }, //?
+        online_status: { type: 'boolean' }, //?
+        created_at: { type: 'string' }, //?
+        playing_time: { type: 'number' } //?
+      }
+    }
+  }
+};
+
+const deleteUserById = {
+  description: 'Delete user by id',
+  tags: ['Users'],
+  summary: 'Delete user info',
+
+  params: {
+    type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+  },
+};
+
+const uploadAvatar = {
+  description: 'Upload user avatar by id',
+  tags: ['Users'],
+  consumes: ['multipart/form-data'], // for swagger only
+  summary: 'upload avatar',
+
+  params: {
+    type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+  },
+
+ /* body: {
+    type: "object",
+    required: ["avatar"],
+    properties: {
+      avatar: { //type: 'object'
+        type: 'string',
+        format: 'binary'
+      }
+    }
+  },*/
+
+  response: {
+    200: {
+      description: 'upload info',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
         avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
       }
     }
   }
@@ -133,6 +186,8 @@ module.exports = {
     getAllUsers,
     postUser,
     getUserById,
-    updateUserById
+    updateUserById,
+    deleteUserById,
+    uploadAvatar
 }
 

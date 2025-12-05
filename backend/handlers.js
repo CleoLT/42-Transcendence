@@ -1,5 +1,8 @@
 const db = require('./db')
 const query = require('./queries')
+const fs = require ('node:fs')
+const { pipeline } = require('node:stream/promises')
+const path = require('node:path')
 
 function getAllUsers(req, reply) {
     const users = query.getAllUsers()
@@ -37,11 +40,49 @@ function updateUserById(req, reply) {
     const result = query.updateUserById(userId, modifiedData)
 
     reply.code(201).send(result);
-}    
+}   
+
+function deleteUserById(req, reply) {
+    const { userId } = req.params
+    query.deleteUserById(userId)
+
+    reply.code(204).send()
+}
+
+async function uploadAvatar(req, reply) {
+    const { userId } = req.params
+
+    const data = await req.file()
+
+  //  const data = req.body.avatar
+
+    if (!data) {
+        return reply.code(400).send({ error: "No file uploaded" })
+    }
+
+    const uploadDir = path.join('/app', 'uploads', 'avatars');
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const filename = `${Date.now()}_${data.filename}`
+    const filepath = path.join(uploadDir, filename)
+
+    await pipeline(data.file, fs.createWriteStream(filepath))
+
+    const query = query.uploadAvatar(userId, filepath)
+
+    reply.code(200).send({ 
+        userId,
+        avatar: query.avatar 
+    })
+}
 
 module.exports = { 
     getAllUsers, 
     postUser, 
     getUserById,
-    updateUserById
+    updateUserById,
+    deleteUserById,
+    uploadAvatar
 }
