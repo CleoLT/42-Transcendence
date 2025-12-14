@@ -146,7 +146,7 @@ const deleteUserById = {
 const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
-  consumes: ['multipart/form-data'], // for swagger only
+ // consumes: ['multipart/form-data'], // for swagger only
   summary: 'upload avatar',
 
   params: {
@@ -157,13 +157,13 @@ const uploadAvatar = {
     required: ['userId']
   },
 
- /* body: {
+ /*body: {
     type: "object",
     required: ["avatar"],
     properties: {
-      avatar: { //type: 'object'
-        type: 'string',
-        format: 'binary'
+      avatar: { type: 'object'
+      //  type: 'string',
+      //  format: 'binary'
       }
     }
   },*/

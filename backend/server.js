@@ -16,17 +16,21 @@ fastify.register(multipart, {
     headerPairs: 2000,  // Max number of header key=>value pairs
     parts: 1000         // For multipart forms, the max number of parts (fields + files)
   }//,
- // attachFieldsToBody: true
+  //attachFieldsToBody: true
 });
+
+fastify.register(routes)
 
 fastify.register(swagger, {
    openapi: {
+    openapi: "3.0.0",
     info: {
       title: 'Transcendance API',
       description: 'Routes documentation with Swagger',
       version: '1.0.0'
     }
-  }
+  },
+  exposeRoute: true
 })
 
 fastify.register(swaggerUI, {
@@ -45,7 +49,7 @@ fastify.get('/', async (req, reply) => {
   return reply.sendFile('index.html'); // archivo dentro de /public
 });
 
-fastify.register(routes)
+
 
 console.log(fastify.printRoutes());
 

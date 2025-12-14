@@ -1,8 +1,10 @@
 const db = require('./db')
 const query = require('./queries')
 const fs = require ('node:fs')
-const { pipeline } = require('node:stream/promises')
+const util = require ('node:util')
+const { pipeline } = require('node:stream')
 const path = require('node:path')
+const pump = util.promisify(pipeline)
 
 function getAllUsers(req, reply) {
     const users = query.getAllUsers()
@@ -50,7 +52,7 @@ function deleteUserById(req, reply) {
 }
 
 async function uploadAvatar(req, reply) {
-    const { userId } = req.params
+    const userId = req.params
 
     const data = await req.file()
 
@@ -68,9 +70,11 @@ async function uploadAvatar(req, reply) {
     const filename = `${Date.now()}_${data.filename}`
     const filepath = path.join(uploadDir, filename)
 
-    await pipeline(data.file, fs.createWriteStream(filepath))
+  //  await pipeline(data.file, fs.createWriteStream(filepath))
+    await pump(data.file, fs.createWriteStream(filepath))
 
-    const query = query.uploadAvatar(userId, filepath)
+
+    const query = uploadAvatar(userId, filepath)
 
     reply.code(200).send({ 
         userId,
