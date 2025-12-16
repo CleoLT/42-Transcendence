@@ -1,0 +1,18 @@
+name: transcendence
+
+services:
+  nginx-front:
+    container_name: nginx-front
+    build: ./containers/nginx-front
+    image: nginx-front:v1
+    ports:
+      - "8080:443"
+#    env_file:
+#      - .env
+    networks:
+      - main
+    restart: always
+
+networks:
+   main:
+     driver: bridge
