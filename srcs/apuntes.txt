@@ -1,0 +1,114 @@
+- en la api gateway, no puedo dar direcciones a una misma ruta, prq sino me da un error. se ve asi en los docker logs: 
+	/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+/app/node_modules/find-my-way/index.js:291
+      throw new Error(`Method '${method}' already declared for route '${pattern}' with constraints '${JSON.stringify(constraints)}'`)
+            ^
+
+Error: Method 'POST' already declared for route '/api/auth/login' with constraints '{}'
+    at Router._on (/app/node_modules/find-my-way/index.js:291:13)
+    at Router.on (/app/node_modules/find-my-way/index.js:139:10)
+    at Object.addNewRoute (/app/node_modules/fastify/lib/route.js:364:16)
+    at Object.route (/app/node_modules/fastify/lib/route.js:255:23)
+    at Object._route [as route] (/app/node_modules/fastify/fastify.js:286:27)
+    at fastifyHttpProxy (/app/node_modules/@fastify/http-proxy/index.js:255:11)
+    at Plugin.exec (/app/node_modules/avvio/lib/plugin.js:125:28)
+    at Boot._loadPlugin (/app/node_modules/avvio/boot.js:432:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v20.19.6
+

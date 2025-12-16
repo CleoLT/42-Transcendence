@@ -9,9 +9,21 @@ services:
       - "8080:443"
 #    env_file:
 #      - .env
+    depends_on:
+      - api-gateway
     networks:
       - main
     restart: always
+
+  api-gateway:
+    container_name: api-gateway
+    build: ./containers/api-gateway
+    expose:
+      - "3000"
+    networks:
+      - main
+    restart: always
+
 
 networks:
    main:

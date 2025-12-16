@@ -1,0 +1,8 @@
+{
+  "name": "api-gateway",
+  "type": "module",
+  "dependencies": {
+    "fastify": "^4",
+    "@fastify/http-proxy": "^9"
+  }
+}
