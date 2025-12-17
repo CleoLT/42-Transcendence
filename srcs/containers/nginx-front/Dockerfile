@@ -1,17 +1,14 @@
-FROM nginx:latest
+FROM nginx:1.25-alpine
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl
+RUN apk add --no-cache openssl \
+ && mkdir -p /etc/ssl/certs /etc/ssl/private \
+ && openssl req -x509 -nodes -days 365 \
+    -subj "/CN=transcendence" \
+    -newkey rsa:2048 \
+    -keyout /etc/ssl/private/transcendence.key \
+    -out /etc/ssl/certs/transcendence.crt
 
-# Create self-signed certificate
-RUN mkdir -p /etc/ssl/certs /etc/ssl/private \
-    && openssl req -x509 -nodes -days 365 \
-        -subj "/CN=transcendence" \
-        -newkey rsa:2048 \
-        -keyout /etc/ssl/private/transcendence.key \
-        -out /etc/ssl/certs/transcendence.crt
-
-COPY ./conf/nginx.conf /etc/nginx/conf.d/
+COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY ./html/index.html /usr/share/nginx/html/index.html
 #aqui copiaba mi html personalizado a la carpeta 'html' para que el contenedor pueda acceder
@@ -22,4 +19,4 @@ COPY ./html/index.html /usr/share/nginx/html/index.html
 EXPOSE 443
 
 # Start NGINX in foreground
-#CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
