@@ -4,7 +4,7 @@ services:
   nginx-front:
     container_name: nginx-front
     build: ./containers/nginx-front
-    image: nginx-front:v1
+#    image: nginx-front:v1
     ports:
       - "8080:443"
 #    env_file:
