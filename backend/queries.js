@@ -7,6 +7,10 @@ function getAllUsers() {
 
 function addUser(username, password, email) {
 
+    const userExists = getUserByUserName(username);
+    if (userExists)
+        return null
+
     const passwordHash = bcrypt.hashSync(password, 10);
 
     const stmt = db.prepare(`

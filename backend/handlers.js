@@ -14,8 +14,10 @@ function postUser(req, reply) {
     const { username, password, email } = req.body;
 
     const result = query.addUser(username, password, email)
-
-    reply.code(201).send({ id: result.lastInsertRowid, username });
+    if(result)
+        reply.code(201).send({ id: result.lastInsertRowid, username });
+    else
+        reply.code(409).send({ error: 'This user already exists.' }); // 409 conflict
 }
 
 function getUserById(req, reply) {
@@ -98,13 +100,18 @@ async function uploadAvatar(req, reply) {
 async function loginUser(req, reply) {
     const { username, password } = req.body;
   
-    const user = await services.login(username, password);
-  
-    if (!user) {
-      return reply.code(401).send({ message: 'Invalid credentials' });
+    try {
+        const user = await services.login(username, password);
+        if (!user)
+        return reply.code(401).send({ message: 'Invalid login' });
+        reply.code(200).send({ id: user.id, username: user.username });
+    } catch (err) {
+        const code = err.message === 'USER_NOT_FOUND' ? 404
+        : err.message === 'ALREADY_ONLINE' ? 409
+        : err.message === 'INVALID_PASSWORD' ? 401
+        : 500;
+        reply.code(code).send({ error: err.message });
     }
-  
-    reply.code(200).send({ id: user.id, username: user.username });
 }
 
 module.exports = { 
