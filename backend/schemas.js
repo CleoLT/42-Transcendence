@@ -51,6 +51,33 @@ const postUser = {
     }
 }
 
+const loginUser = {
+  description: 'User log in',
+  tags: ['Users'],
+  summary: 'Logs user in',
+
+  body: {
+    type: 'object',
+    required: ['username', 'password'],
+    properties: {
+      username: { type: 'string', minLength: 3 },
+      password: { type: 'string', minLength: 6 }
+    },
+    additionalProperties: false
+  },
+
+  response: {
+    201: {
+      description: 'User logged in',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        username: { type: 'string' }
+      }
+    }
+  }
+}
+
 const getUserById = {
   description: 'Get user by id',
   tags: ['Users'],
@@ -188,6 +215,7 @@ module.exports = {
     getUserById,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    loginUser
 }
 

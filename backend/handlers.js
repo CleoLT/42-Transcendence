@@ -3,6 +3,7 @@ const query = require('./queries')
 const fs = require ('node:fs')
 const { pipeline } = require('node:stream/promises')
 const path = require('node:path')
+const services = require('./services')
 
 function getAllUsers(req, reply) {
     const users = query.getAllUsers()
@@ -13,15 +14,33 @@ function postUser(req, reply) {
     const { username, password, email } = req.body;
 
     const result = query.addUser(username, password, email)
-
-    reply.code(201).send({ id: result.lastInsertRowid, username });
-}    
+    if(result)
+        reply.code(201).send({ id: result.lastInsertRowid, username });
+    else
+        reply.code(409).send({ error: 'This user already exists.' }); // 409 conflict
+}
 
 function getUserById(req, reply) {
     const { userId } =  req.params
     const result = query.getUserById(userId)
     reply.code(200).send({
         userId, 
+        username: result.username,
+        email: result.email,
+        alias: result.alias,
+        bio: result.bio,
+        avatar: result.avatar,
+        online_status: result.online_status,
+        created_at: result.created_at,
+        playing_time: result.playing_time
+    }) 
+}
+
+function getUserByUserName(req, reply) {
+    const { userName } =  req.params
+    const result = query.getUserByUserName(userName)
+    reply.code(200).send({
+        userId,
         username: result.username,
         email: result.email,
         alias: result.alias,
@@ -78,11 +97,30 @@ async function uploadAvatar(req, reply) {
     })
 }
 
+async function loginUser(req, reply) {
+    const { username, password } = req.body;
+  
+    try {
+        const user = await services.login(username, password);
+        if (!user)
+        return reply.code(401).send({ message: 'Invalid login' });
+        reply.code(200).send({ id: user.id, username: user.username });
+    } catch (err) {
+        const code = err.message === 'USER_NOT_FOUND' ? 404
+        : err.message === 'ALREADY_ONLINE' ? 409
+        : err.message === 'INVALID_PASSWORD' ? 401
+        : 500;
+        reply.code(code).send({ error: err.message });
+    }
+}
+
 module.exports = { 
     getAllUsers, 
     postUser, 
     getUserById,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    getUserByUserName,
+    uploadAvatar,
+    loginUser
 }
