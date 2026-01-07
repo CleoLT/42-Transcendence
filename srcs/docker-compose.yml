@@ -7,8 +7,6 @@ services:
 #    image: nginx-front:v1
     ports:
       - "8080:443"
-#    env_file:
-#      - .env
     depends_on:
       - api-gateway
     networks:
@@ -22,8 +20,65 @@ services:
       - "3000"
     networks:
       - main
+    depends_on:
+      - user-service
+    #  - auth-service
+    #  - game-history-service
     restart: always
 
+# USER MICROSERVICE
+  user-service:
+    container_name: user-service
+    build: ./containers/user-service/api
+    networks:
+      - main
+    restart: always
+    depends_on:
+      - user-service-db
+
+  user-service-db:
+    container_name: user-service-db
+    build: ./containers/user-service/db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: testdb
+    networks:
+      - main
+    restart: always
+
+# AUTH MICROSERVICE
+#  auth-service:
+#    container_name: auth-service
+#    build: ./containers/auth-service/api
+#    networks:
+#      - main
+#    restart: always
+#    depends_on:
+#      - auth-service-db
+#
+#  auth-service-db:
+#    container_name: auth-service-db
+#    build: ./containers/auth-service/db
+#    networks:
+#      - main
+#    restart: always
+#
+## GAME HISTORY MICROSERVICE
+#  game-history-service:
+#    container_name: game-history-service
+#    build: ./containers/game-history-service/api
+#    networks:
+#      - main
+#    restart: always
+#    depends_on:
+#      - game-history-service-db
+#
+#  game-history-service-db:
+#    container_name: game-history-service-db
+#    build: ./containers/game-history-service/db
+#    networks:
+#      - main
+#    restart: always
 
 networks:
    main:
