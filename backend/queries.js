@@ -1,38 +1,51 @@
-const db = require('./db')
+const pool = require('./db')
 
-function getAllUsers() {
-    return db.prepare('SELECT * FROM users').all();
+async function connection(fct) {
+  const conn = await pool.getConnection()
+  try {
+    return await fct(conn)
+  } finally {
+    conn.release()
+  }
 }
 
-function addUser(username, password, email) {
-    const stmt = db.prepare(`
-        INSERT INTO users (username, password, email, created_at)
-        VALUES (?, ?, ?, datetime(\'now\'))
-    `);
-
-    return stmt.run(username, password, email)
+async function getAllUsers() {
+    return connection(conn => conn.query('SELECT * FROM users'))
 }
 
-function getUserById(userId) {
-    const statment = db.prepare('SELECT * FROM users WHERE id = ?')
-    return statment.get(userId)
+async function addUser(username, password, email) {
+    return connection(conn => conn.query(
+        `INSERT INTO users (username, email, password) 
+        VALUES (?, ?, ?)`,
+        [username, email, password]
+    ))
 }
 
-function updateUserById(userId, modifiedData) {
-    
+async function getUserById(id) {
+    const rows = await connection(conn => conn.query(
+            'SELECT * FROM users WHERE id = ?',
+            [id]
+        ))
+    return rows[0]
+}
+
+async function updateUserById(id, modifiedData) {
+
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")
     const values = keys.map(key => modifiedData[key])
     
-    const stmt = db.prepare(`
-        UPDATE users
+    const rows = connection(conn => conn.query(
+        `UPDATE users
         SET ${setStmt}
-        WHERE id = ? 
-    `);
-    stmt.run(values, userId)
+        WHERE id = ?`, 
+        values, 
+        [id]
+    ))
+    //stmt.run(values, userId)
 
-    return getUserById(userId)
+    return getUserById(id)
 }
 
 function deleteUserById(userId) {
@@ -47,6 +60,57 @@ function uploadAvatar(userId, filepath) {
     return getUserById(userId)
     
 }
+/*async function getAllUsers() {
+    //return db.prepare('SELECT * FROM users').all();
+    const conn = await pool.getConnection()
+    try {
+        const rows = await conn.query('SELECT * FROM users')
+        return rows
+    } finally {
+        conn.release()
+    }
+}
+
+async function addUser(username, password, email) {
+    const conn = await pool.getConnection()
+     try {
+        const rows = await conn.query(
+            `INSERT INTO users (username, email, password) 
+            VALUES (?, ?, ?)`,
+            [username, email, password]
+        )
+        return rows
+    } finally {
+        conn.release()
+    }
+}
+
+async function getUserById(id) {
+    const conn = await pool.getConnection()
+     try {
+        const rows = await conn.query(
+            'SELECT * FROM users WHERE id = ?',
+            [id]
+        )
+        return rows[0]
+    } finally {
+        conn.release()
+    }
+}*/
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = { 
     getAllUsers, 

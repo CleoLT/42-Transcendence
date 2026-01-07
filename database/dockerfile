@@ -1,0 +1,10 @@
+FROM mariadb:11.4
+
+ENV MARIADB_ROOT_PASSWORD=rootpassword
+ENV MARIADB_DATABASE=transcendance_db
+ENV MARIADB_USER=user
+ENV MARIADB_PASSWORD=userpassword
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 3306

@@ -1,4 +1,3 @@
-const db = require('./db')
 const query = require('./queries')
 const fs = require ('node:fs')
 const util = require ('node:util')
@@ -6,22 +5,22 @@ const { pipeline } = require('node:stream')
 const path = require('node:path')
 const pump = util.promisify(pipeline)
 
-function getAllUsers(req, reply) {
-    const users = query.getAllUsers()
+async function getAllUsers(req, reply) {
+    const users = await query.getAllUsers()
     reply.send(users);
 }
 
-function postUser(req, reply) {
+async function postUser(req, reply) {
     const { username, password, email } = req.body;
 
-    const result = query.addUser(username, password, email)
+    const result = await query.addUser(username, password, email)
 
-    reply.code(201).send({ id: result.lastInsertRowid, username });
+    reply.code(201).send({ id: result.insertId, username });
 }    
 
-function getUserById(req, reply) {
+async function getUserById(req, reply) {
     const { userId } =  req.params
-    const result = query.getUserById(userId)
+    const result = await query.getUserById(userId)
     reply.code(200).send({
         userId, 
         username: result.username,

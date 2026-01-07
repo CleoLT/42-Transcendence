@@ -1,0 +1,32 @@
+services:
+  db:
+    build: ./database
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: transcendance_db
+      MARIADB_USER: user
+      MARIADB_PASSWORD: userpassword
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"   # opcional (solo si quieres acceder desde el host)
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: userpassword
+      DB_NAME: transcendance_db
+
+volumes:
+  mariadb_data:
