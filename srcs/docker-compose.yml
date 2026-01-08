@@ -22,7 +22,7 @@ services:
       - main
     depends_on:
       - user-service
-    #  - auth-service
+      - auth-service
     #  - game_history-service
     restart: always
 
@@ -51,13 +51,13 @@ services:
     restart: always
 
 # AUTH MICROSERVICE
-#  auth-service:
-#    container_name: auth-service
-#    build: ./containers/auth/auth-service
-#    networks:
-#      - main
-#    restart: always
-#
+  auth-service:
+    container_name: auth-service
+    build: ./containers/auth/auth-service
+    networks:
+      - main
+    restart: always
+
 ## GAME HISTORY MICROSERVICE
 #  game_history-service:
 #    container_name: game_history-service

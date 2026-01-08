@@ -39,7 +39,7 @@ fastify.register(swaggerUI, {
 })
 
 // Servir archivos estáticos desde /public
-/*fastify.register(static, {
+fastify.register(static, {
   root: path.join(__dirname, 'public'),
   prefix: '/', // la URL base (ej: /index.html)
 });
@@ -47,19 +47,19 @@ fastify.register(swaggerUI, {
 // Ruta por defecto para servir index.html
 fastify.get('/', async (req, reply) => {
   return reply.sendFile('index.html'); // archivo dentro de /public
-});*/
+});
 
 fastify.register(routes)
 
-const db = require('./db')
+//const db = require('./db')
 
-fastify.get('/', async (req, reply) => {
+/*fastify.get('/', async (req, reply) => {
   const conn = await db.getConnection()
  // const res = await conn.query(`INSERT INTO users (id, username, email, password) VALUES (?, ?, ?, ?)`, [1, "cleo", "cleo@gmail.com", "123456"]);
   const rows = await conn.query('SELECT * FROM users')
   conn.release()
   reply.send(rows)
-})
+})*/
 
 
 /*const mariadb = require('mariadb');
