@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Blossom game</title>
+    <link rel="icon" type="png" href="https://static.vecteezy.com/system/resources/previews/018/872/002/non_2x/cherry-blossom-flower-icon-vector.jpg">
+</head>
+<body style="text-align:center;background-color:PapayaWhip">
+    <h1>Welcome to our blossom game!</h1>
+    <p>This is a temporary page while we work on the game.</p>
+    <img src="https://media.tenor.com/net_ivlSaT4AAAAM/bow-bowing.gif" type="gif" alt="bowing gif">
+    <p>thankyou for your patience :)</p>
+        <script>
+       
+        // estamos haciendo una request al back, queremos guardar/POSTear datos en el microservicio 'auth', que aun no existe, con path '/login'
+        fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: "test@test.com",
+                password: "1234"
+            })
+        })
+            .then(res => res.json())
+            .then(console.log);
+
+        </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+name: transcendence
+
+services:
+  nginx_front:
+    container_name: nginx_front
+    build: ./containers/nginx_front
+#    image: nginx_front:v1
+    ports:
+      - "8080:443"
+    depends_on:
+      - api_gateway
+    networks:
+      - main
+    restart: always
+
+  api_gateway:
+    container_name: api_gateway
+    build: ./containers/api_gateway
+    expose:
+      - "3000"
+    networks:
+      - main
+    depends_on:
+      - user-service
+      - auth-service
+    #  - game_history-service
+    restart: always
+
+# USER MICROSERVICE
+  user-service:
+    container_name: user-service
+    build: ./containers/user/user-service
+    env_file:
+      - .user_env
+    networks:
+      - main
+    restart: always
+    depends_on:
+      - user-db
+    #TEMPORAL, solo para ver swagger!!
+    ports:
+      - "3000:3000"
+
+  user-db:
+    container_name: user-db
+    build: ./containers/user/user-db
+    env_file:
+      - .userdb_env
+    networks:
+      - main
+    restart: always
+
+# AUTH MICROSERVICE
+  auth-service:
+    container_name: auth-service
+    build: ./containers/auth/auth-service
+    networks:
+      - main
+    restart: always
+
+## GAME HISTORY MICROSERVICE
+#  game_history-service:
+#    container_name: game_history-service
+#    build: ./containers/game_history/game_history-service
+#    networks:
+#      - main
+#    restart: always
+#    depends_on:
+#      - game_history-service-db
+#
+#  game_history-db:
+#    container_name: game_history-db
+#    build: ./containers/game_history/game_history-db
+#    networks:
+#      - main
+#    restart: always
+
+networks:
+   main:
+     driver: bridge
