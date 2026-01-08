@@ -21,8 +21,9 @@ clean: down
 
 # stops, removes & cleans in depth, including images and cached docker processes
 deep-clean: clean
-	docker rmi -f transcendence-nginx-front:latest transcendence-api-gateway:latest transcendence-user-service:latest transcendence-user-service-db:latest >/dev/null || true
+	docker rmi -f transcendence-nginx_front:latest transcendence-api_gateway:latest transcendence-user-service:latest transcendence-user-db:latest >/dev/null || true
 	docker system prune -a -f || true
+	docker volume prune -f || true
 	
 rebuild: deep-clean build up
 

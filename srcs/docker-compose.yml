@@ -1,21 +1,21 @@
 name: transcendence
 
 services:
-  nginx-front:
-    container_name: nginx-front
-    build: ./containers/nginx-front
-#    image: nginx-front:v1
+  nginx_front:
+    container_name: nginx_front
+    build: ./containers/nginx_front
+#    image: nginx_front:v1
     ports:
       - "8080:443"
     depends_on:
-      - api-gateway
+      - api_gateway
     networks:
       - main
     restart: always
 
-  api-gateway:
-    container_name: api-gateway
-    build: ./containers/api-gateway
+  api_gateway:
+    container_name: api_gateway
+    build: ./containers/api_gateway
     expose:
       - "3000"
     networks:
@@ -23,25 +23,29 @@ services:
     depends_on:
       - user-service
     #  - auth-service
-    #  - game-history-service
+    #  - game_history-service
     restart: always
 
 # USER MICROSERVICE
   user-service:
     container_name: user-service
-    build: ./containers/user-service/api
+    build: ./containers/user/user-service
+    env_file:
+      - .user_env
     networks:
       - main
     restart: always
     depends_on:
-      - user-service-db
+      - user-db
+    #TEMPORAL, solo para ver swagger!!
+    ports:
+      - "3000:3000"
 
-  user-service-db:
-    container_name: user-service-db
-    build: ./containers/user-service/db
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: testdb
+  user-db:
+    container_name: user-db
+    build: ./containers/user/user-db
+    env_file:
+      - .userdb_env
     networks:
       - main
     restart: always
@@ -49,33 +53,24 @@ services:
 # AUTH MICROSERVICE
 #  auth-service:
 #    container_name: auth-service
-#    build: ./containers/auth-service/api
-#    networks:
-#      - main
-#    restart: always
-#    depends_on:
-#      - auth-service-db
-#
-#  auth-service-db:
-#    container_name: auth-service-db
-#    build: ./containers/auth-service/db
+#    build: ./containers/auth/auth-service
 #    networks:
 #      - main
 #    restart: always
 #
 ## GAME HISTORY MICROSERVICE
-#  game-history-service:
-#    container_name: game-history-service
-#    build: ./containers/game-history-service/api
+#  game_history-service:
+#    container_name: game_history-service
+#    build: ./containers/game_history/game_history-service
 #    networks:
 #      - main
 #    restart: always
 #    depends_on:
-#      - game-history-service-db
+#      - game_history-service-db
 #
-#  game-history-service-db:
-#    container_name: game-history-service-db
-#    build: ./containers/game-history-service/db
+#  game_history-db:
+#    container_name: game_history-db
+#    build: ./containers/game_history/game_history-db
 #    networks:
 #      - main
 #    restart: always

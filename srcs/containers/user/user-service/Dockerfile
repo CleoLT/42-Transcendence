@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache python3 make g++ sqlite-dev
+#RUN apk add --no-cache python3 make g++ sqlite-dev
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN npm install
 RUN mkdir -p data
 
 COPY *.js ./
-#COPY public ./public
+COPY public ./public
 
 EXPOSE 3000
 

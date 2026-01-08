@@ -1,0 +1,4 @@
+MARIADB_ROOT_PASSWORD=rootpassword
+MARIADB_DATABASE=transcendance_db
+MARIADB_USER=user
+MARIADB_PASSWORD=userpassword
