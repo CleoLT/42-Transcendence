@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger: true })
-const swagger = require('@fastify/swagger')
-const swaggerUI = require('@fastify/swagger-ui')
+//const swagger = require('@fastify/swagger')
+//const swaggerUI = require('@fastify/swagger-ui')
 const multipart = require('@fastify/multipart')
 const static = require('@fastify/static') //for index.html
 const path = require('node:path') //for index.html
@@ -21,7 +21,7 @@ fastify.register(multipart, {
 
 
 
-fastify.register(swagger, {
+/*fastify.register(swagger, {
    openapi: {
     openapi: "3.0.0",
     info: {
@@ -37,7 +37,7 @@ fastify.register(swaggerUI, {
   routePrefix: '/docs',
   uiConfig: { docExpansion: 'list' }
 })
-
+*/
 // Servir archivos estáticos desde /public
 fastify.register(static, {
   root: path.join(__dirname, 'public'),
@@ -62,32 +62,6 @@ fastify.register(routes)
 })*/
 
 
-/*const mariadb = require('mariadb');
-const pool = mariadb.createPool({
-     host: 'mydb.com', 
-     user:'myUser', 
-     password: 'myPassword',
-     connectionLimit: 5
-});
-async function asyncFunction() {
-  let conn;
-  try {
-	conn = await pool.getConnection();
-	const rows = await conn.query("SELECT 1 as val");
-	console.log(rows); //[ {val: 1}, meta: ... ]
-	const res = await conn.query("INSERT INTO myTable value (?, ?)", [1, "mariadb"]);
-	console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
-
-  } catch (err) {
-	throw err;
-  } finally {
-	if (conn) conn.end();
-  }
-}
-asyncFunction().then(() => {
-  pool.end();
-});
-*/
 
 console.log(fastify.printRoutes());
 

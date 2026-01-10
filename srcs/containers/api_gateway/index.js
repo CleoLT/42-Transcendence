@@ -1,7 +1,36 @@
 import Fastify from "fastify";
 import proxy from "@fastify/http-proxy";
+import swagger from "@fastify/swagger" 
+import swaggerUI from "@fastify/swagger-ui"
 
 const app = Fastify({ logger: true });
+
+app.register(swagger, {
+   openapi: {
+    openapi: "3.0.0",
+    info: {
+      title: 'Transcendance API Gateway',
+      description: 'Routes documentation with Swagger',
+      version: '1.0.0'
+    }
+  },
+  exposeRoute: true
+})
+
+app.register(swaggerUI, {
+  routePrefix: '/docs',
+  uiConfig: { docExpansion: 'list' }
+})
+
+const userDocs = require('./documentation/users.docs')
+
+userDocs.forEach(route => {
+  app.route({
+    ...route,
+    handler: async () => {} // nunca se ejecuta (proxy intercepta)
+  })
+})
+
 
 // MOCK REQUEST
 // le digo que si viene una request tipo POST al microservicio 'auth' con path '/login', 
@@ -29,20 +58,16 @@ app.register(proxy, {
 //  la "app.register(proxy, ...)", no se ejecuta
 //  porque ya ha cuadrado con "app.post"
 
-//Health check
+app.register(proxy, {
+  upstream: "http://user-service:3000",
+  prefix: "/api/users",
+  rewritePrefix: "/"
+})
+
+
+
 app.get("/health", async () => ({ ok: true }));
 
 app.listen({ port: 3000, host: "0.0.0.0" });
-
-
-
-// esto para que los status de respuesta sean mas parecidos a una api-gateway
-//app.setErrorHandler((err, req, reply) => {
-//  if (err.code === 'EAI_AGAIN' || err.code === 'ECONNREFUSED') {
-//    reply.code(502).send({ error: "Bad Gateway" });
-//  } else {
-//    reply.code(500).send({ error: "Internal Server Error" });
-//  }
-//});
 
 
