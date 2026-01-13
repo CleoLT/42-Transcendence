@@ -5,6 +5,7 @@
     "fastify": "^4",
     "@fastify/http-proxy": "^9",
     "@fastify/swagger": "^8.0.0",
-    "@fastify/swagger-ui": "^2.0.0"
+    "@fastify/swagger-ui": "^2.0.0",
+    "@fastify/cors":"^9"
   }
 }

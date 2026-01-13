@@ -23,5 +23,44 @@
             .then(console.log);
 
         </script>
+        <h1>Lista de Usuarios</h1>
+  <ul id="user-list"></ul>
+
+  <script>
+    async function fetchUsers() {
+      try {
+        // Llamamos a la API Gateway
+        const response = await fetch('http://localhost:3000/api/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const users = await response.json();
+
+        const ul = document.getElementById('user-list');
+        ul.innerHTML = ''; // limpiar lista
+
+        users.forEach(user => {
+          const li = document.createElement('li');
+          li.textContent = `ID: ${user.id}, Nombre: ${user.username}`;
+          ul.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        const ul = document.getElementById('user-list');
+        ul.innerHTML = '<li>Error cargando usuarios</li>';
+      }
+    }
+
+    // Ejecutar al cargar la página
+    fetchUsers();
+  </script>
+
 </body>
 </html>
