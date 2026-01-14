@@ -35,6 +35,24 @@ async function getUserById(req, reply) {
     }) 
 }
 
+async function getUserByName(req, reply) {
+    const { username } = req.params
+    const result = await query.getUserByName(username)
+  
+    reply.code(200).send({
+      id: result.id,
+      username: result.username,
+      password: result.password,
+      email: result.email,
+      alias: result.alias,
+      bio: result.bio,
+      avatar: result.avatar,
+      online_status: result.online_status,
+      created_at: result.created_at,
+      playing_time: result.playing_time
+    })
+}
+
 function updateUserById(req, reply) {
     const modifiedData = req.body; //TODO EL OBJETO
     const { userId } = req.params;
@@ -86,6 +104,7 @@ export default {
     getAllUsers, 
     postUser, 
     getUserById,
+    getUserByName,
     updateUserById,
     deleteUserById,
     uploadAvatar

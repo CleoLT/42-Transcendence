@@ -85,6 +85,40 @@ const getUserById = {
   }
 };
 
+const getUserByName = {
+  description: 'Get user by username',
+  tags: ['Users'],
+  summary: 'User info by username',
+
+  params: {
+    type: 'object',
+    properties: {
+      username: { type: 'string' }
+    },
+    required: ['username']
+  },
+
+  response: {
+    200: {
+      description: 'user info',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        username: { type: 'string' },
+        password: { type: 'string' },
+        email: { type: 'string' },
+        alias: { type: 'string' },
+        bio: { type: 'string' },
+        avatar: { type: 'string' },
+        online_status: { type: 'boolean' },
+        created_at: { type: 'string' },
+        playing_time: { type: 'number' }
+      }
+    }
+  }
+};
+
+
 const updateUserById = {
   description: 'Partially update user by id',
   tags: ['Users'],
@@ -185,6 +219,7 @@ export default {
     getAllUsers,
     postUser,
     getUserById,
+    getUserByName,
     updateUserById,
     deleteUserById,
     uploadAvatar

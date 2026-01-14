@@ -1,4 +1,5 @@
 import pool from './db.js'
+import bcrypt from 'bcrypt'
 
 async function connection(fct) {
   const conn = await pool.getConnection()
@@ -14,10 +15,13 @@ async function getAllUsers() {
 }
 
 async function addUser(username, password, email) {
+
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
+
     return connection(conn => conn.query(
         `INSERT INTO users (username, email, password) 
         VALUES (?, ?, ?)`,
-        [username, email, password]
+        [username, email, hashedPassword]
     ))
 }
 
@@ -25,6 +29,14 @@ async function getUserById(id) {
     const rows = await connection(conn => conn.query(
             'SELECT * FROM users WHERE id = ?',
             [id]
+        ))
+    return rows[0]
+}
+
+async function getUserByName(username) {
+    const rows = await connection(conn => conn.query(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
         ))
     return rows[0]
 }
@@ -103,6 +115,7 @@ export default {
     getAllUsers, 
     addUser, 
     getUserById,
+    getUserByName,
     updateUserById,
     deleteUserById,
     uploadAvatar 
