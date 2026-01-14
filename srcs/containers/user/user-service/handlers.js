@@ -1,8 +1,9 @@
-const query = require('./queries')
-const fs = require ('node:fs')
-const util = require ('node:util')
-const { pipeline } = require('node:stream')
-const path = require('node:path')
+import query from './queries.js'
+import fs from 'node:fs'
+import util from 'node:util'
+import { pipeline } from 'node:stream'
+import path from 'node:path'
+
 const pump = util.promisify(pipeline)
 
 async function getAllUsers(req, reply) {
@@ -81,7 +82,7 @@ async function uploadAvatar(req, reply) {
     })
 }
 
-module.exports = { 
+export default { 
     getAllUsers, 
     postUser, 
     getUserById,

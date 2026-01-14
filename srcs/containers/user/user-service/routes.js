@@ -1,5 +1,5 @@
-const schema = require('./schemas')
-const handler = require('./handlers')
+import schema from './schemas.js'
+import handler from './handlers.js'
 
 const routes = async function(fastify, options) {
 
@@ -11,4 +11,4 @@ const routes = async function(fastify, options) {
     fastify.post('/:userId/avatar', { schema: schema.uploadAvatar }, handler.uploadAvatar)
 }
 
-module.exports = routes
+export default routes

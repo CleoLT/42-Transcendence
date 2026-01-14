@@ -1,10 +1,10 @@
-const fastify = require('fastify')({ logger: true })
-const swagger = require('@fastify/swagger')
-const swaggerUI = require('@fastify/swagger-ui')
-const multipart = require('@fastify/multipart')
-const static = require('@fastify/static') //for index.html
-const path = require('node:path') //for index.html
-const routes = require('./routes')
+import Fastify from 'fastify'
+import swagger from '@fastify/swagger'
+import swaggerUI from '@fastify/swagger-ui'
+import multipart from '@fastify/multipart'
+import routes from './routes.js'
+
+const fastify = Fastify({ logger: true })
 
 fastify.register(multipart, {
   limits: {
@@ -18,8 +18,6 @@ fastify.register(multipart, {
   }//,
   //attachFieldsToBody: true
 });
-
-
 
 fastify.register(swagger, {
    openapi: {
