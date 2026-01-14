@@ -11,7 +11,6 @@ RUN npm install
 RUN mkdir -p data
 
 COPY *.js ./
-COPY public ./public
 
 EXPOSE 3000
 

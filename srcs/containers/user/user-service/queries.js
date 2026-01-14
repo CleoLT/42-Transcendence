@@ -1,4 +1,4 @@
-const pool = require('./db')
+import pool from './db.js'
 
 async function connection(fct) {
   const conn = await pool.getConnection()
@@ -99,7 +99,7 @@ async function getUserById(id) {
 }*/
 
 
-module.exports = { 
+export default { 
     getAllUsers, 
     addUser, 
     getUserById,

@@ -181,7 +181,7 @@ const uploadAvatar = {
 };
 
 
-module.exports = {
+export default {
     getAllUsers,
     postUser,
     getUserById,

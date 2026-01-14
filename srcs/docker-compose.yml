@@ -16,8 +16,10 @@ services:
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
+    #expose:
+     # - "3000"
     networks:
       - main
     depends_on:
@@ -38,8 +40,8 @@ services:
     depends_on:
       - user-db
     #TEMPORAL, solo para ver swagger!!
-    ports:
-      - "3000:3000"
+    #ports:
+     # - "3000:3000"
 
   user-db:
     container_name: user-db
