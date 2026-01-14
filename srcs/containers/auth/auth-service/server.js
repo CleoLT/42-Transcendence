@@ -8,23 +8,40 @@ fastify.get('/', async () => {
 });
 
 fastify.post('/login', async (req, reply) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body || {};
 
-  const res = await fetch(`http://user-service:3000/user/${username}`);
-  const user = await res.json();
+    if (!username || !password) return reply.code(400).send({ error: 'Credenciales invalidas' });
 
-  if (!user || !user.username) return reply.code(401).send({ error: 'Usuario no encontrado' });
+    const coincidence = await fetch('http://user-service:3000/user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return reply.code(401).send({ error: 'Contraseña incorrecta' });
-  else
-    return { message: 'Bienvenido ' + user.username };
+    if (!coincidence.ok) {
+      let errorBody = { error: 'Credenciales invalidas' };
 
-  //* JWT y sesion de usuario *//
-  //const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  //reply
-  //  .setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict' })
-  //  .send({ username: user.username });
+      try {
+        const text = await coincidence.text();
+        if (text)
+          errorBody = JSON.parse(text);
+      } catch {}
+
+      return reply.code(coincidence.status).send(errorBody); // propaga error custom desde user-service
+    }
+
+    return reply.send({ message: 'Bienvenido ' + username });
+
+    //* JWT y sesion de usuario *//
+    //const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    //reply
+    //  .setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict' })
+    //  .send({ username: user.username });
+
+  } catch (err) {
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
 });
 
 fastify.listen({ port: 3000, host: '0.0.0.0' });

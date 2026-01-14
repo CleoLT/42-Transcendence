@@ -105,7 +105,6 @@ const getUserByName = {
       properties: {
         id: { type: 'number' },
         username: { type: 'string' },
-        password: { type: 'string' },
         email: { type: 'string' },
         alias: { type: 'string' },
         bio: { type: 'string' },
@@ -113,6 +112,39 @@ const getUserByName = {
         online_status: { type: 'boolean' },
         created_at: { type: 'string' },
         playing_time: { type: 'number' }
+      }
+    }
+  }
+};
+
+const getCredentialsCoincidence = {
+  description: 'Validate user credentials',
+  tags: ['Users'],
+  summary: 'Credentials validation',
+
+  body: {
+    type: 'object',
+    required: ['username', 'password'],
+    properties: {
+      username: { type: 'string' },
+      password: { type: 'string' }
+    }
+  },
+
+  response: {
+    200: {
+      description: 'Credentials valid',
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' },
+        userId: { type: 'number' }
+      }
+    },
+    401: {
+      description: 'Invalid credentials',
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
       }
     }
   }
@@ -220,6 +252,7 @@ export default {
     postUser,
     getUserById,
     getUserByName,
+    getCredentialsCoincidence,
     updateUserById,
     deleteUserById,
     uploadAvatar
