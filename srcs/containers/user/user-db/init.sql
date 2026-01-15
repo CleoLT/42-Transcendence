@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS `transcendance_db`;
+USE `transcendance_db`;
+
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(255) UNIQUE,
@@ -33,5 +36,5 @@ CREATE TABLE IF NOT EXISTS `friendships` (
   CONSTRAINT `fk_friendships_user2`
     FOREIGN KEY (`user2_id`)
     REFERENCES `users`(`id`)
-);
+)ENGINE=InnoDB;
 

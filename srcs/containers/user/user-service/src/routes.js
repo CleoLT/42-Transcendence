@@ -1,5 +1,8 @@
 import userSchema from './schemas/users.js'
 import userHandler from './handlers/users.js'
+import friendSchema from './schemas/friendships.js'
+import friendHandler from './handlers/friendships.js'
+
 
 
 const routes = async function(fastify, options) {
@@ -12,7 +15,8 @@ const routes = async function(fastify, options) {
     fastify.delete('/:userId', { schema: userSchema.deleteUserById }, userHandler.deleteUserById)
     fastify.post('/:userId/avatar', { schema: userSchema.uploadAvatar }, userHandler.uploadAvatar)
 
-    //fastify.post('/friendships/:id1/:id2', { schema: userSchema.newFriendship }, userHandler.newFriendship)
+    fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships)
+    fastify.post('/friendships', { schema: friendSchema.newFriendship }, friendHandler.newFriendship)
 }
 
 export default routes
