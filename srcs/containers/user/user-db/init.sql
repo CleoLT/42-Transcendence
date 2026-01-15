@@ -11,3 +11,27 @@ CREATE TABLE IF NOT EXISTS `users` (
   `playing_time` INT DEFAULT 0,
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE IF NOT EXISTS `friendships` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user1_id` INT NOT NULL,
+  `user2_id` INT NOT NULL,
+
+  `user1_accept` TINYINT(1) DEFAULT 0,
+  `user2_accept` TINYINT(1) DEFAULT 0,
+  `user1_authorization` TINYINT(1) DEFAULT 0,
+  `user2_authorization` TINYINT(1) DEFAULT 0,
+
+  PRIMARY KEY (`id`),
+
+  UNIQUE KEY `unique_friendship` (`user1_id`, `user2_id`),
+
+  CONSTRAINT `fk_friendships_user1`
+    FOREIGN KEY (`user1_id`)
+    REFERENCES `users`(`id`),
+
+  CONSTRAINT `fk_friendships_user2`
+    FOREIGN KEY (`user2_id`)
+    REFERENCES `users`(`id`)
+);
+
