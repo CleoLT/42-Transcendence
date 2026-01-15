@@ -8,37 +8,64 @@
     <p>This is a temporary page while we work on the game.</p>
     <img src="https://media.tenor.com/net_ivlSaT4AAAAM/bow-bowing.gif" type="gif" alt="bowing gif">
     <p>thankyou for your patience :)</p>
-        <script>
-       
-        // estamos haciendo una request al back, queremos guardar/POSTear datos en el microservicio 'auth', que aun no existe, con path '/login'
-        fetch("/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: "test@test.com",
-                password: "1234"
-            })
-        })
-            .then(res => res.json())
-            .then(console.log);
+    <form id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <div class="message" id="message"></div>
+    </form>
+    <script>
+    
+    const form = document.getElementById('loginForm');
+    const message = document.getElementById('message');
 
-        </script>
-        <h1>Lista de Usuarios</h1>
-  <ul id="user-list"></ul>
+    form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  <script>
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+        message.style.color = 'green';
+        message.textContent = data.message;
+        } else {
+        message.style.color = 'red';
+        message.textContent = data.error || 'Login failed';
+        }
+    } catch (err) {
+        message.style.color = 'red';
+        message.textContent = 'Error connecting to server';
+    }
+    })
+
+    </script>
+    <!---
+    <h1>Lista de Usuarios</h1>
+    <ul id="user-list"></ul>
+
+    <script>
     async function fetchUsers() {
-      try {
+        try {
         // Llamamos a la API Gateway
         const response = await fetch('http://localhost:3000/api/users', {
-          method: 'GET',
-          headers: {
+            method: 'GET',
+            headers: {
             'Content-Type': 'application/json'
-          }
+            }
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const users = await response.json();
@@ -47,20 +74,20 @@
         ul.innerHTML = ''; // limpiar lista
 
         users.forEach(user => {
-          const li = document.createElement('li');
-          li.textContent = `ID: ${user.id}, Nombre: ${user.username}`;
-          ul.appendChild(li);
+            const li = document.createElement('li');
+            li.textContent = `ID: ${user.id}, Nombre: ${user.username}`;
+            ul.appendChild(li);
         });
-      } catch (error) {
+        } catch (error) {
         console.error('Error fetching users:', error);
         const ul = document.getElementById('user-list');
         ul.innerHTML = '<li>Error cargando usuarios</li>';
-      }
+        }
     }
 
     // Ejecutar al cargar la página
     fetchUsers();
-  </script>
+    </script> -->
 
 </body>
 </html>

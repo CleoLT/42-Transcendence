@@ -35,6 +35,43 @@ async function getUserById(req, reply) {
     }) 
 }
 
+async function getUserByName(req, reply) {
+    const { username } = req.params
+    const result = await query.getUserByName(username)
+  
+    reply.code(200).send({
+      id: result.id,
+      username: result.username,
+      email: result.email,
+      alias: result.alias,
+      bio: result.bio,
+      avatar: result.avatar,
+      online_status: result.online_status,
+      created_at: result.created_at,
+      playing_time: result.playing_time
+    })
+}
+
+async function getCredentialsCoincidence(req, reply) {
+    const { username, password } = req.body;
+    const match = await query.getCredentialsCoincidence(username, password)
+
+    if (!match)
+        return reply.code(401).send({ error: 'Usuario o contraseña incorrecta' });
+
+    const user = await query.getUserByName(username);
+    if (!user || !user.id) return reply.code(500).send({ error: 'User data invalid' });
+
+    if (user.online_status === 1)
+        return reply.code(401).send({ error: 'Usuario ya en linea' });
+
+    await query.updateUserById(user.id, { online_status: 1 });
+
+    reply.code(200).send({
+        valid: match // true or false
+    });
+}
+
 function updateUserById(req, reply) {
     const modifiedData = req.body; //TODO EL OBJETO
     const { userId } = req.params;
@@ -86,6 +123,8 @@ export default {
     getAllUsers, 
     postUser, 
     getUserById,
+    getUserByName,
+    getCredentialsCoincidence,
     updateUserById,
     deleteUserById,
     uploadAvatar

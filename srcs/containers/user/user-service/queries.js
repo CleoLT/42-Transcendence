@@ -1,4 +1,5 @@
 import pool from './db.js'
+import bcrypt from 'bcrypt'
 
 async function connection(fct) {
   const conn = await pool.getConnection()
@@ -14,10 +15,13 @@ async function getAllUsers() {
 }
 
 async function addUser(username, password, email) {
+
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
+
     return connection(conn => conn.query(
         `INSERT INTO users (username, email, password) 
         VALUES (?, ?, ?)`,
-        [username, email, password]
+        [username, email, hashedPassword]
     ))
 }
 
@@ -29,22 +33,44 @@ async function getUserById(id) {
     return rows[0]
 }
 
+async function getUserByName(username) {
+    const rows = await connection(conn => conn.query(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        ))
+    return rows[0]
+}
+
+async function getCredentialsCoincidence(username, password) {
+    
+    const rows = await connection(conn =>
+        conn.query('SELECT * FROM users WHERE username = ?', [username])
+    );
+
+    const user = rows[0];
+    if (!user) return false;
+
+    const match = await bcrypt.compare(password, user.password);
+    return match;
+}
+
 async function updateUserById(id, modifiedData) {
 
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")
     const values = keys.map(key => modifiedData[key])
+
+    const params = [...values, id]
     
     const rows = connection(conn => conn.query(
         `UPDATE users
         SET ${setStmt}
         WHERE id = ?`, 
-        values, 
-        [id]
+        params
     ))
-    //stmt.run(values, userId)
 
+    //stmt.run(values, userId)
     return getUserById(id)
 }
 
@@ -103,6 +129,8 @@ export default {
     getAllUsers, 
     addUser, 
     getUserById,
+    getUserByName,
+    getCredentialsCoincidence,
     updateUserById,
     deleteUserById,
     uploadAvatar 
