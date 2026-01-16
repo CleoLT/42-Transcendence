@@ -41,7 +41,7 @@ services:
       - user-db
     #TEMPORAL, solo para ver swagger!!
     #ports:
-     # - "3000:3000"
+    #  - "3001:3000"
 
   user-db:
     container_name: user-db

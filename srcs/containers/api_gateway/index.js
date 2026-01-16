@@ -18,7 +18,7 @@ app.register(proxy, {
 });
 
 app.register(proxy, {
-  upstream: "http://auth-service:4000",
+  upstream: "http://auth-service:3000",
   prefix: "/api/auth/",
   rewritePrefix: "/"
 });
