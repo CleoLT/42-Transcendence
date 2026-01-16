@@ -1,4 +1,21 @@
-FROM nginx:1.25-alpine
+# 1. Build stage
+FROM node:20-alpine AS build
+# lo que va detras de 'AS' es el nombre de esa stage del Dockerfile
+WORKDIR /app
+
+COPY front/package*.json .
+
+# instalamos react y lo que haya en el package.json con el comando:
+RUN npm install
+
+COPY front/ .
+RUN npm run build   
+
+# creates /app/dist + vite converts .jsx to .html, .css $ .js
+
+# 2. Serve stage
+# en esta stage NO existe node
+FROM nginx:alpine
 
 RUN apk add --no-cache openssl \
  && mkdir -p /etc/ssl/certs /etc/ssl/private \
@@ -8,15 +25,11 @@ RUN apk add --no-cache openssl \
     -keyout /etc/ssl/private/transcendence.key \
     -out /etc/ssl/certs/transcendence.crt
 
-COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY ./html/index.html /usr/share/nginx/html/index.html
-#aqui copiaba mi html personalizado a la carpeta 'html' para que el contenedor pueda acceder
-#COPY html/ /var/www/martalop.42.fr/
-# y le daba permisos al usuario de FPM (www-data) para poder leerlo luego sin haberlo creado 
-#RUN chown -R www-data:www-data /var/www/martalop.42.fr
+COPY --from=build /app/dist /usr/share/nginx/html
+# copiamos los archivos que se han construido en la primera etapa en la carpeta de la que nginx saca los recursos html, etc
+COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
+# lo ponemos en la carpeta conf.d por los contexts de nginx
 
 EXPOSE 443
-
-# Start NGINX in foreground
 CMD ["nginx", "-g", "daemon off;"]
+

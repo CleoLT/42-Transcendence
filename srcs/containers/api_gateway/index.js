@@ -3,6 +3,7 @@ import proxy from "@fastify/http-proxy";
 import cors from "@fastify/cors"
 
 const app = Fastify({ logger: true });
+// la opcion 'logger: true' muestra logs de incoming requests, redirecciones y codigos de respuesta 
 
 //Cross-origin ressource sharing para que el front pueda hacer fetch
 app.register(cors, {
