@@ -98,6 +98,104 @@ She worked closely with Emilie in the frontend to make sure they were on the sam
 <br>
 
 ## 9. Modules
+
+###  MAJOR | Use a framework for both the frontend and backend (2p)
+We felt that chosing frameworks would help a lot in the frontend and the backend taking into account the architecture of microservices that we wanted to buildand the use of frameworks is strictly necessary in a company environment, so even though they were new to most of us, we felt that it was a good investment.
+##### Implementation
+For the frontend we chose **React** & for the backend **Fastify**.\
+Emilie designed the frontend having the React components in mind while Cristina worked on the game in the front in pure Javascript.\
+In the backend, Manu and Cléo both learned how to use Fastify to create and manage the API routes.
+
+<br>
+
+###  MAJOR | A public API to interact with the database (2p)
+It has to have a secured API key, ratelimiting, documentation, and at least 5 endpoints.
+
+Because creating an API was already a necessity, we thought that making it public, well documented and secure would be a plus that would help reinforce the structure we had planned.
+##### Implementation
+We used Swagger to see and test that the endpoints worked correctly. Cléo worked on the user-service endpoints and Manu on the auth-service ones.
+
+<br>
+
+###  MAJOR | Implement a complete web-based game (2p)
+Because we originally started the project with the old subject, we were already going to do a game, the Pong. Eventhough we eventually decided to adhere to the new subject, therefore having the freedom to do other types of websites, we liked the idea of a game, and the opportunity to make something more interesting and modern. Cristina, our game developer, had a lot of inspiration and motivattion to go for a complex and fun game, so we went for it.
+
+##### Implementation
+(To be completed by @Bgoost)
+
+<br>
+
+###  MAJOR | Introduce an AI Opponent for games (2p)
+Cristina was not only interested in the game logic, but also in the use of an AI tool to train to act as an oponent to the real player. Nowadays AI is going through a huge rise and many companies and users are interested in the topic, so we decided to add it to the game.
+
+##### Implementation
+(To be completed by @Bgoost)
+
+<br>
+
+### MINOR | Game customization options (1p)
+The setup of the game allowed for a lot of customization options that Cristina was able to easily integrate in the game.
+
+##### Implementation
+(To be completed by @Bgoost)
+
+<br>
+
+###  MAJOR | Standard user management and authentication (2p)
+This is a basic requierement for any type of website that offers a service. In our case, because we supply an online game, we wanted to make sure that the user can save his games, customize his settings and profile. This can only happen with a user account system.
+
+##### Implementation
+We made an 'guest' option, as well as a 'log in' or 'register' option when you enter the game. From there there is a form that protected from the front and back that stores the user data so that any stats and user information can live in the our database volumes and be retrieved anytime the user logs in.\
+Cléo made sure this works perfectly.
+
+<br>
+
+###  MAJOR | Backend as microservices (2p)
+Nowadays microservices are the obvious choice for most big companies or websites with a lot of traffic. Not only is it a great security advantatge to have different services running in different containers, but in terms of CI/CD, having every service in a different container allows developers to work on features in an isolated environment and helps them integrate them into the whole program.\
+Moreover, if any of the services ever crashes, it only affects a part of the website, while the rest can continue working. 
+
+##### Implementation
+Marta was in charge of creating the set of containers and their correct communication. 
+
+Using Docker and Docker-compose we set up two containers for the front and four in the back.\
+We decided to have an API Gateway with its own container to further tighten security and protect the containers from the front. The Nginx container then only acts as a server of static files and handles the https connection.\
+We distinguish 3 microservices:
+- user-service (with its own separate db container)
+- authentication-service
+- game_history-service (with its own separate db container)
+  
+<br>
+
+### MINOR | Implement a complete 2FA system (1p)
+Security is a very important aspect of any website. We knew we wanted to choose either the OAuth module or the Two-Factor Authentication and finally chose the latest.
+
+##### Implementation
+(To be completed by @mgimon)
+
+<br>
+
+### MINOR | Custom-made design system with reusable components (1p)
+Given that we chose the frontend framework module, and Emilie learned how React components work, we thought that designing reusable 10 components was something within our capabilities.
+
+##### Implementation
+(To be completed by @EmilieInData)
+
+<br>
+
+### :green_book: Total point count - 15 points
+With these modules we have the 14 mandatory points and one extra, just in case we fail one of them during evaluation.
+
+<br>
+
+### BONUS modules / yet to decide
+
+####  MINOR | Health check and status page system with automated backups and disaster recovery procedures (1p) - MARTA
+####  MINOR | User activity analytics and insights dashboard (1p) - EMILIE + CLÉO
+####  MINOR | Support for additional browsers (1p) - EMILIE
+####  MAJOR | Figma design (2p) - EMILIE 
+
+<br>
+
 > List of all chosen modules (Major and Minor)
 
 > Point calculation (Major = 2pts, Minor = 1pt)
@@ -109,6 +207,7 @@ choice"
 
 > Which team member(s) worked on each module
 <br>
+
 
 ## 10. Individual Contributions
 > Detailed breakdown of what each team member contributed
