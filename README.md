@@ -20,12 +20,45 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
 > section listing classic references related to the topic (documentation, articles, tutorials, etc.), as well as a description of how AI was used — specifying for which tasks and which parts of the project.
 <br>
 
-## 4. Team Information
-> For each team member mentioned at the top of the README.md, you must provide:
- 
- > ◦ Assigned role(s): PO, PM, Tech Lead, Developers, etc.
+## 4. The dream team :handshake:
+Our team consists of five members: Cléo Le Tron, Emilie Sellier, Manu Gimon, Cristina Manzanares and Marta López.\
+All of us are *developers* and, on top of that, three of us have other roles as well:
 
- > ◦ Brief description of their responsibilities.
+####  :tulip: Emilie  | *Product Owner*
+
+As PO, she made sure that the game has the necessary elements so that the users get the best experience. She decided which features made sense and she solved doubts about subject requirements and evaluations.
+She kept track of the overall tasks and the team members assigned to them.
+
+As a developer, she was in charge of the whole front-end and web design and she saw the potential for a new module using Figma for this project. Along with Cristina, who worked on the game on the front, they were in charge of the overall user and game experience.\
+She also kept in touch with the back-end developers to make sure the connection between back and front worked seamlessly.
+  
+#### :seedling: Marta  |  *Project Manager*
+
+As PM, she made sure the team had clear objectives and went over possible issues and how to approach them. She was in charge of scheduling the weekly meetings where she established an individual task debrief so that every team member could track their progress and show any new developments with the rest of the team.\
+She was vocal and active on the Whatsapp group, where she gave updates and meeting reminders.
+
+In terms of the project, she was in charge of creating the docker arquitecture and making sure everyone had a ready-to-use container.\
+She worked closely with the technical lead and the backend team to make the best informed and consensual decisions regarding the sructure and design of the project.
+
+#### :palm_tree: Manu |  *Technical Lead*
+
+As TL, he was in charge of dciding which languages and technologies we used, as well as giving insight on how the architecture should be. He also made sure the code quality was high and consistent throughout the whole project.\
+He established a pull authorization method in github and reviewed all the pull and merge requests before they were applied to the main branch.
+
+As a developer, he worked on the whole authentication system in the backend. He also made sure that the web was secure and protected against possible attacks.
+
+#### :potted_plant: Cléo |  *Developer (back)*
+
+He was the first member to start working on the project. He had knowldege and a keen interest on APIs, so he worked on the user database and requests related to it. He also worked on the API Gateway container, making sure the redirection of requests went to the proper microservice.
+
+He also had more knowledge on Github and its issues, projects and backlog, so he introduced the team to some great practices that were applied throughout the process and made a big difference.
+
+#### :maple_leaf: Cristina |  *Developer (front)*
+
+As a computer games enthusiast herself, she was the person who came up with the idea for the game, and later created it in the frontend. The game is completely original, she put together an aesthetic for it and a game experience with different settings, functionalities, components and customization options.
+
+She worked closely with Emilie in the frontend to make sure they were on the same page and everything went according to plan.
+
 <br>
 
 ## 5. Project Management
