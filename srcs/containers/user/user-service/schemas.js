@@ -85,6 +85,72 @@ const getUserById = {
   }
 };
 
+const getUserByName = {
+  description: 'Get user by username',
+  tags: ['Users'],
+  summary: 'User info by username',
+
+  params: {
+    type: 'object',
+    properties: {
+      username: { type: 'string' }
+    },
+    required: ['username']
+  },
+
+  response: {
+    200: {
+      description: 'user info',
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        alias: { type: 'string' },
+        bio: { type: 'string' },
+        avatar: { type: 'string' },
+        online_status: { type: 'boolean' },
+        created_at: { type: 'string' },
+        playing_time: { type: 'number' }
+      }
+    }
+  }
+};
+
+const getCredentialsCoincidence = {
+  description: 'Validate user credentials',
+  tags: ['Users'],
+  summary: 'Credentials validation',
+
+  body: {
+    type: 'object',
+    required: ['username', 'password'],
+    properties: {
+      username: { type: 'string' },
+      password: { type: 'string' }
+    }
+  },
+
+  response: {
+    200: {
+      description: 'Credentials valid',
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' },
+        userId: { type: 'number' }
+      }
+    },
+    401: {
+      description: 'Invalid credentials',
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
+      }
+    }
+  }
+};
+
+
 const updateUserById = {
   description: 'Partially update user by id',
   tags: ['Users'],
@@ -146,7 +212,7 @@ const deleteUserById = {
 const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
-  consumes: ['multipart/form-data'], // for swagger only
+ // consumes: ['multipart/form-data'], // for swagger only
   summary: 'upload avatar',
 
   params: {
@@ -157,13 +223,13 @@ const uploadAvatar = {
     required: ['userId']
   },
 
- /* body: {
+ /*body: {
     type: "object",
     required: ["avatar"],
     properties: {
-      avatar: { //type: 'object'
-        type: 'string',
-        format: 'binary'
+      avatar: { type: 'object'
+      //  type: 'string',
+      //  format: 'binary'
       }
     }
   },*/
@@ -181,13 +247,13 @@ const uploadAvatar = {
 };
 
 
-
-module.exports = {
+export default {
     getAllUsers,
     postUser,
     getUserById,
+    getUserByName,
+    getCredentialsCoincidence,
     updateUserById,
     deleteUserById,
     uploadAvatar
 }
-

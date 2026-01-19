@@ -1,10 +1,10 @@
-const fastify = require('fastify')({ logger: true })
-const swagger = require('@fastify/swagger')
-const swaggerUI = require('@fastify/swagger-ui')
-const multipart = require('@fastify/multipart')
-const static = require('@fastify/static') //for index.html
-const path = require('node:path') //for index.html
-const routes = require('./routes')
+import Fastify from 'fastify'
+import swagger from '@fastify/swagger'
+import swaggerUI from '@fastify/swagger-ui'
+import multipart from '@fastify/multipart'
+import routes from './routes.js'
+
+const fastify = Fastify({ logger: true })
 
 fastify.register(multipart, {
   limits: {
@@ -16,17 +16,22 @@ fastify.register(multipart, {
     headerPairs: 2000,  // Max number of header key=>value pairs
     parts: 1000         // For multipart forms, the max number of parts (fields + files)
   }//,
- // attachFieldsToBody: true
+  //attachFieldsToBody: true
 });
 
 fastify.register(swagger, {
    openapi: {
+    openapi: "3.0.0",
     info: {
       title: 'Transcendance API',
       description: 'Routes documentation with Swagger',
       version: '1.0.0'
-    }
-  }
+    },
+    servers: [{
+      url: "/api/users"
+    }]
+  },
+  exposeRoute: true
 })
 
 fastify.register(swaggerUI, {
@@ -34,20 +39,6 @@ fastify.register(swaggerUI, {
   uiConfig: { docExpansion: 'list' }
 })
 
-// Servir archivos estáticos desde /public
-fastify.register(static, {
-  root: path.join(__dirname, 'public'),
-  prefix: '/', // la URL base (ej: /index.html)
-});
-
-// Ruta por defecto para servir index.html
-fastify.get('/', async (req, reply) => {
-  return reply.sendFile('index.html'); // archivo dentro de /public
-});
-
 fastify.register(routes)
 
-console.log(fastify.printRoutes());
-
 fastify.listen({ port: 3000, host: "0.0.0.0" });
-
