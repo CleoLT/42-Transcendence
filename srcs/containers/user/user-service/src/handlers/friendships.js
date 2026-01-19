@@ -7,15 +7,22 @@ async function getAllFriendships(req, reply) {
 
 async function newFriendship(req, reply) {
 
-    const { id1, id2 } = req.body;
+    let { id1, id2 } = req.body;
+    let revert = false
 
-    //check friendship, if exists update friendship
-        //return etc
-
-    //else
-    const result = await query.addFriendship(id1, id2)
-    reply.code(201).send({ id: result.insertId });
-
+    if (id1 > id2) {
+        [id1, id2] = [id2, id1]
+        revert = true
+    }
+    
+    const rows = await query.checkIfFrienshipExists(id1, id2)
+    if (rows.length > 0) {
+        const result = await query.acceptPendingFriendship(id1, id2, revert)
+        reply.code(201).send({ id: result.insertId });
+    } else {
+        const result = await query.createFriendship(id1, id2, revert)
+        reply.code(201).send({ id: result.insertId });
+    }
 }    
 
 export default {

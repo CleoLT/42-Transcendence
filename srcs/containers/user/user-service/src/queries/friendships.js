@@ -13,9 +13,9 @@ async function getAllFriendships() {
     return connection(conn => conn.query('SELECT * FROM friendships'))
 }
 
-async function addFriendship(id1, id2) {
+async function createFriendship(id1, id2, revert) {
 
-    if (id1 > id2) 
+    if (revert)
         return connection(conn => conn.query(
             `INSERT INTO friendships (user1_id, user2_id, user2_accept) 
             VALUES (?, ?, ?)`,
@@ -29,7 +29,41 @@ async function addFriendship(id1, id2) {
         ))
 }
 
+async function checkIfFrienshipExists(id1, id2) {
+  return connection(conn => conn.query(`
+    SELECT * FROM friendships 
+    WHERE user1_id = ? AND user2_id = ?
+    LIMIT 1`,
+    [id1, id2]
+  ))
+}
+
+async function acceptPendingFriendship(id1, id2, revert) {
+  let rows
+  if (revert) {
+    rows = connection(conn => conn.query(`
+    UPDATE friendships 
+    SET user2_accept = true 
+    WHERE user1_id = ? AND user2_id = ?
+    LIMIT 1`,
+    [id1, id2]
+  ))
+  } else {
+    rows = connection(conn => conn.query(`
+    UPDATE friendships 
+    SET user1_accept = true 
+    WHERE user1_id = ? AND user2_id = ?
+    LIMIT 1`,
+    [id1, id2]
+  ))
+  }
+  return rows
+}
+
+
 export default {
     getAllFriendships,
-    addFriendship
+    createFriendship, 
+    checkIfFrienshipExists,
+    acceptPendingFriendship
 }
