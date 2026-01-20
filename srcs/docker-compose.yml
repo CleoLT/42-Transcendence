@@ -18,8 +18,6 @@ services:
     build: ./containers/api_gateway
     ports:
       - "3000:3000"
-    #expose:
-     # - "3000"
     networks:
       - main
     depends_on:
