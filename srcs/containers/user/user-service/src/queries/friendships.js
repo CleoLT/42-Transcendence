@@ -45,10 +45,23 @@ async function acceptPendingFriendship(id1, id2, revert) {
     ))
 }
 
+async function authorizeToPlay(id1, id2, revert) {
+    return connection(conn => conn.query(`
+      UPDATE friendships 
+      SET ${revert ? "user2_authorization" : "user1_authorization"} = true 
+      WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
+      LIMIT 1`,
+      [id1, id2]
+    ))
+
+    //if user1_accept !== true and user2_accpet != true 
+    //error they are not friends yet
+}
 
 export default {
     getAllFriendships,
     getFriendshipById,
     createFriendship, 
-    acceptPendingFriendship
+    acceptPendingFriendship,
+    authorizeToPlay
 }

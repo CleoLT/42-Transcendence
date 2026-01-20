@@ -17,6 +17,7 @@ const routes = async function(fastify, options) {
 
     fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships)
     fastify.post('/friendships', { schema: friendSchema.newFriendship }, friendHandler.newFriendship)
+    fastify.post('/friendships/play-status', { schema: friendSchema.addAuthorizationToPlay }, friendHandler.addAuthorizationToPlay)
 }
 
 export default routes
