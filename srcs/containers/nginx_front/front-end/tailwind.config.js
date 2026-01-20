@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
-    extend: {}
+    extend: {
+      fontFamily: {
+        corben: ["Corben", "sans-serif"],       // Regular + Bold
+        sixtyfour: ["Sixtyfour", "sans-serif"], // Close style
+      },
+    },
   },
   plugins: []
-};
+}
