@@ -21,14 +21,14 @@ clean: down
 
 # stops, removes & cleans in depth, including images and cached docker processes
 deep-clean: clean
-	docker rmi -f transcendence-nginx_front:latest transcendence-api_gateway:latest transcendence-auth-service:latest transcendence-user-service:latest transcendence-user-db:latest transcendence-game_history-service:latest >/dev/null || true
+	docker-compose -f srcs/docker-compose.yml down -v --rmi all || true
 	docker system prune -a -f || true
 	docker volume prune -f || true
 
 restart: down up
 
-remake: down
-	docker rmi -f transcendence-nginx_front:latest transcendence-api_gateway:latest transcendence-auth-service:latest transcendence-user-service:latest transcendence-user-db:latest transcendence-game_history-service:latest >/dev/null || true
+remake: 
+	docker-compose -f srcs/docker-compose.yml down --rmi all || true
 	docker-compose -f srcs/docker-compose.yml up -d
 
 rebuild: deep-clean build up
