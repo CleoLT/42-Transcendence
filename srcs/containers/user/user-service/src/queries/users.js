@@ -86,44 +86,6 @@ function uploadAvatar(userId, filepath) {
     return getUserById(userId)
     
 }
-/*async function getAllUsers() {
-    //return db.prepare('SELECT * FROM users').all();
-    const conn = await pool.getConnection()
-    try {
-        const rows = await conn.query('SELECT * FROM users')
-        return rows
-    } finally {
-        conn.release()
-    }
-}
-
-async function addUser(username, password, email) {
-    const conn = await pool.getConnection()
-     try {
-        const rows = await conn.query(
-            `INSERT INTO users (username, email, password) 
-            VALUES (?, ?, ?)`,
-            [username, email, password]
-        )
-        return rows
-    } finally {
-        conn.release()
-    }
-}
-
-async function getUserById(id) {
-    const conn = await pool.getConnection()
-     try {
-        const rows = await conn.query(
-            'SELECT * FROM users WHERE id = ?',
-            [id]
-        )
-        return rows[0]
-    } finally {
-        conn.release()
-    }
-}*/
-
 
 export default { 
     getAllUsers, 

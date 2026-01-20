@@ -40,9 +40,13 @@ const newFriendship = {
         description: 'Friendship actualized',
         type: 'object',
         properties: {
-          id: { type: 'number' }//,
-          //user1_id: { type: 'number' },
-          //user2_id: { type: 'number' }
+          id: { type: 'number' },
+          user1_id: { type: 'number' },
+          user2_id: { type: 'number' },
+          user1_accept: { type: 'number' },
+          user2_accept: { type: 'number' },
+          user1_authorization: { type: 'number' },
+          user2_authorization: { type: 'number' }
         }
       }
     }

@@ -31,10 +31,12 @@ CREATE TABLE IF NOT EXISTS `friendships` (
 
   CONSTRAINT `fk_friendships_user1`
     FOREIGN KEY (`user1_id`)
-    REFERENCES `users`(`id`),
+    REFERENCES `users`(`id`)
+    ON DELETE CASCADE,
 
   CONSTRAINT `fk_friendships_user2`
     FOREIGN KEY (`user2_id`)
     REFERENCES `users`(`id`)
+    ON DELETE CASCADE
 )ENGINE=InnoDB;
 
