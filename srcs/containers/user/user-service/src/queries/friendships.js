@@ -24,38 +24,25 @@ async function getFriendshipById(id1, id2) {
 }
 
 async function createFriendship(id1, id2, revert) {
-    if (revert === true)
-     connection(conn => conn.query(
-            `INSERT INTO friendships (user1_id, user2_id, user2_accept) 
-            VALUES (?, ?, ?)`,
-            [id1, id2, 1]
-        ))
-    else
-        connection(conn => conn.query(
-            `INSERT INTO friendships (user1_id, user2_id, user1_accept) 
-            VALUES (?, ?, ?)`,
-            [id1, id2, 1]
-        ))
+    return connection(conn => conn.query(
+         `INSERT INTO friendships (
+            user1_id, 
+            user2_id, 
+            ${revert ? "user2_accept" : "user1_accept"}
+          ) 
+          VALUES (?, ?, ?)`,
+          [id1, id2, 1]
+    ))
 }
 
 async function acceptPendingFriendship(id1, id2, revert) {
-  if (revert) {
-    connection(conn => conn.query(`
+    return connection(conn => conn.query(`
       UPDATE friendships 
-      SET user2_accept = true 
+      SET ${revert ? "user2_accept" : "user1_accept"} = true 
       WHERE user1_id = ? AND user2_id = ?
       LIMIT 1`,
       [id1, id2]
     ))
-  } else {
-    connection(conn => conn.query(`
-      UPDATE friendships 
-      SET user1_accept = true 
-      WHERE user1_id = ? AND user2_id = ?
-      LIMIT 1`,
-      [id1, id2]
-    ))
-  }
 }
 
 
