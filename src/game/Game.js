@@ -3,7 +3,7 @@ import { LaneSystem } from './LaneSystem.js';
 import { BlossomSystem } from './BlossomSystem.js';
 import { WindSystem } from './WindSystem.js';
 import { RoundSystem } from './RoundSystem.js';
-import { UIManager } from './UIManager.js';
+// import { UIManager } from './UIManager.js';
 import { Renderer } from './Renderer.js';
 import { AI } from './AI.js';
 import { SpriteLibrary } from './SpriteLibrary.js';
@@ -30,7 +30,7 @@ export class Game {
 		this.blossomSystem = null;
 		this.windSystem = null;
 		this.roundSystem = null;
-		this.uiManager = null;
+		// this.uiManager = null;
 		this.renderer = null;
 		this.perfectCatchEffects = [];
 		this.missEffects = []; // Water stain effects for misses
@@ -64,8 +64,8 @@ export class Game {
 		this.blossomSystem = new BlossomSystem(this.laneSystem, this.canvas.width, this.canvas.height);
 		this.windSystem = new WindSystem();
 		this.roundSystem = new RoundSystem(this.players);
-		this.uiManager = new UIManager(this);
-		this.uiManager.init(this.canvas.width, this.canvas.height);
+		// this.uiManager = new UIManager(this);
+		// this.uiManager.init(this.canvas.width, this.canvas.height);
 		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint);
 
 		// Seed starting lane ownership so the UI has clear sides
@@ -199,9 +199,9 @@ export class Game {
 		this.missEffects = this.missEffects.filter(e => e.timer > 0);
 
 		// Refresh UI overlays tied to players, rounds and wind
-		if (this.uiManager && this.state === 'playing') {
-			this.uiManager.update(this.players, this.roundSystem, this.windSystem, dt);
-		}
+		// if (this.uiManager && this.state === 'playing') {
+		// 	this.uiManager.update(this.players, this.roundSystem, this.windSystem, dt);
+		// }
 	}
 
 	/**
@@ -410,7 +410,7 @@ export class Game {
 		// Record game-end state and figure out the winner
 		this.state = 'gameEnd';
 		const winner = this.roundSystem.getWinner();
-		this.uiManager.showGameEnd(winner);
+		// this.uiManager.showGameEnd(winner);
 
 		// Reveal reset button so players can start over
 		const resetBtn = document.getElementById('reset-button');
