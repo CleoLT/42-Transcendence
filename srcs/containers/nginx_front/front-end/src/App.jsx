@@ -7,7 +7,7 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col h-screen bg-cover bg-center items-center justify-center"
+      className="flex flex-col h-screen bg-cover items-center justify-center"
       style={{backgroundImage: "url("+ background + ")"}}>
       <Header/>
       <Content/>
