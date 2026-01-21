@@ -10,6 +10,15 @@ async function connection(fct) {
   }
 }
 
+async function userExists(userId) {
+  const rows = await connection(conn => conn.query(
+    "SELECT 1 FROM users WHERE id = ? LIMIT 1",
+    [userId]
+  ));
+  return rows[0] || null;
+}
+
+
 async function getAllUsers() {
     return connection(conn => conn.query('SELECT * FROM users'))
 }
@@ -88,6 +97,7 @@ function uploadAvatar(userId, filepath) {
 }
 
 export default { 
+    userExists,
     getAllUsers, 
     addUser, 
     getUserById,
