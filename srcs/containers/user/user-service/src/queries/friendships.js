@@ -23,6 +23,42 @@ async function getFriendshipById(id1, id2) {
     return rows[0] || null
 }
 
+async function getFriendsByUserId(id) {
+    return connection(conn => conn.query(
+            `SELECT * FROM friendships 
+            WHERE (user1_id = ? OR user2_id = ?)
+            AND user1_accept = true 
+            AND user2_accept = true`,
+            [id, id]
+        ))
+}
+
+async function getPendingFriendships(id) {
+    return connection(conn => conn.query(
+            `SELECT * FROM friendships 
+            WHERE (user1_id = ? 
+                AND user1_accept = true 
+                AND user2_accept = false)
+            OR (user2_id = ? 
+                AND user1_accept = false 
+                AND user2_accept = true)`,
+            [id, id]
+        ))
+}
+
+async function getReceivedFriendRequests(id) {
+    return connection(conn => conn.query(
+            `SELECT * FROM friendships 
+            WHERE (user1_id = ? 
+                AND user1_accept = false 
+                AND user2_accept = true)
+            OR (user2_id = ? 
+                AND user1_accept = true 
+                AND user2_accept = false)`,
+            [id, id]
+        ))
+}
+
 async function createFriendship(id1, id2, revert) {
     return connection(conn => conn.query(
          `INSERT INTO friendships (
@@ -45,7 +81,7 @@ async function acceptPendingFriendship(id1, id2, revert) {
     ))
 }
 
-async function checkIfAreFriends(id1, id2) {
+/*async function checkIfAreFriends(id1, id2) {
   const rows = await connection(conn => conn.query(`
       SELECT * FROM friendships
       WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
@@ -53,7 +89,7 @@ async function checkIfAreFriends(id1, id2) {
       [id1, id2]
   ))
   return rows[0] || null
-}
+}*/
 
 async function authorizeToPlay(id1, id2, revert) {
 
@@ -69,6 +105,9 @@ async function authorizeToPlay(id1, id2, revert) {
 export default {
     getAllFriendships,
     getFriendshipById,
+    getFriendsByUserId,
+    getPendingFriendships,
+    getReceivedFriendRequests,
     createFriendship, 
     acceptPendingFriendship,
     authorizeToPlay

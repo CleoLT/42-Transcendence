@@ -20,6 +20,14 @@ const friendshipResponse = {
   }
 }
 
+const paramId = {
+  type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+}
+
 const twoIdBody = {
       type: 'object',
       required: ['id1', 'id2'],
@@ -38,8 +46,60 @@ const getAllFriendships = {
     response: {
         200: {
             description: 'Friendships list',
-            ...friendshipResponse
+            type: 'array',
+            items: friendshipResponse
         }
+    }
+}
+
+const getAllFriendsByUserId = {
+    description: 'Get all friendships by user id',
+    tags: ['Friendships'],
+    summary: 'Friendships list for this user',
+
+    params: paramId,
+
+    response: {
+        200: {
+            description: 'Friendships list',
+            type: 'array',
+            items: friendshipResponse
+        },
+        404: errorResponse
+    }
+}
+
+const getPendingFriendships = {
+    description: 'Get all pending friendships by user id (the other user have to respond)',
+    tags: ['Friendships'],
+    summary: 'Pending friendships list for this user (the other user have to respond)',
+
+    params: paramId,
+
+    response: {
+        200: {
+            description: 'Pending friendships list',
+            type: 'array',
+            items: friendshipResponse
+        },
+        404: errorResponse
+    }
+}
+
+const getReceivedFriendRequests = {
+    description: 'Get all pending friendships by user id (the user have to respond)',
+    tags: ['Friendships'],
+    summary: 'Pending friendships list for this user (the user have to respond)',
+
+    params: paramId,
+
+    response: {
+        200: {
+            description: 'Pending friendships list',
+            type: 'array',
+            items: friendshipResponse
+        },
+        404: errorResponse
     }
 }
 
@@ -80,6 +140,9 @@ const addAuthorizationToPlay = {
 
 export default {
     getAllFriendships,
+    getAllFriendsByUserId,
+    getPendingFriendships,
+    getReceivedFriendRequests,
     newFriendship,
     addAuthorizationToPlay
 }

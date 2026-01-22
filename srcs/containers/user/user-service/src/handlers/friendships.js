@@ -6,6 +6,45 @@ async function getAllFriendships(req, reply) {
     reply.code(200).send(friendships);
 }
 
+async function getAllFriendsByUserId(req, reply) {
+    const { userId } =  req.params
+
+    const user = await userQueries.userExists(userId)
+    if (user === null) {
+        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
+        return
+    }
+
+    const result = await query.getFriendsByUserId(userId)
+    reply.code(200).send(result) 
+}
+
+async function getPendingFriendships(req, reply) {
+    const { userId } =  req.params
+
+    const user = await userQueries.userExists(userId)
+    if (user === null) {
+        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
+        return
+    }
+
+    const result = await query.getPendingFriendships(userId)
+    reply.code(200).send(result) 
+}
+
+async function getReceivedFriendRequests(req, reply) {
+    const { userId } =  req.params
+
+    const user = await userQueries.userExists(userId)
+    if (user === null) {
+        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
+        return
+    }
+
+    const result = await query.getReceivedFriendRequests(userId)
+    reply.code(200).send(result) 
+}
+
 async function newFriendship(req, reply) {
 
     let { id1, id2 } = req.body;
@@ -75,6 +114,9 @@ async function addAuthorizationToPlay(req, reply) {
 
 export default {
     getAllFriendships,
+    getAllFriendsByUserId,
+    getPendingFriendships,
+    getReceivedFriendRequests,
     newFriendship,
     addAuthorizationToPlay
 }

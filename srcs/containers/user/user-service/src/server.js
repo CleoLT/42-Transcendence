@@ -15,6 +15,15 @@ const fastify = Fastify({
   }
 })
 
+//si hay un error no encontrado fastify devuelve 500 por defecto
+fastify.setErrorHandler((err, req, reply) => {
+  reply.code(err.statusCode || 500).send({
+    statusCode: err.statusCode || 500,
+    error: err.name || "Internal Server Error",
+    message: err.message
+  })
+})
+
 fastify.register(multipart, {
   limits: {
     fieldNameSize: 100, // Max field name size in bytes
