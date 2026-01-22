@@ -4,7 +4,16 @@ import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import routes from './routes.js'
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({
+  logger: true,
+  ajv: {
+    customOptions: {
+      strict: true,
+      allErrors: true,
+      removeAdditional: false
+    }
+  }
+})
 
 fastify.register(multipart, {
   limits: {

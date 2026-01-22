@@ -1,23 +1,44 @@
+const errorResponse = {
+    type: 'object',
+    properties: {
+        statusCode: { type: 'number' },
+        error: { type: 'string' },
+        message: { type: 'string' }
+    }
+}
+
+const friendshipResponse = {
+  type: 'object',
+  properties: {
+      id: { type: 'number' },
+      user1_id: { type: 'number' },
+      user2_id: { type: 'number' },
+      user1_accept: { type: 'number' },
+      user2_accept: { type: 'number' },
+      user1_authorization: { type: 'number' },
+      user2_authorization: { type: 'number' }
+  }
+}
+
+const twoIdBody = {
+      type: 'object',
+      required: ['id1', 'id2'],
+      additionalProperties: false,
+      properties: {
+        id1: { type: 'number' },
+        id2: { type: 'number' }
+      }
+}
+
 const getAllFriendships = {
     description: 'Get all friendships',
-        tags: ['Friendships'], // agrupa rutas en Swagger
-        summary: 'Friendships list',
-        response: {
+    tags: ['Friendships'],
+    summary: 'Friendships list',
+
+    response: {
         200: {
             description: 'Friendships list',
-            type: 'array',
-            items: {
-            type: 'object',
-            properties: {
-                id: { type: 'number' },
-                user1_id: { type: 'number' },
-                user2_id: { type: 'number' },
-                user1_accept: { type: 'boolean' }, 
-                user2_accept: { type: 'boolean' }, 
-                user1_authorization: { type: 'boolean' },
-                user2_authorization: { type: 'boolean' }
-            }
-            }
+            ...friendshipResponse
         }
     }
 }
@@ -27,28 +48,15 @@ const newFriendship = {
     tags: ['Friendships'],
     summary: 'Create friendship',
 
-    body: {
-      type: 'object',
-      properties: {
-        id1: { type: 'number' },
-        id2: { type: 'number' }
-      }
-    },
+    body: twoIdBody,
 
     response: {
       201: {
         description: 'Friendship actualized',
-        type: 'object',
-        properties: {
-          id: { type: 'number' },
-          user1_id: { type: 'number' },
-          user2_id: { type: 'number' },
-          user1_accept: { type: 'number' },
-          user2_accept: { type: 'number' },
-          user1_authorization: { type: 'number' },
-          user2_authorization: { type: 'number' }
-        }
-      }
+        ...friendshipResponse
+      },
+      400: errorResponse,
+      404: errorResponse
     }
 }
 
@@ -57,37 +65,16 @@ const addAuthorizationToPlay = {
     tags: ['Friendships'],
     summary: 'Authorize a friend to play',
 
-    body: {
-      type: 'object',
-      properties: {
-        id1: { type: 'number' },
-        id2: { type: 'number' }
-      }
-    },
+    body: twoIdBody,
 
     response: {
       201: {
         description: 'Friendship actualized',
-        type: 'object',
-        properties: {
-          id: { type: 'number' },
-          user1_id: { type: 'number' },
-          user2_id: { type: 'number' },
-          user1_accept: { type: 'number' },
-          user2_accept: { type: 'number' },
-          user1_authorization: { type: 'number' },
-          user2_authorization: { type: 'number' }
-        }
+        ...friendshipResponse
       },
-      404: {
-        descripton: 'Frienship does not exist',
-        type: 'object',
-        properties: {
-          statusCode: { type: 'number' },
-          error: { type: 'string' },
-          message: { type: 'string' }
-        }
-      }
+      400: errorResponse,
+      403: errorResponse,
+      404: errorResponse
     }
 }
 
@@ -96,3 +83,4 @@ export default {
     newFriendship,
     addAuthorizationToPlay
 }
+

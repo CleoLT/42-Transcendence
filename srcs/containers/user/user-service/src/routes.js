@@ -16,8 +16,11 @@ const routes = async function(fastify, options) {
     fastify.post('/:userId/avatar', { schema: userSchema.uploadAvatar }, userHandler.uploadAvatar)
 
     fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships)
+    //fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId }, friendHandler.getAllFriendsByUserId)
+    //fastify.get('/:userId/friendships/pending')
+    //fastify.get('/:userId/friendships/requests')
     fastify.post('/friendships', { schema: friendSchema.newFriendship }, friendHandler.newFriendship)
-    fastify.post('/friendships/play-status', { schema: friendSchema.addAuthorizationToPlay }, friendHandler.addAuthorizationToPlay)
+    fastify.post('/friendships/play-authorization', { schema: friendSchema.addAuthorizationToPlay }, friendHandler.addAuthorizationToPlay)
 }
 
 export default routes

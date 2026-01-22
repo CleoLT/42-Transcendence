@@ -10,6 +10,11 @@ async function newFriendship(req, reply) {
 
     let { id1, id2 } = req.body;
 
+    if (id1 === id2) {
+        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        return
+    }
+
     const user1 = await userQueries.userExists(id1)
     const user2 = await userQueries.userExists(id2)
 
@@ -38,6 +43,12 @@ async function newFriendship(req, reply) {
 
 async function addAuthorizationToPlay(req, reply) {
     let { id1, id2 } = req.body;
+
+    if (id1 === id2) {
+        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        return
+    }
+
     let revert = false
 
     if (id1 > id2) {
