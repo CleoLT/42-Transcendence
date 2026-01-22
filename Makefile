@@ -1,55 +1,82 @@
+DEV_PROFILE  = dev
+PROD_PROFILE = prod
+
+# Default profile
+PROFILE ?= $(DEV_PROFILE)
+
+DC = docker-compose -f srcs/docker-compose.yml --profile $(PROFILE)
+
 all: build up
 
 build:
-	docker-compose -f srcs/docker-compose.yml build
-
-# -f especifica el path del compose file
+	$(DC) build
 
 up:
-	docker-compose -f srcs/docker-compose.yml up -d
+	$(DC) up -d
 
-# stops AND removes containers
 down:
-	docker-compose -f srcs/docker-compose.yml down || true
-
-# down + removes volumes
-clean: down
-	docker-compose -f srcs/docker-compose.yml down -v || true
-#	-sudo rm -rf /home/martalc/data/wordpress/* || true
-#	-sudo rm -rf /home/martalc/data/database/* || true
-# quita los host files, si no los quitamos volverian a aparecer en los nuevos contenedores porque realmente estos volumes son bind mounts (nosotros escogemos la ruta donde guarda el host los archivos)
-
-# stops, removes & cleans in depth, including images and cached docker processes
-deep-clean: clean
-	docker-compose -f srcs/docker-compose.yml down -v --rmi all || true
-	docker system prune -a -f || true
-	docker volume prune -f || true
+	$(DC) down || true
 
 restart: down up
 
-remake: 
-	docker-compose -f srcs/docker-compose.yml down --rmi all || true
-	docker-compose -f srcs/docker-compose.yml up -d
+clean:
+	$(DC) down -v || true
+	# anonymous volumes like /app/node_modules are removed here
+
+deep-clean: clean
+	$(DC) down -v --rmi all || true
+	docker system prune -a -f || true
+	docker volume prune -f || true
+
+remake:
+	$(DC) down --rmi all || true
+	$(DC) up -d
 
 rebuild: deep-clean build up
 
-# Show logs for all services
-logs:
-	docker-compose -f srcs/docker-compose.yml logs -f || true
+# profile shortcuts
+dev:
+	$(MAKE) PROFILE=$(DEV_PROFILE) all
 
-# -f del final es 'force', para que no te pregunte
+prod:
+	$(MAKE) PROFILE=$(PROD_PROFILE) all
+
+dev-up:
+	$(MAKE) PROFILE=$(DEV_PROFILE) up
+
+prod-up:
+	$(MAKE) PROFILE=$(PROD_PROFILE) up
+
+dev-clean:
+	$(MAKE) PROFILE=$(DEV_PROFILE) clean
+
+prod-clean:
+	$(MAKE) PROFILE=$(PROD_PROFILE) clean
+
+logs:
+	$(DC) logs -f || true
+
+profile:
+	@echo "Active profile: $(PROFILE)"
 
 help:
 	@echo "Makefile rules:"
-	@echo "  all           : build and start containers"
-	@echo "  build         : build images"
-	@echo "  up            : start containers in detached mode"
-	@echo "  down          : stop and remove containers"
-	@echo "  clean         : stop and remove containers + remove volumes"
-	@echo "  deep-clean    : stop and remove containers + remove volumes + remove images + prune"
-	@echo "  restart       : remove + restart containers (same images)"
-	@echo "  remake        : remove containers + remove images + restart containers"
-	@echo "  rebuild       : deep-clean, and start containers"
-	@echo "  logs          : show live logs of all services"
+	@echo "  make dev            : build + up (DEV profile)"
+	@echo "  make prod           : build + up (PROD profile)"
+	@echo "  make up             : up using current profile (default: dev)"
+	@echo "  make build          : build images"
+	@echo "  make down           : stop + remove containers"
+	@echo "  make clean          : stop + remove containers & volumes"
+	@echo "  make deep-clean     : clean + remove images + prune"
+	@echo "  make restart        : remove + restart containers (same images)"
+	@echo "  make remake         : remove containers + remove images + restart conatiners"
+	@echo "  make rebuild        : deep-clean and start containers"
+	@echo "  make logs           : follow logs"
+	@echo "  make profile        : show active profile"
+	@echo ""
+	@echo "Override profile manually:"
+	@echo "  make PROFILE=prod up"
 
-.PHONY: all build up down clean logs help
+.PHONY: all build up down restart clean deep-clean remake rebuild \
+        dev prod dev-up prod-up dev-clean prod-clean logs profile help
+
