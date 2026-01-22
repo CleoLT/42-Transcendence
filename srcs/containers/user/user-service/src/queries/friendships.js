@@ -81,7 +81,7 @@ async function acceptPendingFriendship(id1, id2, revert) {
     ))
 }
 
-/*async function checkIfAreFriends(id1, id2) {
+async function checkIfAreFriends(id1, id2) {
   const rows = await connection(conn => conn.query(`
       SELECT * FROM friendships
       WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
@@ -89,7 +89,7 @@ async function acceptPendingFriendship(id1, id2, revert) {
       [id1, id2]
   ))
   return rows[0] || null
-}*/
+}
 
 async function authorizeToPlay(id1, id2, revert) {
 
@@ -97,6 +97,33 @@ async function authorizeToPlay(id1, id2, revert) {
       UPDATE friendships 
       SET ${revert ? "user2_authorization" : "user1_authorization"} = true 
       WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
+      LIMIT 1`,
+      [id1, id2]
+    ))
+}
+
+async function cancelFriendship(id1, id2, revert) {
+
+    return connection(conn => conn.query(`
+      UPDATE friendships 
+      SET ${revert ? "user2_accept" : "user1_accept"} = false,
+        user1_authorization = false,
+        user2_authorization = false
+      WHERE user1_id = ? AND user2_id = ?
+      LIMIT 1`,
+      [id1, id2]
+    ))
+}
+
+async function cancelAuthorization(id1, id2, revert) {
+
+    return connection(conn => conn.query(`
+      UPDATE friendships 
+      SET ${revert ? "user2_authorization" : "user1_authorization"} = false 
+      WHERE user1_id = ? 
+        AND user2_id = ? 
+        AND user1_accept = true 
+        AND user2_accept = true
       LIMIT 1`,
       [id1, id2]
     ))
@@ -110,5 +137,8 @@ export default {
     getReceivedFriendRequests,
     createFriendship, 
     acceptPendingFriendship,
-    authorizeToPlay
+    checkIfAreFriends,
+    authorizeToPlay,
+    cancelFriendship,
+    cancelAuthorization
 }

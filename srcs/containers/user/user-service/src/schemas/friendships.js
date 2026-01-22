@@ -138,12 +138,48 @@ const addAuthorizationToPlay = {
     }
 }
 
+const cancelFriendship = {
+    description: 'Cancel a friendship, always initiate by id1 ---> to id2',
+    tags: ['Friendships'],
+    summary: 'Cancel friendship',
+
+    body: twoIdBody,
+
+    response: {
+      201: {
+        description: 'Friendship actualized',
+        ...friendshipResponse
+      },
+      400: errorResponse,
+      404: errorResponse
+    }
+}
+
+const cancelAuthorization = {
+    description: 'Cancel an authorization to play, always initiate by id1 ---> to id2',
+    tags: ['Friendships'],
+    summary: 'Cancel authorization to play',
+
+    body: twoIdBody,
+
+    response: {
+      201: {
+        description: 'Friendship actualized',
+        ...friendshipResponse
+      },
+      400: errorResponse,
+      404: errorResponse
+    }
+}
+
 export default {
     getAllFriendships,
     getAllFriendsByUserId,
     getPendingFriendships,
     getReceivedFriendRequests,
     newFriendship,
-    addAuthorizationToPlay
+    addAuthorizationToPlay,
+    cancelFriendship,
+    cancelAuthorization
 }
 

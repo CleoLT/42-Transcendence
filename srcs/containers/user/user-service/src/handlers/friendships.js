@@ -112,11 +112,77 @@ async function addAuthorizationToPlay(req, reply) {
     reply.code(201).send(friendship)
 }
 
+async function cancelFriendship(req, reply) {
+    let { id1, id2 } = req.body;
+
+    if (id1 === id2) {
+        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        return
+    }
+
+    let revert = false
+
+    if (id1 > id2) {
+        [id1, id2] = [id2, id1]
+        revert = true
+    }
+
+    const rows = await query.getFriendshipById(id1, id2)
+    if (rows === null) {
+        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
+        return
+    }
+
+    /*const friend = await query.checkIfAreFriends(id1, id2)
+    if (friend === null){
+        reply.code(403).send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
+        return
+    }*/
+
+    await query.cancelFriendship(id1, id2, revert)
+    const friendship = await query.getFriendshipById(id1, id2)
+    reply.code(201).send(friendship)
+}
+
+async function cancelAuthorization(req, reply) {
+    let { id1, id2 } = req.body;
+
+    if (id1 === id2) {
+        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        return
+    }
+
+    let revert = false
+
+    if (id1 > id2) {
+        [id1, id2] = [id2, id1]
+        revert = true
+    }
+
+    const rows = await query.getFriendshipById(id1, id2)
+    if (rows === null) {
+        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
+        return
+    }
+
+    const friend = await query.checkIfAreFriends(id1, id2)
+    if (friend === null){
+        reply.code(403).send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
+        return
+    }
+
+    await query.cancelAuthorization(id1, id2, revert)
+    const friendship = await query.getFriendshipById(id1, id2)
+    reply.code(201).send(friendship)
+}
+
 export default {
     getAllFriendships,
     getAllFriendsByUserId,
     getPendingFriendships,
     getReceivedFriendRequests,
     newFriendship,
-    addAuthorizationToPlay
+    addAuthorizationToPlay,
+    cancelFriendship,
+    cancelAuthorization
 }
