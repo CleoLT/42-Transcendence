@@ -99,12 +99,25 @@ export class Game {
 	 * Registers high-level DOM event listeners that affect game state.
 	 */
 	setupEventListeners() {
-		// Start the game from the menu when space is pressed
-		document.addEventListener('keydown', (e) => {
+		// Guardar referencia al handler para poder limpiarlo
+		this.spaceKeyHandler = (e) => {
 			if (e.code === 'Space' && this.state === 'menu') {
 				this.startGame();
 			}
-		});
+		};
+		
+		// Start the game from the menu when space is pressed
+		document.addEventListener('keydown', this.spaceKeyHandler);
+	}
+
+	/**
+	 * Limpia los event listeners del juego.
+	 */
+	cleanup() {
+		if (this.spaceKeyHandler) {
+			document.removeEventListener('keydown', this.spaceKeyHandler);
+			this.spaceKeyHandler = null;
+		}
 	}
 
 	/**

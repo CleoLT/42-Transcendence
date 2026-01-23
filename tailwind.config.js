@@ -2,7 +2,12 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'sixtyfour': ['Sixtyfour', 'sans-serif'],
+        'corben': ['Corben', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

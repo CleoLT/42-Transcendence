@@ -9,16 +9,21 @@ export class InputManager {
 		this.keys = new Set();
 		this.keysPressed = new Set();
 
-		// Listen for DOM keydown events and update sets accordingly
-		window.addEventListener('keydown', (e) => {
+		// Guardar referencias a los handlers para poder limpiarlos
+		this.keydownHandler = (e) => {
 			this.keys.add(e.code);
 			this.keysPressed.add(e.code);
-		});
+		};
+
+		this.keyupHandler = (e) => {
+			this.keys.delete(e.code);
+		};
+
+		// Listen for DOM keydown events and update sets accordingly
+		window.addEventListener('keydown', this.keydownHandler);
 
 		// On keyup, remove the key from the held set
-		window.addEventListener('keyup', (e) => {
-			this.keys.delete(e.code);
-		});
+		window.addEventListener('keyup', this.keyupHandler);
 	}
 
 	/**
@@ -65,6 +70,20 @@ export class InputManager {
 	 */
 	simulateKeyRelease(code) {
 		this.keys.delete(code);
+	}
+
+	/**
+	 * Limpia los event listeners para evitar memory leaks.
+	 */
+	cleanup() {
+		if (this.keydownHandler) {
+			window.removeEventListener('keydown', this.keydownHandler);
+		}
+		if (this.keyupHandler) {
+			window.removeEventListener('keyup', this.keyupHandler);
+		}
+		this.keys.clear();
+		this.keysPressed.clear();
 	}
 }
 

@@ -9,7 +9,7 @@ export class RoundSystem {
 		this.players = players;
 		this.currentRound = 0;
 		this.maxRounds = 2;
-		this.roundTime = 20;
+		this.roundTime = 60;
 		this.timeRemaining = 0;
 		this.roundActive = false;
 

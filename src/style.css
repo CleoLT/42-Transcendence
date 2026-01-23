@@ -13,11 +13,12 @@ body {
 
 #game-container {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 #game-canvas {
@@ -25,6 +26,9 @@ body {
   background: linear-gradient(to bottom, #2d1b3d 0%, #1a0f2e 50%, #0d0517 100%);
   border: 3px solid #8b7355;
   box-shadow: 0 0 30px rgba(139, 115, 85, 0.5);
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 #ui-overlay {

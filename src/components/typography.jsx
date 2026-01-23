@@ -1,7 +1,7 @@
 export function Sixtyfour({children, className = ""}){
     return(
         <h1 className={"font-sixtyfour text-s " + className}
-          style={{ letterSpacing: "-0.13em" }}>
+          style={{ letterSpacing: "-0.13em", fontFamily: "'Sixtyfour', sans-serif" }}>
           {children}
         </h1>
     )

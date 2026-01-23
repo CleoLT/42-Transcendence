@@ -1,9 +1,14 @@
-import GameCanvas from "./GameCanvas";
+import {IconsList} from "./icon.jsx"
+import GameContainer from "./GameContainer";
 
-export default function Content({ children }) {
-  return (
-    <div className="relative w-[95%] flex-1 border-4 border-black">
-      {children}
-    </div>
-  );
+export default function Content(){
+    return (
+        <div 
+            className="flex flex-row h-[85%] w-[95%] lg:border-8 sm:border-4 border-2 border-black" >
+            <IconsList />
+            <div className="flex-1 relative">
+                <GameContainer />
+            </div>
+        </div>
+    )
 }
