@@ -18,6 +18,36 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
 
 ## 3. Resources
 > section listing classic references related to the topic (documentation, articles, tutorials, etc.), as well as a description of how AI was used — specifying for which tasks and which parts of the project.
+
+This is a list with all the resources we used classified by topics. It contains a mix of websites, tutorials and videos that helped us understand how we should approach the project and helped us learn new tools.\
+At the end of the section, you can find out more about how we approached the use of AI.
+
+#### Docker
+- https://docs.docker.com/reference/compose-file/services/
+- https://docs.docker.com/build/building/multi-stage/
+- https://www.datacamp.com/es/tutorial/nginx-docker
+- https://www.docker.com/blog/understanding-the-docker-user-instruction/
+- https://blog.devops.dev/understanding-how-uid-and-gid-work-in-docker-containers-9e043f6405c1
+###### Youtube video on: [Multi-stage Dockerfiles](https://www.youtube.com/watch?v=t779DVjCKCs)
+
+#### APIs
+- https://strapi.io/blog/how-to-store-API-keys-securely
+- https://medium.com/%40maheshsaini.sec/what-does-api-gateway-do-in-microservices-architecture-d1e93e27e040
+###### Youtube videos on: [API security](https://www.youtube.com/watch?v=FsB_nRGdeLs&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=71)  |   [What is an API](https://www.youtube.com/watch?v=rMPLHPnltmM&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=66) |  [API types](https://www.youtube.com/watch?v=4vLxWqE94l4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=60)
+
+#### Node & npm
+- https://www.npmjs.com/package/nodemon
+###### Youtube video on: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69)
+
+#### Web
+###### Youtube videos on: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0)
+
+#### SPAs
+###### Youtube videos on: [Dynamic Websites vs Static Pages vs Single Page Apps](https://www.youtube.com/watch?v=Kg0Q_YaQ3Gk&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=63) |  [Multi-page vs single page](https://www.youtube.com/watch?v=me5lS00Nj1k&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=61)
+
+#### React
+###### Youtube video on: [React beguinner tutorial](https://www.youtube.com/watch?v=SqcY0GlETPk&t=163s)
+  
 <br>
 
 ## 4. The dream team :handshake:
@@ -35,7 +65,8 @@ She also kept in touch with the back-end developers to make sure the connection 
 #### :seedling: Marta  |  *Project Manager*
 
 As PM, she made sure the team had clear objectives and went over possible issues and how to approach them. She was in charge of scheduling the weekly meetings where she established an individual task debrief so that every team member could track their progress and show any new developments with the rest of the team.\
-She was vocal and active on the Whatsapp group, where she gave updates and meeting reminders.
+She was vocal and active on the Whatsapp group, where she gave updates and meeting reminders.\
+She also dedicated time to project documentation, like the redaction of this Readme.
 
 In terms of the project, she was in charge of creating the docker arquitecture and making sure everyone had a ready-to-use container.\
 She worked closely with the technical lead and the backend team to make the best informed and consensual decisions regarding the sructure and design of the project.
@@ -53,7 +84,7 @@ He was the first member to start working on the project. He had knowldege and a 
 
 He also had more knowledge on Github and its issues, projects and backlog, so he introduced the team to some great practices that were applied throughout the process and made a big difference.
 
-#### :maple_leaf: Cristina |  *Developer (front)*
+#### :blossom: Cristina |  *Game developer (front)*
 
 As a computer games enthusiast herself, she was the person who came up with the idea for the game, and later created it in the frontend. The game is completely original, she put together an aesthetic for it and a game experience with different settings, functionalities, components and customization options.
 
