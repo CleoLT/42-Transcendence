@@ -30,6 +30,28 @@ Anything over 14 points is considered part of the **bonus**.
 > section containing any relevant information about compilation, installation, and/or execution.
 
 > should mention all the needed prerequisites (software, tools, versions, configuration like .env setup, etc.), and step-by-step instructions to run the project.
+
+To run the project, you should follow these steps:  
+1. **Make sure you have Docker and Git installed on your machine** :package:
+   
+2. **Clone the repository:** 
+
+   `git clone [repository-url]`  
+
+3. ~~Set up environment variables: Copy `.env.example` to `.env` and fill in the required values.~~ (to be specified)
+
+4. **Build and run the project:**
+
+   Execute `make` , `make dev` or `make prod` in the cloned folder.
+   
+   We have 2 creation modes:
+   	- for development -> hot reload on front + back, vite server on 5173 :hammer_and_pick:
+    - for production -> recompilation is necessary to see changes, no node, nginx server on 8080 :shield: (*default*) 
+
+	See `make help` to get more information about each `make` command
+
+5. **Open your browser and navigate to** `https://localhost:8080` (*prod*) **or**  `https://localhost:5173` (*dev*)
+
 <br>
 
 ## 3. Resources
