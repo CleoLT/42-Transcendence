@@ -8,6 +8,22 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
 > section that clearly presents the project, including its goal and a brief overview.
 
 > should also contain a clear name for the project and its key features.
+
+_**ft_transcendence**_ is a group project with the goal of building a real-world web application that demonstrates our ability to adapt to new technologies, collaborate effectively as a team, and deliver a functional and secure final product.
+
+There is a lot of freedom in what this final product can look like: it can be a multiplayer game, a collaborative platform, or a social network, depending on the modules you choose. \
+There is a **mandatory** part that demands basic web functionality and security, and then we also have to comply with: 
+
+ #### *the modules*
+
+They are requirements for the project that focus on very specific topics and features classified as **MAJOR** (2p) or **MINOR**(1p).\
+The complexity and length of the module influences whether it is considered a MAJOR (more difficult and long) or MINOR (easier to implement) one.
+
+> [!IMPORTANT] 
+> The minimum points you need to evaluate and pass the project is 14!
+
+Anything over 14 points is considered part of the **bonus**.
+
 <br>
 
 ## 2. Instructions
@@ -28,25 +44,25 @@ At the end of the section, you can find out more about how we approached the use
 - https://www.datacamp.com/es/tutorial/nginx-docker
 - https://www.docker.com/blog/understanding-the-docker-user-instruction/
 - https://blog.devops.dev/understanding-how-uid-and-gid-work-in-docker-containers-9e043f6405c1
-###### Youtube video on: [Multi-stage Dockerfiles](https://www.youtube.com/watch?v=t779DVjCKCs)
+###### Youtube video: [Multi-stage Dockerfiles](https://www.youtube.com/watch?v=t779DVjCKCs)
 
 #### APIs
 - https://strapi.io/blog/how-to-store-API-keys-securely
 - https://medium.com/%40maheshsaini.sec/what-does-api-gateway-do-in-microservices-architecture-d1e93e27e040
-###### Youtube videos on: [API security](https://www.youtube.com/watch?v=FsB_nRGdeLs&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=71)  |   [What is an API](https://www.youtube.com/watch?v=rMPLHPnltmM&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=66) |  [API types](https://www.youtube.com/watch?v=4vLxWqE94l4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=60)
+###### Youtube videos: [API security](https://www.youtube.com/watch?v=FsB_nRGdeLs&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=71)  |   [What is an API](https://www.youtube.com/watch?v=rMPLHPnltmM&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=66) |  [API types](https://www.youtube.com/watch?v=4vLxWqE94l4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=60) | [API authentication](https://www.youtube.com/watch?v=xJA8tP74KD0) | [API gateway](https://www.youtube.com/watch?v=7-6F3b14baA)
 
 #### Node & npm
 - https://www.npmjs.com/package/nodemon
-###### Youtube video on: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69)
+###### Youtube video: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69)
 
 #### Web
-###### Youtube videos on: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0)
+###### Youtube videos: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0)
 
 #### SPAs
-###### Youtube videos on: [Dynamic Websites vs Static Pages vs Single Page Apps](https://www.youtube.com/watch?v=Kg0Q_YaQ3Gk&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=63) |  [Multi-page vs single page](https://www.youtube.com/watch?v=me5lS00Nj1k&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=61)
+###### Youtube videos: [Dynamic Websites vs Static Pages vs Single Page Apps](https://www.youtube.com/watch?v=Kg0Q_YaQ3Gk&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=63) |  [Multi-page vs single page](https://www.youtube.com/watch?v=me5lS00Nj1k&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=61)
 
 #### React
-###### Youtube video on: [React beguinner tutorial](https://www.youtube.com/watch?v=SqcY0GlETPk&t=163s)
+###### Youtube video: [React beguinner tutorial](https://www.youtube.com/watch?v=SqcY0GlETPk&t=163s)
   
 <br>
 
