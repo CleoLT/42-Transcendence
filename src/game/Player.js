@@ -56,6 +56,9 @@ export class Player {
 		// Collision side flags used to restrict movement
 		this.blockedLeft = false;
 		this.blockedRight = false;
+
+		// Horizontal knockback velocity applied by push interactions
+		this.pushVelocityX = 0;
 	}
 
 	/**
@@ -131,23 +134,28 @@ export class Player {
 		// Cache whether the push key is currently held
 		this.pushActive = inputManager.isKeyPressed(keys.push);
 
-		// Consume dash input and calculate dash direction if eligible
-		if (inputManager.wasKeyJustPressed(keys.dash) && !this.dashing && this.dashCooldown <= 0) {
-			// Start from current movement keys to derive dash axis
-			let dashX = 0;
-			if (inputManager.isKeyPressed(keys.left)) dashX = -1;
-			if (inputManager.isKeyPressed(keys.right)) dashX = 1;
-
-			// Fallback direction when no input is held
-			if (dashX === 0) {
-				dashX = this.id === 1 ? -1 : 1;
-			}
-
-			this.dashDirection = { x: dashX };
-			this.dashing = true;
-			this.dashTimer = this.dashDuration;
-			this.pushInvulnerable = true;
+		// Dash input is edge-triggered with no buffering: the press is always
+		// consumed on this frame, even if the dash cannot be started.
+		if (inputManager.wasKeyJustPressed(keys.dash)) {
 			inputManager.consumeKey(keys.dash);
+
+			// Only start a dash when the state actually allows it
+			if (!this.dashing && this.dashCooldown <= 0) {
+				// Start from current movement keys to derive dash axis
+				let dashX = 0;
+				if (inputManager.isKeyPressed(keys.left)) dashX = -1;
+				if (inputManager.isKeyPressed(keys.right)) dashX = 1;
+
+				// Fallback direction when no input is held
+				if (dashX === 0) {
+					dashX = this.id === 1 ? -1 : 1;
+				}
+
+				this.dashDirection = { x: dashX };
+				this.dashing = true;
+				this.dashTimer = this.dashDuration;
+				this.pushInvulnerable = true;
+			}
 		}
 
 		// Calculate effective movement speed before applying input
@@ -169,40 +177,53 @@ export class Player {
 			}
 		}
 
-		// Resolve overlap against the other player before clamping bounds
-		if (otherPlayer && !this.pushInvulnerable && !otherPlayer.pushInvulnerable) {
-			this.checkCollision(otherPlayer);
+		// Apply any pending knockback from push interactions, with damping so
+		// that the motion is smooth over multiple frames instead of a teleport.
+		if (this.pushVelocityX !== 0) {
+			this.x += this.pushVelocityX * deltaTime;
+
+			// Exponential damping keeps the motion feeling like a shove
+			const damping = 6; // higher = shorter push duration
+			const decay = Math.exp(-damping * deltaTime);
+			this.pushVelocityX *= decay;
+
+			// Snap to zero once the remaining speed is visually negligible
+			if (Math.abs(this.pushVelocityX) < 5) {
+				this.pushVelocityX = 0;
+			}
 		}
 
 		// Clamp the bowl within the horizontal canvas limits
-		this.x = Math.max(this.radius, Math.min(this.canvasWidth - this.radius, this.x));
+		//this.x = Math.max(this.radius, Math.min(this.canvasWidth - this.radius, this.x));
 
-		// Map keyboard inputs to abilities for this player index
+		// Map keyboard inputs to abilities for this player index. Abilities are
+		// also edge-triggered: a press that happens while the ability is on
+		// cooldown or unaffordable is discarded instead of being buffered.
 		if (this.id === 1) {
-			if (inputManager.isKeyPressed('Digit1')) {
-				abilityUsed = this.useAbility('reversePush');
+			if (inputManager.wasKeyJustPressed('Digit1')) {
 				inputManager.consumeKey('Digit1');
+				abilityUsed = this.useAbility('reversePush');
 			}
-			if (inputManager.isKeyPressed('Digit2')) {
-				abilityUsed = this.useAbility('inkFreeze');
+			if (inputManager.wasKeyJustPressed('Digit2')) {
 				inputManager.consumeKey('Digit2');
+				abilityUsed = this.useAbility('inkFreeze');
 			}
-			if (inputManager.isKeyPressed('Digit3')) {
-				abilityUsed = this.useAbility('momentumSurge');
+			if (inputManager.wasKeyJustPressed('Digit3')) {
 				inputManager.consumeKey('Digit3');
+				abilityUsed = this.useAbility('momentumSurge');
 			}
 		} else {
-			if (inputManager.isKeyPressed('Numpad1')) {
-				abilityUsed = this.useAbility('reversePush');
+			if (inputManager.wasKeyJustPressed('Numpad1')) {
 				inputManager.consumeKey('Numpad1');
+				abilityUsed = this.useAbility('reversePush');
 			}
-			if (inputManager.isKeyPressed('Numpad2')) {
-				abilityUsed = this.useAbility('inkFreeze');
+			if (inputManager.wasKeyJustPressed('Numpad2')) {
 				inputManager.consumeKey('Numpad2');
+				abilityUsed = this.useAbility('inkFreeze');
 			}
-			if (inputManager.isKeyPressed('Numpad3')) {
-				abilityUsed = this.useAbility('momentumSurge');
+			if (inputManager.wasKeyJustPressed('Numpad3')) {
 				inputManager.consumeKey('Numpad3');
+				abilityUsed = this.useAbility('momentumSurge');
 			}
 		}
 
@@ -405,7 +426,7 @@ export class Player {
 	}
 
 	/**
-	 * Applies the actual horizontal position change to the other player.
+	 * Applies a horizontal knockback impulse to the other player.
 	 *
 	 * @param {Player} otherPlayer - Player being pushed or pulled.
 	 * @param {boolean} reverse - True to pull instead of push.
@@ -415,30 +436,31 @@ export class Player {
 		const dx = otherPlayer.x - this.x;
 		const distance = Math.abs(dx);
 
+		// Base impulse strength for the knockback; this is converted into an
+		// initial horizontal velocity that decays over subsequent frames.
+		const baseImpulse = 900;
+
+		let directionX = 0;
 		if (distance === 0) {
 			// If overlapping exactly, bias movement away from player sides
-			const pushX = this.id === 1 ? -100 : 100;
-			if (reverse) {
-				otherPlayer.x -= pushX;
-			} else {
-				otherPlayer.x += pushX;
-			}
+			directionX = this.id === 1 ? -1 : 1;
 		} else {
-			// Convert direction into a scaled impulse
-			const pushForce = 100;
-			const pushX = (dx / distance) * pushForce;
-
-			if (reverse) {
-				// Reverse push: move the target towards the attacker
-				otherPlayer.x -= pushX;
-			} else {
-				// Normal push: move the target away from the attacker
-				otherPlayer.x += pushX;
-			}
+			directionX = dx / distance;
 		}
 
-		// Clamp the pushed player back inside the play area
-		otherPlayer.x = Math.max(otherPlayer.radius, Math.min(this.canvasWidth - otherPlayer.radius, otherPlayer.x));
+		// Reverse push pulls instead of pushing away
+		if (reverse) {
+			directionX *= -1;
+		}
+
+		// Apply the impulse as an additive velocity on the target
+		const impulseX = directionX * baseImpulse;
+		const maxSpeed = 1200;
+
+		otherPlayer.pushVelocityX += impulseX;
+		// Clamp to a sensible maximum speed so repeated pushes don't explode
+		if (otherPlayer.pushVelocityX > maxSpeed) otherPlayer.pushVelocityX = maxSpeed;
+		if (otherPlayer.pushVelocityX < -maxSpeed) otherPlayer.pushVelocityX = -maxSpeed;
 	}
 
 	/**
@@ -468,6 +490,7 @@ export class Player {
 		this.pushInvulnerable = false;
 		this.blockedLeft = false;
 		this.blockedRight = false;
+		this.pushVelocityX = 0;
 	}
 
 	/**

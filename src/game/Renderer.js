@@ -757,20 +757,34 @@ export class Renderer {
 			ctx.save();
 			ctx.globalAlpha = effect.alpha;
 
+			// Lazily generate a stable organic shape for this stain the first
+			// time it is rendered so that it does not flicker or change shape
+			// every frame.
+			if (!effect._shape) {
+				const pointCount = 8;
+				const points = [];
+				for (let i = 0; i < pointCount; i++) {
+					const angle = (i / pointCount) * Math.PI * 2;
+					// Precompute a radius jitter for this vertex; this stays
+					// fixed for the lifetime of the effect.
+					const radius = effect.size * (0.7 + Math.random() * 0.3);
+					points.push({ angle, radius });
+				}
+				effect._shape = points;
+			}
+
 			ctx.fillStyle = 'rgba(139, 115, 85, 0.4)';
 			ctx.beginPath();
-			const points = 8;
-			for (let i = 0; i < points; i++) {
-				const angle = (i / points) * Math.PI * 2;
-				const radius = effect.size * (0.7 + Math.random() * 0.3);
-				const x = effect.x + Math.cos(angle) * radius;
-				const y = effect.y + Math.sin(angle) * radius;
-				if (i === 0) {
+			const points = effect._shape;
+			points.forEach((p, index) => {
+				const x = effect.x + Math.cos(p.angle) * p.radius;
+				const y = effect.y + Math.sin(p.angle) * p.radius;
+				if (index === 0) {
 					ctx.moveTo(x, y + 60);
 				} else {
 					ctx.lineTo(x, y + 60);
 				}
-			}
+			});
 			ctx.closePath();
 			ctx.fill();
 

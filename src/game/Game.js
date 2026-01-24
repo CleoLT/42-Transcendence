@@ -39,6 +39,8 @@ export class Game {
 		this.aiMode = false;
 		this.spriteLibrary = null;
 		this.laneTint = null;
+		this.arenaLeft = 0;
+		this.arenaRight = 0;
 	}
 
 	/**
@@ -68,12 +70,18 @@ export class Game {
 		// this.uiManager.init(this.canvas.width, this.canvas.height);
 		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint);
 
+	  
 		// Seed starting lane ownership so the UI has clear sides
 		this.laneSystem.lanes[0].owner = 1;
 		this.laneSystem.lanes[2].owner = 2;
 
 		// Wire up input needed at the game level (e.g. start-from-menu)
 		this.setupEventListeners();
+		const tableWidth = Math.round(this.canvas.width * 0.95);
+		const tableInset = Math.max(4, Math.round(tableWidth * 0.03));
+		const tableX = ((this.canvas.width - tableWidth) / 2);
+		this.arenaLeft = tableX + tableInset + 36;
+		this.arenaRight = tableX + tableWidth - tableInset - 36;
 	}
 
 	/**
@@ -132,6 +140,14 @@ export class Game {
 		this.roundSystem.startRound();
 	}
 
+	clampPlayersToArena() {
+		this.players.forEach(p => {
+		  p.x = Math.max(this.arenaLeft, Math.min(this.arenaRight, p.x));
+		});
+	  }
+	  
+	
+
 	/**
 	 * Main per-frame update that advances all game systems.
 	 *
@@ -144,12 +160,17 @@ export class Game {
 			this.inputManager = inputManager;
 		}
 
-		// Advance player movement, abilities, and meters
+		// 1. Update lógico de jugadores (sin clamp)
 		this.players.forEach((player, index) => {
 			const otherPlayer = this.players[1 - index];
 			player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
 			player.perfectMeter.update(dt);
 		});
+		
+		this.resolvePlayerCollision();
+		this.clampPlayersToArena();
+  
+
 
 		// Tick wind and blossom simulation before collision checks
 		if (this.windSystem) {
@@ -211,11 +232,58 @@ export class Game {
 
 		this.missEffects = this.missEffects.filter(e => e.timer > 0);
 
-		// Refresh UI overlays tied to players, rounds and wind
-		// if (this.uiManager && this.state === 'playing') {
-		// 	this.uiManager.update(this.players, this.roundSystem, this.windSystem, dt);
-		// }
 	}
+
+	/**
+	 * Resolves horizontal penetration between the two players in a symmetric,
+	 * edge-safe way so that their visual overlap is always bounded by the same
+	 * small amount, regardless of where they are in the arena.
+	 */
+	resolvePlayerCollision() {
+		const [p1, p2] = this.players;
+		if (p1.pushInvulnerable || p2.pushInvulnerable) return;
+	
+		const left = p1.x <= p2.x ? p1 : p2;
+		const right = left === p1 ? p2 : p1;
+	
+		const minDistance = left.radius + right.radius;
+		const targetDistance = minDistance * 0.99;
+	
+		const distance = right.x - left.x;
+		if (distance >= targetDistance) {
+			left.blockedRight = right.blockedLeft = false;
+			return;
+		}
+	
+		const overlap = targetDistance - distance;
+	
+		const minLeftX = this.arenaLeft;
+		const maxRightX = this.arenaRight;
+		
+		const leftAtWall = left.x <= minLeftX + 0.5;
+		const rightAtWall = right.x >= maxRightX - 0.5;
+
+
+		
+		if (leftAtWall && !rightAtWall) {
+			// todo el ajuste va al de la derecha
+			left.x = minLeftX;
+			right.x = left.x + targetDistance;
+		} else if (rightAtWall && !leftAtWall) {
+			// todo el ajuste va al de la izquierda
+			right.x = maxRightX;
+			left.x = right.x - targetDistance;
+		} else {
+			// centro: separación perfectamente simétrica
+			left.x -= overlap / 2;
+			right.x += overlap / 2;
+		}
+	
+		left.blockedRight = true;
+		right.blockedLeft = true;
+	}
+	
+	
 
 	/**
 	 * Detects interactions between players and blossoms and routes them
