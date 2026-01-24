@@ -46,8 +46,8 @@ services:
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-    ports:
-      - "3000:3000"
+#    ports:
+#     - "3000:3000"
     networks:
       - main
     depends_on:
