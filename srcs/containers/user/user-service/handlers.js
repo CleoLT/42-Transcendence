@@ -67,8 +67,9 @@ async function getCredentialsCoincidence(req, reply) {
 
     await query.updateUserById(user.id, { online_status: 1 });
 
-    reply.code(200).send({
-        valid: match // true or false
+    return reply.code(200).send({
+        valid: true,
+        userId: user.id
     });
 }
 

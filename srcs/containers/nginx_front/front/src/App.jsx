@@ -16,7 +16,7 @@ export default function App() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://localhost:8080/api/users/user", {
+      const res = await fetch("https://localhost:8080/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
