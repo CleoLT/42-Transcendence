@@ -241,171 +241,91 @@ export class Renderer {
 		ctx.restore();
 	}
 
-	/**
-	 * Renders a single player's perfect meter using the shared fill sprite,
-	 * clipped to their side of the bar.
-	 *
-	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
-	 * @param {Player} player - Player whose meter is rendered.
-	 * @param {number} centerX - Center X of the shared bar.
-	 * @param {number} y - Vertical position of the bar center.
-	 */
+	renderPerfectMeterLabels(ctx, player, centerX, y) {
+		const isLeft = player.side === 'left';
+	
+		ctx.save();
+		ctx.fillStyle = '#000000';
+		ctx.font = '25px font-corben font-bold text-s';
+		ctx.textBaseline = 'middle';
+		
+	
+		const nameX = isLeft
+			? centerX - 500
+			: centerX + 500;
+	
+		ctx.textAlign = isLeft ? 'right' : 'left';
+		ctx.fillText(player.name, nameX, y - 18);
+	
+		ctx.font = '14px font-corben font-bold';
+		ctx.fillText(
+			`${player.score}`,
+			nameX,
+			y + 18
+		);
+	
+		ctx.restore();
+	}
+	
+
+	drawCapsule(ctx, x, y, w, h, r, color) {
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.roundRect(x, y, w, h, r);
+		ctx.fill();
+	}
+
 	renderPerfectMeter(ctx, player, centerX, y) {
+		const CAPSULE_COUNT = 6;
+		const CAPSULE_WIDTH = 40;
+		const CAPSULE_HEIGHT = 75;
+		const CAPSULE_GAP = 10;
+		const CAPSULE_RADIUS = 100;
+
+		const FIRST_COLOR = '#FEEBEB';
+		const SECOND_COLOR = '#F9BEBE';
+		const THIRD_COLOR = '#FDD28B';
+		const INACTIVE_COLOR = '#D9D9D9';
+		const CAPSULE_COLORS = [FIRST_COLOR, FIRST_COLOR, SECOND_COLOR, SECOND_COLOR, THIRD_COLOR, THIRD_COLOR];
+
 		const meter = player.perfectMeter;
 		if (!meter) return;
-
-		// Bullet layout configuration for thresholds (3, 6, 9)
-		const bulletRadius = 10;
-		const bulletOffset = 120;
-		const bulletSpacing = 180;
-		const maxBullets = 3;
-
-		// Resolve ink sprite used to fill the bar dynamically
-		const inkSprite = (this.spriteLibrary && this.spriteLibrary.getInkFillSprite());
-		if (!inkSprite) return;
-
-		const inkWidth = inkSprite.width;
-		const inkHeight = inkSprite.height;
-
-		const isLeftPlayer = player.side === 'left';
-
-		// Prepare bullet positions (they will be drawn on top of the ink sprite)
-		const bullets = [];
-		for (let i = 0; i < maxBullets; i++) {
-			const dist = bulletOffset + i * bulletSpacing;
-			bullets.push({
-				x: isLeftPlayer ? centerX - dist : centerX + dist,
-				y
-			});
-		}
-
-		// Use the smoothed visualValue for a more fluid animation
-		const visual = (typeof meter.visualValue === 'number') ? meter.visualValue : meter.value;
-		if (!visual || visual <= 0) {
-			// Still draw bullets (always visible) even when no ink is present
-			bullets.forEach((b, i) => {
-				const active = meter.value >= (i + 1) * 3;
-				ctx.fillStyle = active ? '#e00000' : '#000000';
-				ctx.beginPath();
-				ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2);
-				ctx.fill();
-
-				ctx.fillStyle = '#ffffff';
-				ctx.beginPath();
-				ctx.arc(b.x, b.y, bulletRadius * 0.45, 0, Math.PI * 2);
-				ctx.fill();
-			});
-			return;
-		}
-
-		// Calculate how far the sprite should travel for each meter segment
-		const firstBulletDist = bulletOffset; // distance from center to first bullet
-		const lastBulletDist = bulletOffset + bulletSpacing * (maxBullets - 1);
-
-		// Ensure a small visible nib when visual > 0 so 1 point is visible
-		const minVisible = 12;
-
-		let travel = 0;
-		if (!visual || visual <= 0) {
-			travel = 0;
-		} else if (visual < 3) {
-			// Map visual in (0..3) -> (minVisible .. firstBulletDist)
-			const t = visual / 3; // 0..1
-			travel = minVisible + t * (firstBulletDist - minVisible);
-		} else {
-			// Linear mapping: travel(visual=3) === firstBulletDist, travel(visual=meter.max) === lastBulletDist
-			const a = (lastBulletDist - firstBulletDist) / (meter.max - 3);
-			const b = firstBulletDist - a * 3;
-			travel = a * visual + b;
-		}
-
-		// Clamp travel into sensible range
-		travel = Math.max(0, Math.min(travel, lastBulletDist));
-
-		// Determine sprite X for each player so the tip extends from center
-		let drawX;
-		if (isLeftPlayer) {
-			// Sprite slides left from center
-			// Tip (left edge) extends leftward from center
-			// drawX is the left edge position = centerX - travel
-			drawX = centerX - travel;
-		} else {
-			// Sprite slides right from center
-			// Tip (right edge) extends rightward from center
-			// drawX is the left edge position = centerX + travel - inkWidth
-			// But we want the right edge at (centerX + travel), so:
-			drawX = centerX + travel - inkWidth;
-		}
-
-		const drawY = y - inkHeight / 2;
-
-		ctx.save();
-
-		// Clip at the centre line so each player only occupies their half
-		ctx.beginPath();
-		if (isLeftPlayer) {
-			// Only allow pixels LEFT of center
-			ctx.rect(
-				-10000,               // far left
-				-10000,
-				centerX + 10000,      // stop at center
-				20000
-			);
-		} else {
-			// Only allow pixels RIGHT of center
-			ctx.rect(
-				centerX,              // start at center
-				-10000,
-				20000,                // extend far right
-				20000
+	
+		const isLeft = player.side === 'left';
+		const filled = meter.value;
+	
+		const totalWidth =
+			CAPSULE_COUNT * CAPSULE_WIDTH +
+			(CAPSULE_COUNT - 1) * CAPSULE_GAP;
+	
+			// Capsules grow outward from center
+			const startX = isLeft
+			? (centerX - 50) - totalWidth
+			: (centerX + 50);
+			
+			const yTop = y - CAPSULE_HEIGHT / 2;
+	
+		for (let i = 0; i < CAPSULE_COUNT; i++) {
+			const index = isLeft
+				? CAPSULE_COUNT - 1 - i // fill from center outward
+				: i;
+	
+			const active = index < filled;
+	
+			const x =
+				startX +
+				i * (CAPSULE_WIDTH + CAPSULE_GAP);
+	
+			this.drawCapsule(
+				ctx,
+				x,
+				yTop,
+				CAPSULE_WIDTH,
+				CAPSULE_HEIGHT,
+				CAPSULE_RADIUS,
+				active ? CAPSULE_COLORS[index] : INACTIVE_COLOR
 			);
 		}
-		ctx.clip();
-
-		// Draw sprite at calculated position (slides from center)
-		if (isLeftPlayer) {
-			ctx.drawImage(
-				inkSprite,
-				drawX,
-				drawY,
-				inkWidth,
-				inkHeight
-			);
-		} else {
-			// Right-side player: mirror the sprite horizontally so the tip faces outward
-			ctx.save();
-			// Move origin to the right edge of where the sprite would be, then flip
-			ctx.translate(drawX + inkWidth, 0);
-			ctx.scale(-1, 1);
-			// Draw at x=0 because we've translated to the right edge
-			ctx.drawImage(
-				inkSprite,
-				0,
-				drawY,
-				inkWidth,
-				inkHeight
-			);
-			ctx.restore();
-		}
-
-		ctx.restore();
-
-		// Render threshold bullets on top of the ink sprite
-		bullets.forEach((b, i) => {
-			// Bullets activate from center outward (i=0 is closest to center)
-			const active = meter.value >= (i + 1) * 3;
-
-			ctx.fillStyle = active ? '#e00000' : '#000000';
-			ctx.beginPath();
-			ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2);
-			ctx.fill();
-
-			ctx.fillStyle = '#ffffff';
-			ctx.beginPath();
-			ctx.arc(b.x, b.y, bulletRadius * 0.45, 0, Math.PI * 2);
-			ctx.fill();
-		});
-
 	}
 
 	renderLaneBar() {
@@ -862,10 +782,11 @@ export class Renderer {
 			ctx.arc(0, 0, 50, 0, Math.PI * 2);
 			ctx.fill();
 
-			ctx.font = 'bold 36px Georgia';
+			ctx.font = '36px sixtyfour';
+			ctx.letterSpacing = '-0.13em';
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
-			ctx.lineWidth = 4;
+			ctx.lineWidth = 1;
 
 			ctx.strokeStyle = '#000';
 			ctx.fillStyle = e.golden ? '#d4af37' : '#4a90e2';

@@ -164,7 +164,7 @@ export class Game {
 		this.players.forEach((player, index) => {
 			const otherPlayer = this.players[1 - index];
 			player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
-			player.perfectMeter.update(dt);
+			//player.perfectMeter.update(dt);
 		});
 		
 		this.resolvePlayerCollision();
@@ -358,13 +358,12 @@ export class Game {
 	handleCatch(player, blossom, isPerfect, laneRegion) {
 		// Work out lane-based bonus multiplier for this player
 		const lanePoints = this.laneSystem.lanes.filter(lane => lane.owner === player.id).length;
-		console.log('Lane points for player ', player.id, ':', lanePoints);
-		const points = blossom.golden ? 2 + (lanePoints ? lanePoints : 1) : (lanePoints ? lanePoints : 1);
+		const points = blossom.golden ? 1 + (lanePoints ? lanePoints : 1) : (lanePoints ? lanePoints : 1);
 		player.addScore(points);
 
 		// Charge perfect meter and spawn visual feedback when applicable
 		if (isPerfect) {
-			if (blossom.golden) player.perfectMeter.add(3);
+			if (blossom.golden) player.perfectMeter.add(2);
 			else player.perfectMeter.add();
 			this.perfectCatchEffects.push({
 				x: player.getX(),
@@ -615,9 +614,9 @@ export class Game {
 		});
 
 		// Ensure meters are back to zero at the start of the round
-		this.players.forEach(p => {
-			p.perfectMeter.reset();
-		});
+		//this.players.forEach(p => {
+		//	p.perfectMeter.reset();
+		//});
 	}
 
 	/**
@@ -650,22 +649,30 @@ export class Game {
 			this.renderer.renderLaneBar();
 			const centerX = this.canvas.width / 2;
 			const barY = this.canvas.height * 0.15;
+			
+			
 			this.renderer.renderPerfectMeterBackplate(
 				this.ctx,
 				centerX,
 				barY
 			);
+			const red = '#FF0000';
+			this.renderer.drawCapsule(ctx, centerX - 40, barY - 40, 80, 80, 100, red);
+			this.renderer.renderPerfectMeter(ctx, this.players[0], centerX, barY);
+			this.renderer.renderPerfectMeter(ctx, this.players[1], centerX, barY);
 
-			this.players.forEach(player => {
-				this.renderer.renderPerfectMeter(this.ctx, player, centerX, barY);
-			});
+			this.renderer.renderPerfectMeterLabels(ctx, this.players[0], centerX, barY);
+			this.renderer.renderPerfectMeterLabels(ctx, this.players[1], centerX, barY);
+			// this.players.forEach(player => {
+			// 	this.renderer.renderPerfectMeter(this.ctx, player, centerX, barY);
+			// });
 
 			this.renderer.renderWindEffect(this.windSystem);
 			this.renderer.renderMissEffects(this.missEffects);
 
 			// Overlay catch FX sprites and meter highlights
 			this.renderer.renderPerfectCatchEffects(this.perfectCatchEffects);
-			this.renderer.renderPerfectMeters(this.players);
+			//this.renderer.renderPerfectMeters(this.players);
 
 		} else if (this.state === 'menu') {
 			// When in menu, background is sufficient; rest is HTML-driven

@@ -18,7 +18,7 @@ export class Player {
 
 		// Scoring and perfect meter resource
 		this.score = 0;
-		this.perfectMeter = new PerfectMeter(9);
+		this.perfectMeter = new PerfectMeter(6);
 
 		// Initial bowl position and basic movement parameters
 		this.x = side === 'left' ? canvasWidth * 0.25 : canvasWidth * 0.75;
@@ -43,9 +43,9 @@ export class Player {
 
 		// Ability slots and resource thresholds
 		this.abilities = {
-			reversePush: { cost: 3, cooldown: 0, active: false },
-			inkFreeze: { cost: 6, cooldown: 0, active: false },
-			momentumSurge: { cost: 9, cooldown: 0, active: false }
+			reversePush: { cost: 2, cooldown: 0, active: false },
+			inkFreeze: { cost: 4, cooldown: 0, active: false },
+			momentumSurge: { cost: 6, cooldown: 0, active: false }
 		};
 		this.frozen = false;
 		this.freezeTimer = 0;

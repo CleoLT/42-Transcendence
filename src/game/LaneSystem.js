@@ -66,7 +66,18 @@ export class LaneSystem {
 	 */
 	getRandomSpawnPosition(laneIndex) {
 		const lane = this.lanes[laneIndex];
-		const x = lane.leftEdge + Math.random() * (lane.rightEdge - lane.leftEdge);
+		var leftEdge = lane.leftEdge;
+		var rightEdge = lane.rightEdge;
+		switch(laneIndex)
+		{
+			case 0:
+				leftEdge = 133;
+				break;
+			case 2:
+				rightEdge = 1668;		
+				break;
+		}
+		const x = leftEdge + Math.random() * (rightEdge - leftEdge);
 		return { x, laneIndex };
 	}
 

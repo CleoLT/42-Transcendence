@@ -42,8 +42,9 @@ export class LaneTint {
 
 		// Player colour palette used when lanes are claimed
 		this.playerColors = {
-			1: { r: 33, g: 144, b: 182 },
-			2: { r: 144, g: 238, b: 144 }
+			//0:rgb(232, 176, 163),
+			1: { r: 232, g: 176, b: 163 },
+			2: { r: 253, g: 210, b: 139 }
 		};
 	}
 
