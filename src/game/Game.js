@@ -3,7 +3,6 @@ import { LaneSystem } from './LaneSystem.js';
 import { BlossomSystem } from './BlossomSystem.js';
 import { WindSystem } from './WindSystem.js';
 import { RoundSystem } from './RoundSystem.js';
-// import { UIManager } from './UIManager.js';
 import { Renderer } from './Renderer.js';
 import { AI } from './AI.js';
 import { SpriteLibrary } from './SpriteLibrary.js';
@@ -41,6 +40,7 @@ export class Game {
 		this.laneTint = null;
 		this.arenaLeft = 0;
 		this.arenaRight = 0;
+		this.pauseButtonBounds = null;
 	}
 
 	/**
@@ -107,15 +107,30 @@ export class Game {
 	 * Registers high-level DOM event listeners that affect game state.
 	 */
 	setupEventListeners() {
-		// Guardar referencia al handler para poder limpiarlo
-		this.spaceKeyHandler = (e) => {
-			if (e.code === 'Space' && this.state === 'menu') {
-				this.startGame();
+		// Note: Space key handling for starting the game is now handled by StartScreen component
+		// which validates player names before calling startGame()
+		this.spaceKeyHandler = null;
+
+		// Handle pause button clicks
+		this.canvasClickHandler = (e) => {
+			if (this.pauseButtonBounds && (this.state === 'playing' || this.state === 'paused')) {
+				const rect = this.canvas.getBoundingClientRect();
+				const scaleX = this.canvas.width / rect.width;
+				const scaleY = this.canvas.height / rect.height;
+				const x = (e.clientX - rect.left) * scaleX;
+				const y = (e.clientY - rect.top) * scaleY;
+
+				// Check if click is within pause button bounds
+				if (x >= this.pauseButtonBounds.x &&
+					x <= this.pauseButtonBounds.x + this.pauseButtonBounds.width &&
+					y >= this.pauseButtonBounds.y &&
+					y <= this.pauseButtonBounds.y + this.pauseButtonBounds.height) {
+					this.togglePause();
+				}
 			}
 		};
-		
-		// Start the game from the menu when space is pressed
-		document.addEventListener('keydown', this.spaceKeyHandler);
+
+		this.canvas.addEventListener('click', this.canvasClickHandler);
 	}
 
 	/**
@@ -126,18 +141,61 @@ export class Game {
 			document.removeEventListener('keydown', this.spaceKeyHandler);
 			this.spaceKeyHandler = null;
 		}
+		if (this.canvasClickHandler) {
+			this.canvas.removeEventListener('click', this.canvasClickHandler);
+			this.canvasClickHandler = null;
+		}
 	}
 
 	/**
 	 * Moves the game from the menu state into active play.
+	 * @param {string} player1Name - Name for player 1.
+	 * @param {string} player2Name - Name for player 2 (or "AI" if AI mode).
 	 */
-	startGame() {
-		// Switch state and hide menu overlay
+	startGame(player1Name, player2Name) {
+		// Validate names
+		if (!player1Name || !player1Name.trim()) {
+			console.warn('Player 1 name is required');
+			return;
+		}
+		if (!player2Name || !player2Name.trim()) {
+			console.warn('Player 2 name is required');
+			return;
+		}
+
+		// Set player names
+		if (this.players[0]) {
+			this.players[0].name = player1Name.trim();
+		}
+		if (this.players[1]) {
+			this.players[1].name = player2Name.trim();
+		}
+
+		// Switch state - React will handle UI visibility based on state
 		this.state = 'playing';
-		document.getElementById('start-screen').classList.add('hidden');
+		console.log('🎮 Game state changed to:', this.state);
 
 		// Begin the first round
 		this.roundSystem.startRound();
+	}
+
+	/**
+	 * Toggles pause state between 'playing' and 'paused'.
+	 */
+	togglePause() {
+		if (this.state === 'playing') {
+			this.state = 'paused';
+		} else if (this.state === 'paused') {
+			this.state = 'playing';
+		}
+	}
+
+	/**
+	 * Sets the game state to a specific value.
+	 * @param {'menu' | 'playing' | 'paused' | 'gameEnd'} newState - Target game state.
+	 */
+	setGameState(newState) {
+		this.state = newState;
 	}
 
 	clampPlayersToArena() {
@@ -160,61 +218,63 @@ export class Game {
 			this.inputManager = inputManager;
 		}
 
-		// 1. Update lógico de jugadores (sin clamp)
-		this.players.forEach((player, index) => {
-			const otherPlayer = this.players[1 - index];
-			player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
-			//player.perfectMeter.update(dt);
-		});
-		
-		this.resolvePlayerCollision();
-		this.clampPlayersToArena();
-  
+		// Only run gameplay logic when state is 'playing'
+		if (this.state === 'playing') {
+			// 1. Update lógico de jugadores (sin clamp)
+			this.players.forEach((player, index) => {
+				const otherPlayer = this.players[1 - index];
+				player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
+				//player.perfectMeter.update(dt);
+			});
+			
+			this.resolvePlayerCollision();
+			this.clampPlayersToArena();
+	  
 
+			// Tick wind and blossom simulation before collision checks
+			if (this.windSystem) {
+				this.windSystem.update(dt);
+			}
+			const windActive = this.windSystem.isActive();
+			const windDirection = this.windSystem.getDirection();
+			this.blossomSystem.update(dt, windActive, windDirection);
 
-		// Tick wind and blossom simulation before collision checks
-		if (this.windSystem) {
-			this.windSystem.update(dt);
-		}
-		const windActive = this.windSystem.isActive();
-		const windDirection = this.windSystem.getDirection();
-		this.blossomSystem.update(dt, windActive, windDirection);
+			// Progress round timer and detect end-of-round transitions
+			if (this.roundSystem) {
+				const status = this.roundSystem.update(dt);
+				if (status === 'roundEnd') {
+					this.handleRoundEnd();
+				}
+			}
 
-		// Progress round timer and detect end-of-round transitions
-		if (this.roundSystem && this.state === 'playing') {
-			const status = this.roundSystem.update(dt);
-			if (status === 'roundEnd') {
-				this.handleRoundEnd();
+			// Resolve blossom–player collisions and misses
+			this.checkCollisions();
+
+			// Apply push interactions when players are overlapping
+			if (this.inputManager) {
+				this.checkPushes(this.inputManager);
+			}
+
+			// Drive AI decisions and input when enabled
+			if (this.aiMode && this.ai) {
+				this.ai.update(
+					dt,
+					this.blossomSystem.getBlossoms(),
+					this.players[0],
+					this.laneSystem,
+					this.windSystem,
+					this.inputManager
+				);
+				this.ai.getMovementInput(this.inputManager);
 			}
 		}
 
-		// Fade lane tints smoothly towards their target appearance
+		// Fade lane tints smoothly towards their target appearance (always runs for visual continuity)
 		if (this.laneTint) {
 			this.laneTint.update(dt);
 		}
 
-		// Resolve blossom–player collisions and misses
-		this.checkCollisions();
-
-		// Apply push interactions when players are overlapping
-		if (this.inputManager) {
-			this.checkPushes(this.inputManager);
-		}
-
-		// Drive AI decisions and input when enabled
-		if (this.aiMode && this.ai && this.state === 'playing') {
-			this.ai.update(
-				dt,
-				this.blossomSystem.getBlossoms(),
-				this.players[0],
-				this.laneSystem,
-				this.windSystem,
-				this.inputManager
-			);
-			this.ai.getMovementInput(this.inputManager);
-		}
-
-		// Animate and fade perfect catch feedback sprites
+		// Animate and fade perfect catch feedback sprites (always runs for visual continuity)
 		this.perfectCatchEffects.forEach(e => {
 			e.timer -= dt;
 			e.alpha = e.timer / 0.6;
@@ -224,7 +284,7 @@ export class Game {
 		this.perfectCatchEffects =
 			this.perfectCatchEffects.filter(e => e.timer > 0);
 
-		// Animate and fade miss (water stain) effects
+		// Animate and fade miss (water stain) effects (always runs for visual continuity)
 		this.missEffects.forEach(e => {
 			e.timer -= dt;
 			e.alpha = Math.max(0, e.timer / 2.0);
@@ -627,13 +687,22 @@ export class Game {
 	render(ctx) {
 		// Skip rendering until the renderer has been initialised
 		if (!this.renderer) {
+			// Draw a simple background while waiting for renderer to initialize
+			ctx.fillStyle = '#1a0f2e';
+			ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+			// Draw a simple loading indicator
+			ctx.fillStyle = '#ffffff';
+			ctx.font = '24px Arial';
+			ctx.textAlign = 'center';
+			ctx.fillText('Loading...', this.canvas.width / 2, this.canvas.height / 2);
 			return;
 		}
 
 		// Always draw the background first regardless of game state
+		// This ensures the canvas is visible even when menu is showing
 		this.renderer.renderBackground(ctx, this.canvas.width, this.canvas.height);
 
-		if (this.state === 'playing') {
+		if (this.state === 'playing' || this.state === 'paused') {
 
 			// Overlay lane tint above bowls and blossoms
 			if (this.laneTint) {
@@ -651,21 +720,50 @@ export class Game {
 			const barY = this.canvas.height * 0.15;
 			
 			
-			this.renderer.renderPerfectMeterBackplate(
-				this.ctx,
-				centerX,
-				barY
-			);
+			// this.renderer.renderPerfectMeterBackplate(this.ctx, centerX, barY);
+			// Pause button (red circle) - store position for click detection
+			const pauseButtonX = centerX - 40;
+			const pauseButtonY = barY - 40;
+			const pauseButtonSize = 80;
+			this.pauseButtonBounds = {
+				x: pauseButtonX,
+				y: pauseButtonY,
+				width: pauseButtonSize,
+				height: pauseButtonSize
+			};
+			
+			// Draw pause button first (red circle)
 			const red = '#FF0000';
-			this.renderer.drawCapsule(ctx, centerX - 40, barY - 40, 80, 80, 100, red);
+			this.renderer.drawCapsule(ctx, pauseButtonX, pauseButtonY, pauseButtonSize, pauseButtonSize, 100, red);
+			
+			// Render timer INSIDE the pause button (centered, always visible during gameplay)
+			if (this.roundSystem && this.roundSystem.roundActive) {
+				const timeRemaining = this.roundSystem.getTimeRemaining();
+				ctx.save();
+				// Draw text with outline for better visibility on red background
+				ctx.font = 'bold 30px corben';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				
+				// Draw black outline first
+				// ctx.strokeStyle = '#000000';
+				// ctx.lineWidth = 2;
+				// ctx.strokeText(`${timeRemaining}s`, centerX, pauseButtonY + 40);
+				
+				// Draw white text on top
+				ctx.fillStyle = '#000000';
+				ctx.fillText(`${timeRemaining}s`, centerX, pauseButtonY + 45);
+				ctx.restore();
+			}
 			this.renderer.renderPerfectMeter(ctx, this.players[0], centerX, barY);
 			this.renderer.renderPerfectMeter(ctx, this.players[1], centerX, barY);
 
 			this.renderer.renderPerfectMeterLabels(ctx, this.players[0], centerX, barY);
 			this.renderer.renderPerfectMeterLabels(ctx, this.players[1], centerX, barY);
-			// this.players.forEach(player => {
-			// 	this.renderer.renderPerfectMeter(this.ctx, player, centerX, barY);
-			// });
+			
+			// Render ability indicator dots
+			this.renderer.renderAbilityIndicators(ctx, this.players[0], centerX, barY);
+			this.renderer.renderAbilityIndicators(ctx, this.players[1], centerX, barY);
 
 			this.renderer.renderWindEffect(this.windSystem);
 			this.renderer.renderMissEffects(this.missEffects);
@@ -673,6 +771,30 @@ export class Game {
 			// Overlay catch FX sprites and meter highlights
 			this.renderer.renderPerfectCatchEffects(this.perfectCatchEffects);
 			//this.renderer.renderPerfectMeters(this.players);
+
+			// Show pause indicator when paused
+			if (this.state === 'paused') {
+				ctx.save();
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+				ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+				
+				// Display "PAUSED" text
+				ctx.fillStyle = '#FFFFFF';
+				ctx.font = 'bold 64px Arial';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 - 60);
+				
+				// Display remaining time
+				if (this.roundSystem && this.roundSystem.roundActive) {
+					const timeRemaining = this.roundSystem.getTimeRemaining();
+					ctx.fillStyle = '#FFD700';
+					ctx.font = 'bold 48px Arial';
+					ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + 40);
+				}
+				
+				ctx.restore();
+			}
 
 		} else if (this.state === 'menu') {
 			// When in menu, background is sufficient; rest is HTML-driven

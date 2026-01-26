@@ -15,6 +15,7 @@ export class Player {
 		this.side = side;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
+		this.name = `Player ${id}`; // Default name, can be set from menu
 
 		// Scoring and perfect meter resource
 		this.score = 0;

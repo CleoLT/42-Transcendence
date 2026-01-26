@@ -213,33 +213,33 @@ export class Renderer {
 		ctx.restore();
 	}
 
-	renderPerfectMeterBackplate(ctx, centerX, y) {
-		/**
-		 * Draws the static backplate behind both players' perfect meters.
-		 */
+	// renderPerfectMeterBackplate(ctx, centerX, y) {
+	// 	/**
+	// 	 * Draws the static backplate behind both players' perfect meters.
+	// 	 */
 
-		// Compute shared bar bounds across the middle of the canvas
-		const totalWidth = this.canvasWidth * 0.9;
-		const height = 48;
+	// 	// Compute shared bar bounds across the middle of the canvas
+	// 	const totalWidth = this.canvasWidth * 0.9;
+	// 	const height = 48;
 
-		const x = centerX - totalWidth / 2;
-		const yTop = y - height / 2;
+	// 	const x = centerX - totalWidth / 2;
+	// 	const yTop = y - height / 2;
 
-		ctx.save();
+	// 	ctx.save();
 
-		// Draw solid bar background
-		ctx.fillStyle = 'rgba(8,8,8, 0.5)';
-		ctx.beginPath();
-		ctx.roundRect(x, yTop, totalWidth, height, 14);
-		ctx.fill();
+	// 	// Draw solid bar background
+	// 	ctx.fillStyle = 'rgba(8,8,8, 0.5)';
+	// 	ctx.beginPath();
+	// 	ctx.roundRect(x, yTop, totalWidth, height, 14);
+	// 	ctx.fill();
 
-		// Outline the bar for definition
-		ctx.strokeStyle = '#00000080';
-		ctx.lineWidth = 2;
-		ctx.stroke();
+	// 	// Outline the bar for definition
+	// 	ctx.strokeStyle = '#00000080';
+	// 	ctx.lineWidth = 2;
+	// 	ctx.stroke();
 
-		ctx.restore();
-	}
+	// 	ctx.restore();
+	// }
 
 	renderPerfectMeterLabels(ctx, player, centerX, y) {
 		const isLeft = player.side === 'left';
@@ -251,19 +251,161 @@ export class Renderer {
 		
 	
 		const nameX = isLeft
-			? centerX - 500
-			: centerX + 500;
+			? centerX - 700
+			: centerX + 700;
 	
-		ctx.textAlign = isLeft ? 'right' : 'left';
+		ctx.textAlign = isLeft ? 'left' : 'right';
 		ctx.fillText(player.name, nameX, y - 18);
 	
-		ctx.font = '14px font-corben font-bold';
+		ctx.font = '20px font-corben font-bold';
 		ctx.fillText(
 			`${player.score}`,
 			nameX,
 			y + 18
 		);
 	
+		ctx.restore();
+	}
+
+	/**
+	 * Renders three ability indicator dots below the player name/score.
+	 * Each dot shows whether an ability is available (lit) or on cooldown (dim).
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 * @param {Player} player - Player whose abilities to display.
+	 * @param {number} centerX - Center X coordinate of the perfect meter.
+	 * @param {number} y - Y coordinate of the perfect meter bar.
+	 */
+	renderAbilityIndicators(ctx, player, centerX, y) {
+		const isLeft = player.side === 'left';
+		const nameX = isLeft
+			? centerX - 700
+			: centerX + 700;
+
+		// Position dots below the score (which is at y + 18)
+		const dotY = y + 18;
+		const dotRadius = 9;
+		const dotSpacing = 30;
+		
+		// For left player (right-aligned text), dots start from nameX and go left
+		// For right player (left-aligned text), dots start from nameX and go right
+		const dotStartX = isLeft 
+			? nameX + (dotSpacing * 3) // Right-align: start from nameX, go left
+			: nameX - (dotSpacing * 3); // Left-align: start from nameX, go right
+
+		ctx.save();
+
+		// Define abilities in order: reversePush, inkFreeze, momentumSurge
+		const abilities = ['reversePush', 'inkFreeze', 'momentumSurge'];
+
+		abilities.forEach((abilityName, index) => {
+			const ability = player.abilities[abilityName];
+			// For left player, subtract to go left; for right player, add to go right
+			const dotX = isLeft 
+				? dotStartX - (index * dotSpacing)
+				: dotStartX + (index * dotSpacing);
+
+			// Ability is available if cooldown is 0 and player has enough perfect meter
+			const isAvailable = ability && 
+				ability.cooldown <= 0 && 
+				player.perfectMeter.value >= ability.cost;
+
+			// Draw dot - lit if available, dim if on cooldown
+			ctx.beginPath();
+			ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+			
+			if (isAvailable) {
+				// Lit: glowing/filled circle
+				ctx.fillStyle = '#00ff11'; // Green when available
+				ctx.fill();
+				// Add a subtle glow effect
+				ctx.shadowBlur = 10;
+				ctx.shadowColor = '#00ff11';
+				ctx.fill();
+				ctx.shadowBlur = 0;
+			} else {
+				// Dim: outline only
+				ctx.fillStyle = '#CCCCCC'; // Gray when unavailable
+				ctx.fill();
+				ctx.strokeStyle = '#999999';
+				ctx.lineWidth = 1;
+				ctx.stroke();
+			}
+
+			// Draw ability sprite below the dot
+			const spriteY = dotY + dotRadius + 12;
+			this.drawAbilitySprite(ctx, abilityName, dotX, spriteY, isAvailable);
+		});
+
+		ctx.restore();
+	}
+
+	/**
+	 * Draws a simple icon/sprite representing an ability.
+	 * 
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 * @param {string} abilityName - Name of the ability.
+	 * @param {number} x - Center X coordinate.
+	 * @param {number} y - Center Y coordinate.
+	 * @param {boolean} isAvailable - Whether the ability is available.
+	 */
+	drawAbilitySprite(ctx, abilityName, x, y, isAvailable) {
+		const spriteSize = 16;
+		const alpha = isAvailable ? 1.0 : 0.4;
+
+		ctx.save();
+		ctx.globalAlpha = alpha;
+		ctx.translate(x, y);
+
+		if (abilityName === 'reversePush') {
+			// Draw a double-arrow (push back symbol)
+			ctx.strokeStyle = isAvailable ? '#FF6B6B' : '#999999';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			// Left arrow
+			ctx.moveTo(-spriteSize / 2, 0);
+			ctx.lineTo(-spriteSize / 4, -spriteSize / 4);
+			ctx.moveTo(-spriteSize / 2, 0);
+			ctx.lineTo(-spriteSize / 4, spriteSize / 4);
+			// Right arrow (reversed)
+			ctx.moveTo(spriteSize / 2, 0);
+			ctx.lineTo(spriteSize / 4, -spriteSize / 4);
+			ctx.moveTo(spriteSize / 2, 0);
+			ctx.lineTo(spriteSize / 4, spriteSize / 4);
+			ctx.stroke();
+		} else if (abilityName === 'inkFreeze') {
+			// Draw a snowflake/freeze symbol
+			ctx.strokeStyle = isAvailable ? '#4A90E2' : '#999999';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			// Horizontal line
+			ctx.moveTo(-spriteSize / 2, 0);
+			ctx.lineTo(spriteSize / 2, 0);
+			// Vertical line
+			ctx.moveTo(0, -spriteSize / 2);
+			ctx.lineTo(0, spriteSize / 2);
+			// Diagonal lines
+			ctx.moveTo(-spriteSize / 3, -spriteSize / 3);
+			ctx.lineTo(spriteSize / 3, spriteSize / 3);
+			ctx.moveTo(spriteSize / 3, -spriteSize / 3);
+			ctx.lineTo(-spriteSize / 3, spriteSize / 3);
+			ctx.stroke();
+		} else if (abilityName === 'momentumSurge') {
+			const s = spriteSize / 2; // half size for convenience
+			ctx.strokeStyle = isAvailable ? '#00ff11' : '#999999';
+			ctx.lineWidth = 2; // visible but not too thick
+			ctx.beginPath();
+		
+			// Simple jagged lightning bolt with lines
+			ctx.moveTo(0, -s);       // top center
+			ctx.lineTo(-s / 2, -s / 4); // middle left
+			ctx.lineTo(s / 4, 0);    // middle right
+			ctx.lineTo(-s / 4, s / 2); // bottom left
+			ctx.lineTo(s / 2, s / 4); // bottom right
+		
+			ctx.stroke();
+		}
+
 		ctx.restore();
 	}
 	
