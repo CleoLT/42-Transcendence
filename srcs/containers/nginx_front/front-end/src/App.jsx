@@ -12,12 +12,8 @@ export default function App() {
       <div className="absolute inset-0 bg-cover"
         style={{backgroundImage: "url("+ background + ")"}}>
       </div>
-      <div className="absolute inset-0 bg-no-repeat opacity-50"
-          style={{
-            backgroundImage: "url("+ flowerGround + ")",
-            backgroundSize: "50%",
-            backgroundPosition: "right bottom"}}>
-      </div>
+      <img src={flowerGround} alt="flower"
+           className="absolute bottom-0 right-0 opacity-50 w-[100vw] md:w-[75vw] lg:w-[50vw]" />
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
         <Header />
         <Content />
@@ -26,3 +22,5 @@ export default function App() {
     </div>
   )
 }
+
+

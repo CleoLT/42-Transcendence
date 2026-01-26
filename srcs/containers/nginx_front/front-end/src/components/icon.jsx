@@ -7,7 +7,7 @@ import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 export function Icon(props){
     return(
         <img
-            className="pl-[10%] h-[17%] w-auto"
+            className="w-10 sm:w-12 lg:w-14 h-auto"
             src={props.image}
             alt={props.text + "icon"}
         />
@@ -16,7 +16,7 @@ export function Icon(props){
 
 export function IconsList(props){
     return(
-        <div className= "flex flex-col h-full justify-evenly pr-[0.5%] lg:border-r-8 sm:border-r-4 border-r-2 border-black">
+        <div className= "flex flex-col h-full justify-evenly items-center sm:border-r-4 border-r-2 border-black px-1 sm-px-4">
             <Icon image={homeIcon} text="Home" />
             <Icon image={profileIcon} text="Profile" />
             <Icon image={friendsIcon} text="Friends" />
