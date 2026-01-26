@@ -104,9 +104,27 @@ const getReceivedFriendRequests = {
 }
 
 const newFriendship = {
-    description: 'Create a new friendship, or accept a pending friendship, always initiate by id1 ---> to id2',
+    description: 'Create a new friendship, (borrar: or accept a pending friendship,) always initiate by id1 ---> to id2',
     tags: ['Friendships'],
     summary: 'Create friendship',
+
+    body: twoIdBody,
+
+    response: {
+      201: {
+        description: 'Friendship created',
+        ...friendshipResponse
+      },
+      400: errorResponse,
+      404: errorResponse,
+      409: errorResponse
+    }
+}
+
+const acceptFriendship = {
+    description: 'Accept a pending friendship, always initiate by id1 ---> to id2',
+    tags: ['Friendships'],
+    summary: 'Accept a friendship',
 
     body: twoIdBody,
 
@@ -178,6 +196,7 @@ export default {
     getPendingFriendships,
     getReceivedFriendRequests,
     newFriendship,
+    acceptFriendship,
     addAuthorizationToPlay,
     cancelFriendship,
     cancelAuthorization

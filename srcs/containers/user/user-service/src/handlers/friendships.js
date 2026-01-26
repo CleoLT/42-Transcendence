@@ -10,10 +10,10 @@ async function getAllFriendsByUserId(req, reply) {
     const { userId } =  req.params
 
     const user = await userQueries.userExists(userId)
-    if (user === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
-        return
-    }
+    if (user === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
 
     const result = await query.getFriendsByUserId(userId)
     reply.code(200).send(result) 
@@ -23,10 +23,10 @@ async function getPendingFriendships(req, reply) {
     const { userId } =  req.params
 
     const user = await userQueries.userExists(userId)
-    if (user === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
-        return
-    }
+    if (user === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
 
     const result = await query.getPendingFriendships(userId)
     reply.code(200).send(result) 
@@ -36,11 +36,11 @@ async function getReceivedFriendRequests(req, reply) {
     const { userId } =  req.params
 
     const user = await userQueries.userExists(userId)
-    if (user === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
-        return
-    }
-
+    if (user === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
+    
     const result = await query.getReceivedFriendRequests(userId)
     reply.code(200).send(result) 
 }
@@ -49,18 +49,18 @@ async function newFriendship(req, reply) {
 
     let { id1, id2 } = req.body;
 
-    if (id1 === id2) {
-        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
-        return
-    }
+    if (id1 === id2)
+        return reply
+            .code(400)
+            .send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
 
     const user1 = await userQueries.userExists(id1)
     const user2 = await userQueries.userExists(id2)
 
-    if (user1 === null || user2 === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
-        return
-    }
+    if (user1 === null || user2 === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
 
     let revert = false
 
@@ -70,12 +70,45 @@ async function newFriendship(req, reply) {
     }
     
     const rows = await query.getFriendshipById(id1, id2)
-    if (rows !== null) {
-        await query.acceptPendingFriendship(id1, id2, revert)
-    } else {
-        await query.createFriendship(id1, id2, revert)
-    }
+    if (rows !== null)
+        return reply
+            .code(409)
+            .send({ "statusCode": 409, "error": "Conflict", "message": "Friendship already exists" })
 
+    await query.createFriendship(id1, id2, revert)
+    const friendship = await query.getFriendshipById(id1, id2)
+    reply.code(201).send(friendship)
+}
+
+async function acceptFriendship(req, reply) {
+
+    let { id1, id2 } = req.body;
+
+    if (id1 === id2) 
+        return reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        
+    const user1 = await userQueries.userExists(id1)
+    const user2 = await userQueries.userExists(id2)
+
+    if (user1 === null || user2 === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "User not found" })
+    
+    let revert = false
+
+    if (id1 > id2) {
+        [id1, id2] = [id2, id1]
+        revert = true
+    }
+    
+    const rows = await query.getFriendshipById(id1, id2)
+    if (rows === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
+
+    await query.acceptPendingFriendship(id1, id2, revert)
     const friendship = await query.getFriendshipById(id1, id2)
     reply.code(201).send(friendship)
 }
@@ -83,11 +116,11 @@ async function newFriendship(req, reply) {
 async function addAuthorizationToPlay(req, reply) {
     let { id1, id2 } = req.body;
 
-    if (id1 === id2) {
-        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
-        return
-    }
-
+    if (id1 === id2) 
+        return reply
+            .code(400)
+            .send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
+        
     let revert = false
 
     if (id1 > id2) {
@@ -96,16 +129,16 @@ async function addAuthorizationToPlay(req, reply) {
     }
 
     const rows = await query.getFriendshipById(id1, id2)
-    if (rows === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
-        return
-    }
+    if (rows === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
 
     const friend = await query.checkIfAreFriends(id1, id2)
-    if (friend === null){
-        reply.code(403).send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
-        return
-    }
+    if (friend === null)
+        return reply
+            .code(403)
+            .send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
 
     await query.authorizeToPlay(id1, id2, revert)
     const friendship = await query.getFriendshipById(id1, id2)
@@ -115,10 +148,10 @@ async function addAuthorizationToPlay(req, reply) {
 async function cancelFriendship(req, reply) {
     let { id1, id2 } = req.body;
 
-    if (id1 === id2) {
-        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
-        return
-    }
+    if (id1 === id2)
+        return reply
+            .code(400)
+            .send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
 
     let revert = false
 
@@ -128,16 +161,10 @@ async function cancelFriendship(req, reply) {
     }
 
     const rows = await query.getFriendshipById(id1, id2)
-    if (rows === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
-        return
-    }
-
-    /*const friend = await query.checkIfAreFriends(id1, id2)
-    if (friend === null){
-        reply.code(403).send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
-        return
-    }*/
+    if (rows === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
 
     await query.cancelFriendship(id1, id2, revert)
     const friendship = await query.getFriendshipById(id1, id2)
@@ -147,10 +174,10 @@ async function cancelFriendship(req, reply) {
 async function cancelAuthorization(req, reply) {
     let { id1, id2 } = req.body;
 
-    if (id1 === id2) {
-        reply.code(400).send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
-        return
-    }
+    if (id1 === id2)
+        return reply
+            .code(400)
+            .send({ "statusCode": 400, "error": "Bad Request", "message": "cannot use the same id" })
 
     let revert = false
 
@@ -160,16 +187,16 @@ async function cancelAuthorization(req, reply) {
     }
 
     const rows = await query.getFriendshipById(id1, id2)
-    if (rows === null) {
-        reply.code(404).send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
-        return
-    }
+    if (rows === null)
+        return reply
+            .code(404)
+            .send({ "statusCode": 404, "error": "Not Found", "message": "Friendship not found" })
 
     const friend = await query.checkIfAreFriends(id1, id2)
-    if (friend === null){
-        reply.code(403).send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
-        return
-    }
+    if (friend === null)
+        return reply
+            .code(403)
+            .send({ "statusCode": 403, "error": "Forbidden", "message": "Users are not friends" })
 
     await query.cancelAuthorization(id1, id2, revert)
     const friendship = await query.getFriendshipById(id1, id2)
@@ -182,6 +209,7 @@ export default {
     getPendingFriendships,
     getReceivedFriendRequests,
     newFriendship,
+    acceptFriendship,
     addAuthorizationToPlay,
     cancelFriendship,
     cancelAuthorization
