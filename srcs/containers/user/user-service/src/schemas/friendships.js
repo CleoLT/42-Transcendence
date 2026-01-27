@@ -38,6 +38,8 @@ const twoIdBody = {
       }
 }
 
+/*-----------------SCHEMAS-------------------*/
+
 const getAllFriendships = {
     description: 'Get all friendships',
     tags: ['Friendships'],
@@ -106,7 +108,7 @@ const getReceivedFriendRequests = {
 const newFriendship = {
     description: 'Create a new friendship, (borrar: or accept a pending friendship,) always initiate by id1 ---> to id2',
     tags: ['Friendships'],
-    summary: 'Create friendship',
+    summary: 'Create a new friendship',
 
     body: twoIdBody,
 
