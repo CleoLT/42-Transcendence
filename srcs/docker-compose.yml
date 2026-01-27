@@ -18,14 +18,12 @@ services:
     build: ./containers/api_gateway
     ports:
       - "3000:3000"
-    #expose:
-     # - "3000"
     networks:
       - main
     depends_on:
       - user-service
       - auth-service
-    #  - game_history-service
+      - game_history-service
     restart: always
 
 # USER MICROSERVICE
@@ -39,9 +37,6 @@ services:
     restart: always
     depends_on:
       - user-db
-    #TEMPORAL, solo para ver swagger!!
-    #ports:
-    #  - "3001:3000"
 
   user-db:
     container_name: user-db
@@ -60,13 +55,13 @@ services:
       - main
     restart: always
 
-## GAME HISTORY MICROSERVICE
-#  game_history-service:
-#    container_name: game_history-service
-#    build: ./containers/game_history/game_history-service
-#    networks:
-#      - main
-#    restart: always
+# GAME HISTORY MICROSERVICE
+  game_history-service:
+    container_name: game_history-service
+    build: ./containers/game_history/game_history-service
+    networks:
+      - main
+    restart: always
 #    depends_on:
 #      - game_history-service-db
 #

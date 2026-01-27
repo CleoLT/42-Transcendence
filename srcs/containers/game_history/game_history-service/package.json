@@ -1,0 +1,16 @@
+{
+  "name": "game_history",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.0.0",
+    "mariadb": "^3.3.3",
+    "@fastify/swagger": "^8.0.0",
+    "@fastify/swagger-ui": "^2.0.0",
+    "@fastify/multipart": "^8.1.0"
+  }
+}

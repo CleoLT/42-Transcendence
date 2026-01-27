@@ -13,31 +13,23 @@ fastify.post('/login', async (req, reply) => {
 
     if (!username || !password) return reply.code(400).send({ error: 'Credenciales invalidas' });
 
-    const coincidence = await fetch('http://user-service:3000/user', {
+    const coincidence = await fetch('http://user-service:3000/user',
+    {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
 
-    if (!coincidence.ok) {
-      let errorBody = { error: 'Credenciales invalidas' };
-
-      try {
-        const text = await coincidence.text();
-        if (text)
-          errorBody = JSON.parse(text);
-      } catch {}
-
-      return reply.code(coincidence.status).send(errorBody); // propaga error custom desde user-service
-    }
-
-    return reply.send({ message: 'Bienvenido ' + username });
-
+    let resValues = await coincidence.json();
+    
+    //const userId = resValues.userId;
     //* JWT y sesion de usuario *//
     //const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     //reply
     //  .setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict' })
     //  .send({ username: user.username });
+
+    return reply.code(coincidence.status).send(resValues); // propaga error custom desde user-service
 
   } catch (err) {
     return reply.code(500).send({ error: 'Internal auth error' });
