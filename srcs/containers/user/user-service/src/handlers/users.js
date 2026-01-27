@@ -1,4 +1,4 @@
-import query from './queries.js'
+import query from '../queries/users.js'
 import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
