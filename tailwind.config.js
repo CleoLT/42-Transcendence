@@ -6,6 +6,11 @@ export default {
       fontFamily: {
         'sixtyfour': ['Sixtyfour', 'sans-serif'],
         'corben': ['Corben', 'sans-serif'],
+        'baskerville': ['"Libre Baskerville"', 'Georgia', 'serif'],
+      },
+      colors: {
+        'start-red': '#cf2a27',
+        'start-beige': '#f0e9d6',
       },
     },
   },

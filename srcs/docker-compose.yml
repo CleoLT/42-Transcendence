@@ -3,7 +3,9 @@ name: transcendence
 services:
   nginx_front:
     container_name: nginx_front
-    build: ./containers/nginx_front
+    build:
+      context: .
+      dockerfile: containers/nginx_front/Dockerfile
 #    image: nginx_front:v1
     ports:
       - "8080:443"

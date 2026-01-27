@@ -174,7 +174,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(26, 15, 46, 0.95) 0%, rgba(0, 0, 0, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.95) 0%, #ff0000 100%);
   backdrop-filter: blur(5px);
   animation: fadeIn 0.3s ease-in;
 }
@@ -190,15 +190,11 @@ body {
 
 #start-screen {
   text-align: center;
-  background: linear-gradient(145deg, rgba(20, 10, 35, 0.98) 0%, rgba(10, 5, 20, 0.98) 100%);
-  padding: 50px 70px;
-  border: 3px solid #d4af37;
+  background: rgb(255, 0, 0);
+  padding: 50px 50px;
   border-radius: 20px;
-  box-shadow: 
-    0 0 60px rgba(212, 175, 55, 0.6),
-    inset 0 0 40px rgba(212, 175, 55, 0.1);
-  max-width: 650px;
-  width: 90%;
+  max-width: 450px;
+  width: 60vw;
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.4s ease-out;
@@ -271,7 +267,7 @@ body {
   font-size: 22px;
   color: #f5f5dc;
   margin-bottom: 30px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 1px 1px 2px rgb(255, 0, 0);
   font-weight: 500;
 }
 
@@ -361,7 +357,7 @@ body {
 
 #mode-selector button {
   padding: 12px 30px;
-  background: linear-gradient(145deg, rgba(139, 115, 85, 0.4), rgba(100, 80, 60, 0.4));
+  background: linear-gradient(145deg, rgb(255, 140, 0), rgb(255, 128, 0));
   border: 2px solid #8b7355;
   border-radius: 10px;
   color: #f5f5dc;
@@ -384,7 +380,7 @@ body {
   border-color: #ffd700;
   box-shadow: 
     0 0 15px rgba(212, 175, 55, 0.6),
-    0 4px 8px rgba(0, 0, 0, 0.4);
+    0 4px 8px rgb(111, 0, 255);
   color: #ffd700;
   transform: translateY(-2px);
 }
@@ -471,4 +467,23 @@ body {
 .reset-btn:hover {
   background: rgba(212, 175, 55, 1);
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+}
+
+/* New start screen: paper + floral bg, dark purple oval (overrides above) */
+#start-screen-overlay {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+#start-screen-overlay .start-screen-oval {
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  min-height: 100px;
+  max-height: 60vh;
+}
+
+#start-screen-overlay .start-screen-oval::before {
+  display: none;
 }

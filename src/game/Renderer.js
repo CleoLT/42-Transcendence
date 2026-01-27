@@ -213,47 +213,43 @@ export class Renderer {
 		ctx.restore();
 	}
 
-	// renderPerfectMeterBackplate(ctx, centerX, y) {
-	// 	/**
-	// 	 * Draws the static backplate behind both players' perfect meters.
-	// 	 */
+	renderPerfectMeterBackplate(ctx, centerX, y) {
+		const totalWidth = 200;
+		const height = 100;
 
-	// 	// Compute shared bar bounds across the middle of the canvas
-	// 	const totalWidth = this.canvasWidth * 0.9;
-	// 	const height = 48;
+		const x = centerX - totalWidth / 2;
+		const yTop = y - height / 2;
 
-	// 	const x = centerX - totalWidth / 2;
-	// 	const yTop = y - height / 2;
+		ctx.save();
 
-	// 	ctx.save();
+		// Draw solid bar background	
+		ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+		ctx.beginPath();
+		ctx.roundRect(x, yTop, totalWidth, height, 100);
+		ctx.fill();
 
-	// 	// Draw solid bar background
-	// 	ctx.fillStyle = 'rgba(8,8,8, 0.5)';
-	// 	ctx.beginPath();
-	// 	ctx.roundRect(x, yTop, totalWidth, height, 14);
-	// 	ctx.fill();
+		// Outline the bar for definition
+		ctx.strokeStyle = '#9d0000';
+		ctx.lineWidth = 2;
+		ctx.stroke();
 
-	// 	// Outline the bar for definition
-	// 	ctx.strokeStyle = '#00000080';
-	// 	ctx.lineWidth = 2;
-	// 	ctx.stroke();
-
-	// 	ctx.restore();
-	// }
+		ctx.restore();
+	}
 
 	renderPerfectMeterLabels(ctx, player, centerX, y) {
 		const isLeft = player.side === 'left';
-	
+		const nameX = isLeft
+		? centerX - 700
+		: centerX + 700;
+		this.renderPerfectMeterBackplate(ctx, isLeft ? nameX + 60 : nameX - 60, y + 5);
+		
 		ctx.save();
 		ctx.fillStyle = '#000000';
 		ctx.font = '25px font-corben font-bold text-s';
 		ctx.textBaseline = 'middle';
 		
-	
-		const nameX = isLeft
-			? centerX - 700
-			: centerX + 700;
-	
+		
+		
 		ctx.textAlign = isLeft ? 'left' : 'right';
 		ctx.fillText(player.name, nameX, y - 18);
 	
@@ -290,8 +286,8 @@ export class Renderer {
 		// For left player (right-aligned text), dots start from nameX and go left
 		// For right player (left-aligned text), dots start from nameX and go right
 		const dotStartX = isLeft 
-			? nameX + (dotSpacing * 3) // Right-align: start from nameX, go left
-			: nameX - (dotSpacing * 3); // Left-align: start from nameX, go right
+			? nameX + (dotSpacing * 4) // Right-align: start from nameX, go left
+			: nameX - (dotSpacing * 4); // Left-align: start from nameX, go right
 
 		ctx.save();
 
@@ -359,7 +355,7 @@ export class Renderer {
 
 		if (abilityName === 'reversePush') {
 			// Draw a double-arrow (push back symbol)
-			ctx.strokeStyle = isAvailable ? '#FF6B6B' : '#999999';
+			ctx.strokeStyle = isAvailable ? '#fbff00' : '#999999';
 			ctx.lineWidth = 2;
 			ctx.beginPath();
 			// Left arrow
