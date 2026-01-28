@@ -4,7 +4,25 @@ import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import routes from './routes.js'
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({
+  logger: true,
+  ajv: {
+    customOptions: {
+      strict: true,
+      allErrors: true,
+      removeAdditional: false
+    }
+  }
+})
+
+//si hay un error no encontrado fastify devuelve 500 por defecto
+fastify.setErrorHandler((err, req, reply) => {
+  reply.code(err.statusCode || 500).send({
+    statusCode: err.statusCode || 500,
+    error: err.name || "Internal Server Error",
+    message: err.message
+  })
+})
 
 fastify.register(multipart, {
   limits: {

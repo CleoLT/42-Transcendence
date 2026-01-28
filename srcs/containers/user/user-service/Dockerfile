@@ -10,8 +10,8 @@ RUN npm install
 
 RUN mkdir -p data
 
-COPY *.js ./
+COPY src ./src
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "src/server.js"]
