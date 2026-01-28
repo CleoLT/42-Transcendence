@@ -24,9 +24,11 @@ export default function App() {
     
     // print para debug
     console.log("base url:", baseUrl);
-    const url = `${baseUrl}/api/users/user`;
+    //const url = `${baseUrl}/api/users/user`;
+    const url = `${baseUrl}/api/auth/login`;
 
     try {
+
       const res = await fetch(url, {
         method: "POST",
         headers: {

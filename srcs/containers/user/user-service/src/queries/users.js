@@ -1,4 +1,4 @@
-import pool from './db.js'
+import pool from '../db.js'
 import bcrypt from 'bcrypt'
 
 async function connection(fct) {
@@ -9,6 +9,15 @@ async function connection(fct) {
     conn.release()
   }
 }
+
+async function userExists(userId) {
+  const rows = await connection(conn => conn.query(
+    "SELECT 1 FROM users WHERE id = ? LIMIT 1",
+    [userId]
+  ));
+  return rows[0] || null;
+}
+
 
 async function getAllUsers() {
     return connection(conn => conn.query('SELECT * FROM users'))
@@ -86,46 +95,9 @@ function uploadAvatar(userId, filepath) {
     return getUserById(userId)
     
 }
-/*async function getAllUsers() {
-    //return db.prepare('SELECT * FROM users').all();
-    const conn = await pool.getConnection()
-    try {
-        const rows = await conn.query('SELECT * FROM users')
-        return rows
-    } finally {
-        conn.release()
-    }
-}
-
-async function addUser(username, password, email) {
-    const conn = await pool.getConnection()
-     try {
-        const rows = await conn.query(
-            `INSERT INTO users (username, email, password) 
-            VALUES (?, ?, ?)`,
-            [username, email, password]
-        )
-        return rows
-    } finally {
-        conn.release()
-    }
-}
-
-async function getUserById(id) {
-    const conn = await pool.getConnection()
-     try {
-        const rows = await conn.query(
-            'SELECT * FROM users WHERE id = ?',
-            [id]
-        )
-        return rows[0]
-    } finally {
-        conn.release()
-    }
-}*/
-
 
 export default { 
+    userExists,
     getAllUsers, 
     addUser, 
     getUserById,
