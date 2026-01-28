@@ -52,9 +52,9 @@ async function getUserByName(req, reply) {
     })
 }
 
-async function getCredentialsCoincidence(req, reply) {
+async function tryLogin(req, reply) {
     const { username, password } = req.body;
-    const match = await query.getCredentialsCoincidence(username, password)
+    const match = await query.tryLogin(username, password)
 
     if (!match)
         return reply.code(401).send({ error: 'Usuario o contraseña incorrecta' });
@@ -66,6 +66,17 @@ async function getCredentialsCoincidence(req, reply) {
         return reply.code(401).send({ error: 'Usuario ya en linea' });
 
     await query.updateUserById(user.id, { online_status: 1 });
+
+    return reply.code(200).send({
+        valid: true,
+        userId: user.id
+    });
+}
+
+async function logOut(req, reply) {
+    const { username } = req.body;
+    const user = await query.getUserByName(username);
+    await query.updateUserById(user.id, { online_status: 0 });
 
     return reply.code(200).send({
         valid: true,
@@ -125,7 +136,8 @@ export default {
     postUser, 
     getUserById,
     getUserByName,
-    getCredentialsCoincidence,
+    tryLogin,
+    logOut,
     updateUserById,
     deleteUserById,
     uploadAvatar
