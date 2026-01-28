@@ -65,51 +65,76 @@ export default function App() {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="flex gap-8">
         {/* LOGIN FORM */}
-        <form
-          onSubmit={handleLogin}
-          className="bg-gray-800 p-6 rounded-lg w-80 space-y-4"
-        >
-          <h1 className="text-2xl font-bold text-center">Login</h1>
-
-          <input
-            type="text"
-            placeholder="Username"
-            value={loginUsername}
-            onChange={(e) => setLoginUsername(e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 focus:outline-none"
-            required
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 focus:outline-none"
-            required
-          />
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-semibold"
+        <div>
+          <form
+            onSubmit={handleLogin}
+            className="bg-gray-800 p-6 rounded-lg w-80 space-y-4"
           >
-            Send
+            <h1 className="text-2xl font-bold text-center">Login</h1>
+  
+            <input
+              type="text"
+              placeholder="Username"
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none"
+              required
+            />
+  
+            <input
+              type="password"
+              placeholder="Password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              className="w-full p-2 rounded bg-gray-700 focus:outline-none"
+              required
+            />
+  
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-semibold"
+            >
+              Send
+            </button>
+  
+            {loginResult && (
+              <pre className="text-xs bg-black p-2 rounded overflow-auto">
+                {JSON.stringify(loginResult, null, 2)}
+              </pre>
+            )}
+          </form>
+  
+          {/* LOGOUT BUTTON BELOW LOGIN, OUTSIDE FORM */}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const res = await fetch("https://localhost:8080/api/auth/logout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ username: loginUsername }),
+                });
+                const data = await res.json();
+                console.log("Logout response:", data);
+                setLoginResult(data);
+              } catch (err) {
+                console.error("Logout failed:", err);
+                setLoginResult({ error: "Request failed" });
+              }
+            }}
+            className="w-full bg-red-600 hover:bg-red-700 p-2 rounded font-semibold mt-2"
+          >
+            Logout
           </button>
-
-          {loginResult && (
-            <pre className="text-xs bg-black p-2 rounded overflow-auto">
-              {JSON.stringify(loginResult, null, 2)}
-            </pre>
-          )}
-        </form>
-
+        </div>
+  
         {/* REGISTER FORM */}
         <form
           onSubmit={handleRegister}
           className="bg-gray-800 p-6 rounded-lg w-80 space-y-4"
         >
           <h1 className="text-2xl font-bold text-center">Create Account</h1>
-
+  
           <input
             type="text"
             placeholder="Username"
@@ -118,7 +143,7 @@ export default function App() {
             className="w-full p-2 rounded bg-gray-700 focus:outline-none"
             required
           />
-
+  
           <input
             type="email"
             placeholder="Email"
@@ -127,7 +152,7 @@ export default function App() {
             className="w-full p-2 rounded bg-gray-700 focus:outline-none"
             required
           />
-
+  
           <input
             type="password"
             placeholder="Password"
@@ -136,14 +161,14 @@ export default function App() {
             className="w-full p-2 rounded bg-gray-700 focus:outline-none"
             required
           />
-
+  
           <button
             type="submit"
             className="w-full bg-green-600 hover:bg-green-700 p-2 rounded font-semibold"
           >
             Create
           </button>
-
+  
           {regResult && (
             <pre className="text-xs bg-black p-2 rounded overflow-auto">
               {JSON.stringify(regResult, null, 2)}
@@ -153,5 +178,6 @@ export default function App() {
       </div>
     </div>
   );
+  
 }
 
