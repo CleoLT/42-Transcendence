@@ -1,0 +1,12 @@
+/* Google Fonts import */
+@import url('https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Sixtyfour&display=swap');
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*Font by default*/
+body {
+  font-family: 'Corben', sans-serif;
+}
