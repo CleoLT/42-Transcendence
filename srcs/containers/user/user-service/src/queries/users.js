@@ -50,7 +50,7 @@ async function getUserByName(username) {
     return rows[0]
 }
 
-async function getCredentialsCoincidence(username, password) {
+async function tryLogin(username, password) {
     
     const rows = await connection(conn =>
         conn.query('SELECT * FROM users WHERE username = ?', [username])
@@ -102,7 +102,7 @@ export default {
     addUser, 
     getUserById,
     getUserByName,
-    getCredentialsCoincidence,
+    tryLogin,
     updateUserById,
     deleteUserById,
     uploadAvatar 
