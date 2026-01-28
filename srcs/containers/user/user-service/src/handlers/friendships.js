@@ -1,21 +1,11 @@
 import query from '../queries/friendships.js'
-import userQueries from '../queries/users.js'
+import userHandlers from './users.js'
 
 function normalizeIds(id1, id2) {
   if (id1 > id2)
     return { idA: id2, idB: id1, revert: true }
   else
     return { idA: id1, idB: id2, revert: false }
-}
-
-async function checkIfUserExists(userId) {
-    const user = await userQueries.userExists(userId)
-    if (user === null) {
-        const err = new Error('User not found')
-        err.statusCode = 404
-        err.name = 'Not Found'
-        throw err
-  }
 }
 
 async function checkIfTwoIdsAreCorrect(id1, id2) {
@@ -25,8 +15,8 @@ async function checkIfTwoIdsAreCorrect(id1, id2) {
         err.name = 'Bad Request'
         throw err
     }
-    await checkIfUserExists(id1)
-    await checkIfUserExists(id2)
+    await userHandlers.checkIfUserExists(id1)
+    await userHandlers.checkIfUserExists(id2)
 }
 
 async function checkIfFriendshipExists(id1, id2) {
@@ -60,7 +50,7 @@ async function getAllFriendsByUserId(req, reply) {
     const { userId } =  req.params
 
     try {
-        await checkIfUserExists(userId)
+        await userHandlers.checkIfUserExists(userId)
         const result = await query.getFriendsByUserId(userId)
         reply.code(200).send(result) 
     } catch(err) {
@@ -72,7 +62,7 @@ async function getPendingFriendships(req, reply) {
     const { userId } =  req.params
 
     try {
-        await checkIfUserExists(userId)
+        await userHandlers.checkIfUserExists(userId)
         const result = await query.getPendingFriendships(userId)
         reply.code(200).send(result) 
     } catch(err) {
@@ -84,7 +74,7 @@ async function getReceivedFriendRequests(req, reply) {
     const { userId } =  req.params
  
     try {
-        await checkIfUserExists(userId)
+        await userHandlers.checkIfUserExists(userId)
         const result = await query.getReceivedFriendRequests(userId)
         reply.code(200).send(result) 
     } catch(err) {

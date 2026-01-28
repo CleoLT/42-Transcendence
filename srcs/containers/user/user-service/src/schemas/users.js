@@ -1,25 +1,27 @@
+const userResponse = {
+  type: 'object',
+  properties: {
+      id: { type: 'number' },
+      username: { type: 'string' },
+      email: { type: 'string' },
+      alias: { type: 'string' },
+      bio: { type: 'string' },
+      avatar: { type: 'string' },
+      online_status: { type: 'boolean' },
+      created_at: { type: 'string' }
+  }
+}
+
 const getAllUsers = {
     description: 'Get all users',
         tags: ['Users'], // agrupa rutas en Swagger
         summary: 'User list',
         response: {
-        200: {
-            description: 'Users list',
-            type: 'array',
-            items: {
-            type: 'object',
-            properties: {
-                id: { type: 'number' },
-                username: { type: 'string' },
-                email: { type: 'string' },
-                alias: { type: 'string' },
-                bio: { type: 'string' },
-                avatar: { type: 'string' },
-                online_status: { type: 'boolean' },
-                created_at: { type: 'string' }
+            200: {
+                description: 'Users list',
+                type: 'array',
+                items: userResponse
             }
-            }
-        }
         }
 }
 
@@ -65,22 +67,10 @@ const getUserById = {
     required: ['userId']
   },
 
-  // 👇 Validación de la respuesta
   response: {
     200: {
       description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
+      ...userResponse
     }
   }
 };
@@ -101,18 +91,7 @@ const getUserByName = {
   response: {
     200: {
       description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
+      ...userResponse
     }
   }
 };
@@ -179,18 +158,7 @@ const updateUserById = {
   response: {
     200: {
       description: 'user updated',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' }, //?
-        online_status: { type: 'boolean' }, //?
-        created_at: { type: 'string' }, //?
-        playing_time: { type: 'number' } //?
-      }
+      ...userResponse
     }
   }
 };
