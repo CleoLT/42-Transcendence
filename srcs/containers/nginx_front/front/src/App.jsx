@@ -12,11 +12,24 @@ export default function App() {
   const [regEmail, setRegEmail] = useState("");
   const [regResult, setRegResult] = useState(null);
 
+  // elegimos el inicio de url segun el modo de compilacion
+  // dev o prod
+  // si es dev = http://localhost:5173
+  // si es prod = https://localhost:8080
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    // print para debug
+    console.log("base url:", baseUrl);
+    //const url = `${baseUrl}/api/users/user`;
+    const url = `${baseUrl}/api/auth/login`;
 
     try {
-      const res = await fetch("https://localhost:8080/api/auth/login", {
+
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,8 +52,12 @@ export default function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // print para debug
+    console.log("base url:", baseUrl);
+    const url = `${baseUrl}/api/users`;
+
     try {
-      const res = await fetch("https://localhost:8080/api/users", {
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
