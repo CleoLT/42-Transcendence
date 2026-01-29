@@ -168,6 +168,7 @@ const updateUserById = {
 
   body: {
       type: 'object',
+      minProperties: 1,
       properties: {
         username: username,
         password: password,
@@ -181,7 +182,7 @@ const updateUserById = {
   params: paramId,
 
   response: {
-    200: {
+    201: {
       description: 'user updated',
       ...userResponse
     }
@@ -196,7 +197,7 @@ const deleteUserById = {
   params: paramId,
 
   reponse: {
-    200: { decription: 'User deleted from database ????????' }
+    204: { decription: 'User deleted from database ????????' }
   }
 };
 

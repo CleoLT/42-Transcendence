@@ -79,24 +79,21 @@ async function updateUserById(id, modifiedData) {
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")
+    
     const values = keys.map(key => modifiedData[key])
-
     const params = [...values, id]
     
-    const rows = connection(conn => conn.query(
+    const rows = await connection(conn => conn.query(
         `UPDATE users
         SET ${setStmt}
         WHERE id = ?`, 
         params
     ))
-
-    //stmt.run(values, userId)
-    return getUserById(id)
 }
 
-function deleteUserById(userId) {
-    const stmt = db.prepare('DELETE FROM users WHERE id = ?')
-    stmt.run(userId)
+async function deleteUserById(userId) {
+    //const stmt = db.prepare('DELETE FROM users WHERE id = ?')
+    //stmt.run(userId)
 }
 
 function uploadAvatar(userId, filepath) {

@@ -55,7 +55,6 @@ async function getUserByName(req, reply) {
     } catch (error) {
         reply.send(error)
     }
- 
 }
 
 async function postUser(req, reply) {
@@ -96,20 +95,36 @@ async function getCredentialsCoincidence(req, reply) {
     });
 }
 
-function updateUserById(req, reply) {
-    const modifiedData = req.body; //TODO EL OBJETO
+async function updateUserById(req, reply) {
+    const modifiedData = req.body
+    const { username, email } = req.body
     const { userId } = req.params;
 
-    const result = query.updateUserById(userId, modifiedData)
+    try {
+        const user = await checkIfUserExists(userId)
+        if (user.username === username) userConflictError()
+        if (user.email === email) userConflictError()
 
-    reply.code(201).send(result);
+        await query.updateUserById(userId, modifiedData)
+        const result = await query.getUserById(userId)
+        reply.code(201).send(result);
+    } catch (error) {
+        reply.send(error)
+    }
 }   
 
-function deleteUserById(req, reply) {
+async function deleteUserById(req, reply) {
     const { userId } = req.params
-    query.deleteUserById(userId)
-
-    reply.code(204).send()
+    
+    try {
+        await checkIfUserExists(userId)
+        
+        query.deleteUserById(userId)
+        reply.code(204).send('User deleted')
+    } catch (error) {
+        reply.send(error)
+    }
+    
 }
 
 async function uploadAvatar(req, reply) {
