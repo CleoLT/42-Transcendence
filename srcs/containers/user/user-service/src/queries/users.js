@@ -10,15 +10,6 @@ async function connection(fct) {
   }
 }
 
-/*async function userExists(userId) {
-  const rows = await connection(conn => conn.query(
-    "SELECT 1 FROM users WHERE id = ? LIMIT 1",
-    [userId]
-  ));
-  return rows[0] || null;
-}*/
-
-
 async function getAllUsers() {
     return connection(conn => conn.query('SELECT * FROM users'))
 }
@@ -40,7 +31,7 @@ async function getUserById(id) {
             LIMIT 1`,
             [id]
         ))
-    return rows[0] || null //he anadido el null a ver si peta lol
+    return rows[0] || null
         //cuidado que esto devuelve el password !!!
 }
 
@@ -92,8 +83,11 @@ async function updateUserById(id, modifiedData) {
 }
 
 async function deleteUserById(userId) {
-    //const stmt = db.prepare('DELETE FROM users WHERE id = ?')
-    //stmt.run(userId)
+    await connection(conn => conn.query(
+            `DELETE FROM users WHERE id = ?
+            LIMIT 1`,
+            [userId]
+        ))
 }
 
 function uploadAvatar(userId, filepath) {
@@ -105,7 +99,6 @@ function uploadAvatar(userId, filepath) {
 }
 
 export default { 
-    //userExists,
     getAllUsers, 
     addUser, 
     getUserById,

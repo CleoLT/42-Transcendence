@@ -119,8 +119,9 @@ async function deleteUserById(req, reply) {
     try {
         await checkIfUserExists(userId)
         
-        query.deleteUserById(userId)
-        reply.code(204).send('User deleted')
+        //poner anonymous los partidos en la database de games de este user ????
+        await query.deleteUserById(userId)
+        reply.code(204).send('user deleted')
     } catch (error) {
         reply.send(error)
     }

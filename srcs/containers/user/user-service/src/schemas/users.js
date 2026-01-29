@@ -192,7 +192,7 @@ const updateUserById = {
 const deleteUserById = {
   description: 'Delete user by id',
   tags: ['Users'],
-  summary: 'Delete all user info replace username by ananymous or delete id from database ??????',
+  summary: 'Delete all user info replace username by anonymous or delete id from database ??????',
 
   params: paramId,
 
