@@ -86,6 +86,7 @@ const postUser = {
         description: 'User created',
         ...userResponse
       },
+      400: errorResponse,
       409: errorResponse
     }
 }
@@ -185,19 +186,26 @@ const updateUserById = {
     201: {
       description: 'user updated',
       ...userResponse
-    }
+    },
+    400: errorResponse,
+    404: errorResponse,
+    409: errorResponse
   }
 };
 
 const deleteUserById = {
   description: 'Delete user by id',
   tags: ['Users'],
-  summary: 'Delete all user info replace username by anonymous or delete id from database ??????',
+  summary: 'Delete all user info and friendships from database. Replace username by anonymous in  ??????',
 
   params: paramId,
 
-  reponse: {
-    204: { decription: 'User deleted from database ????????' }
+  response: {
+    204: { 
+      description: 'User deleted',
+      type: 'null' 
+    },
+    404: errorResponse
   }
 };
 
