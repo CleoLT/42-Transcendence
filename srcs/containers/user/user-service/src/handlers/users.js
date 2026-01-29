@@ -125,7 +125,6 @@ async function deleteUserById(req, reply) {
     } catch (error) {
         reply.send(error)
     }
-    
 }
 
 async function uploadAvatar(req, reply) {

@@ -122,7 +122,7 @@ const getUserByName = {
 
     response: {
         200: {
-           description: 'user info',
+            description: 'user info',
             ...userResponse
         },
         404: errorResponse
@@ -130,83 +130,83 @@ const getUserByName = {
 };
 
 const getCredentialsCoincidence = {
-  description: 'Validate user credentials',
-  tags: ['Users'],
-  summary: 'Credentials validation',
+    description: 'Validate user credentials',
+    tags: ['Users'],
+    summary: 'Credentials validation',
 
-  body: {
-    type: 'object',
-    required: ['username', 'password'],
-    properties: {
-      username: { type: 'string' },
-      password: { type: 'string' }
-    }
-  },
-
-  response: {
-    200: {
-      description: 'Credentials valid',
-      type: 'object',
-      properties: {
-        valid: { type: 'boolean' },
-        userId: { type: 'number' }
-      }
+    body: {
+        type: 'object',
+        required: ['username', 'password'],
+        properties: {
+          username: { type: 'string' },
+          password: { type: 'string' }
+        }
     },
-    401: {
-      description: 'Invalid credentials',
-      type: 'object',
-      properties: {
-        error: { type: 'string' }
-      }
+
+    response: {
+        200: {
+            description: 'Credentials valid',
+            type: 'object',
+            properties: {
+              valid: { type: 'boolean' },
+              userId: { type: 'number' }
+            }
+        },
+        401: {
+            description: 'Invalid credentials',
+            type: 'object',
+            properties: {
+              error: { type: 'string' }
+            }
+        }
     }
-  }
 };
 
 const updateUserById = {
-  description: 'Partially update user by id',
-  tags: ['Users'],
-  summary: 'update user info',
+    description: 'Partially update user by id',
+    tags: ['Users'],
+    summary: 'update user info',
 
-  body: {
-      type: 'object',
-      minProperties: 1,
-      properties: {
-        username: username,
-        password: password,
-        email: email,
-        alias: username,
-        bio: { type: 'string', minLength: 3, maxLength: 200 }
+    body: {
+        type: 'object',
+        minProperties: 1,
+        properties: {
+            username: username,
+            password: password,
+            email: email,
+            alias: username,
+            bio: { type: 'string', minLength: 3, maxLength: 200 }
+        },
+        additionalProperties: false
       },
-      additionalProperties: false
-    },
-    
-  params: paramId,
+      
+    params: paramId,
 
-  response: {
-    201: {
-      description: 'user updated',
-      ...userResponse
-    },
-    400: errorResponse,
-    404: errorResponse,
-    409: errorResponse
-  }
+    response: {
+        201: {
+            description: 'user updated',
+            ...userResponse
+        },
+        400: errorResponse,
+        404: errorResponse,
+        409: errorResponse
+    }
 };
 
 const deleteUserById = {
-  description: 'Delete user by id',
-  tags: ['Users'],
-  summary: 'Delete all user info and friendships from database. Replace username by anonymous in  ??????',
+    description: 'Delete user by id',
+    tags: ['Users'],
+    summary: 'Delete all user info and friendships from database. Replace username by anonymous in  ??????',
 
-  params: paramId,
+    params: paramId,
 
-  response: {
-    204: { 
-      description: 'User deleted',
-      type: 'null' 
-    },
-    404: errorResponse
-  }
+    response: {
+        204: { 
+            description: 'User deleted',
+            type: 'null' 
+        },
+        404: errorResponse
+    }
 };
 
 const uploadAvatar = {
