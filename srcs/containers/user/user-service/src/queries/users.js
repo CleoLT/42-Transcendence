@@ -36,18 +36,30 @@ async function addUser(username, password, email) {
 
 async function getUserById(id) {
     const rows = await connection(conn => conn.query(
-            'SELECT * FROM users WHERE id = ?',
+            `SELECT * FROM users WHERE id = ?
+            LIMIT 1`,
             [id]
         ))
     return rows[0] || null //he anadido el null a ver si peta lol
+        //cuidado que esto devuelve el password !!!
 }
 
 async function getUserByName(username) {
     const rows = await connection(conn => conn.query(
-            'SELECT * FROM users WHERE username = ?',
+            `SELECT * FROM users WHERE username = ?
+            LIMIT 1`,
             [username]
         ))
-    return rows[0]
+    return rows[0] || null
+}
+
+async function getUserByEmail(email) {
+    const rows = await connection(conn => conn.query(
+            `SELECT * FROM users WHERE email = ?
+            LIMIT 1`,
+            [email]
+        ))
+    return rows[0] || null
 }
 
 async function getCredentialsCoincidence(username, password) {
@@ -64,7 +76,6 @@ async function getCredentialsCoincidence(username, password) {
 }
 
 async function updateUserById(id, modifiedData) {
-
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")
@@ -97,11 +108,12 @@ function uploadAvatar(userId, filepath) {
 }
 
 export default { 
-    userExists,
+    //userExists,
     getAllUsers, 
     addUser, 
     getUserById,
     getUserByName,
+    getUserByEmail,
     getCredentialsCoincidence,
     updateUserById,
     deleteUserById,

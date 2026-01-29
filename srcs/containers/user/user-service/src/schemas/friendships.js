@@ -43,7 +43,7 @@ const twoIdBody = {
 const getAllFriendships = {
     description: 'Get all friendships',
     tags: ['Friendships'],
-    summary: 'Friendships list',
+    summary: 'Friendships list. This is a tool for developpment',
 
     response: {
         200: {
