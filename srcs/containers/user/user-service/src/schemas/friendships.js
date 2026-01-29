@@ -1,4 +1,4 @@
-const errorResponse = {
+const errorResponse = { //duplicate
     type: 'object',
     properties: {
         statusCode: { type: 'number' },
@@ -20,7 +20,7 @@ const friendshipResponse = {
   }
 }
 
-const paramId = {
+const paramId = {  //duplicate
   type: 'object',
     properties: {
       userId: { type: 'number' }

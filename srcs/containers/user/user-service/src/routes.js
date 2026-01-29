@@ -19,7 +19,7 @@ const routes = async function(fastify, options) {
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId }, friendHandler.getAllFriendsByUserId)
     fastify.get('/:userId/friendships/pending', { schema: friendSchema.getPendingFriendships }, friendHandler.getPendingFriendships)
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests }, friendHandler.getReceivedFriendRequests)
-    fastify.post('/friendships', { schema: friendSchema.newFriendship }, friendHandler.newFriendship) // esto se tendria que separar en dos rutas en realidad una post y una patch
+    fastify.post('/friendships', { schema: friendSchema.newFriendship }, friendHandler.newFriendship)
     fastify.patch('/friendships/accept', { schema: friendSchema.acceptFriendship }, friendHandler.acceptFriendship)
     fastify.patch('/friendships/cancel', { schema: friendSchema.cancelFriendship }, friendHandler.cancelFriendship)
     fastify.patch('/friendships/authorization', { schema: friendSchema.addAuthorizationToPlay }, friendHandler.addAuthorizationToPlay)

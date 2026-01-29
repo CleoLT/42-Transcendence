@@ -1,25 +1,46 @@
+const userResponse = {
+  type: 'object',
+  properties: {
+      id: { type: 'number' },
+      username: { type: 'string' },
+      email: { type: 'string' },
+      alias: { type: 'string' },
+      bio: { type: 'string' },
+      avatar: { type: 'string' },
+      online_status: { type: 'boolean' },
+      created_at: { type: 'string' }
+  }
+}
+
+const errorResponse = {  //duplicado
+    type: 'object',
+    properties: {
+        statusCode: { type: 'number' },
+        error: { type: 'string' },
+        message: { type: 'string' }
+    }
+}
+
+const paramId = {        //duplicado
+  type: 'object',
+    properties: {
+      userId: { type: 'number' }
+    },
+    required: ['userId']
+}
+
+/*-----------------------SCHEMAS--------------------*/
+
 const getAllUsers = {
     description: 'Get all users',
-        tags: ['Users'], // agrupa rutas en Swagger
+        tags: ['Users'],
         summary: 'User list',
         response: {
-        200: {
-            description: 'Users list',
-            type: 'array',
-            items: {
-            type: 'object',
-            properties: {
-                id: { type: 'number' },
-                username: { type: 'string' },
-                email: { type: 'string' },
-                alias: { type: 'string' },
-                bio: { type: 'string' },
-                avatar: { type: 'string' },
-                online_status: { type: 'boolean' },
-                created_at: { type: 'string' }
+            200: {
+                description: 'Users list',
+                type: 'array',
+                items: userResponse
             }
-            }
-        }
         }
 }
 
@@ -56,32 +77,14 @@ const getUserById = {
   tags: ['Users'],
   summary: 'User info',
 
-  // 👇 Validación del parámetro de la ruta
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
+  params: paramId,
 
-  // 👇 Validación de la respuesta
   response: {
     200: {
       description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
-    }
+      ...userResponse
+    },
+    404: errorResponse
   }
 };
 
@@ -101,18 +104,7 @@ const getUserByName = {
   response: {
     200: {
       description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
+      ...userResponse
     }
   }
 };
@@ -179,18 +171,7 @@ const updateUserById = {
   response: {
     200: {
       description: 'user updated',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' }, //?
-        online_status: { type: 'boolean' }, //?
-        created_at: { type: 'string' }, //?
-        playing_time: { type: 'number' } //?
-      }
+      ...userResponse
     }
   }
 };

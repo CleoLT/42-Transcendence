@@ -6,6 +6,17 @@ import path from 'node:path'
 
 const pump = util.promisify(pipeline)
 
+async function checkIfUserExists(userId) {
+    const user = await query.getUserById(userId)
+    if (user === null) {
+        const err = new Error('User not found')
+        err.statusCode = 404
+        err.name = 'Not Found'
+        throw err
+    }
+}
+
+
 async function getAllUsers(req, reply) {
     const users = await query.getAllUsers()
     reply.send(users);
@@ -14,42 +25,50 @@ async function getAllUsers(req, reply) {
 async function postUser(req, reply) {
     const { username, password, email } = req.body;
 
-    const result = await query.addUser(username, password, email)
+    try {
+        //check if username already exists
+        //check if email already exists
+        // check username syntax min 2 char max X char
+        //check password syntax min 6 char min 1 number 1 char 
+        //check email syntax, @ . characteres no authorizados 
 
-    reply.code(201).send({ id: result.insertId, username });
+        const user = await query.addUser(username, password, email)
+        const result = await query.getUserById(user.insertId) 
+    
+        reply.code(201).send(result);
+    } catch (error) {
+        reply.send(error)
+    }
+   
 }    
 
 async function getUserById(req, reply) {
     const { userId } =  req.params
-    const result = await query.getUserById(userId)
-    reply.code(200).send({
-        userId, 
-        username: result.username,
-        email: result.email,
-        alias: result.alias,
-        bio: result.bio,
-        avatar: result.avatar,
-        online_status: result.online_status,
-        created_at: result.created_at,
-        playing_time: result.playing_time
-    }) 
+
+    try {
+        //check if user with this id exists OK
+        await checkIfUserExists(userId)
+        //const result = await checkIfUserExists(userId) //
+        const result = await query.getUserById(userId) 
+        
+        console.log(result)
+        reply.code(200).send(result) 
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function getUserByName(req, reply) {
     const { username } = req.params
-    const result = await query.getUserByName(username)
-  
-    reply.code(200).send({
-      id: result.id,
-      username: result.username,
-      email: result.email,
-      alias: result.alias,
-      bio: result.bio,
-      avatar: result.avatar,
-      online_status: result.online_status,
-      created_at: result.created_at,
-      playing_time: result.playing_time
-    })
+
+    try {
+        //check if user with this username exists
+        const result = await query.getUserByName(username)
+        reply.code(200).send(result)
+    } catch (error) {
+        reply.send(error)
+    }
+ 
 }
 
 async function getCredentialsCoincidence(req, reply) {
@@ -121,6 +140,7 @@ async function uploadAvatar(req, reply) {
 }
 
 export default { 
+    checkIfUserExists,
     getAllUsers, 
     postUser, 
     getUserById,

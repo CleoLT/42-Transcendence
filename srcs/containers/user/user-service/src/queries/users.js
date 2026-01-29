@@ -10,13 +10,13 @@ async function connection(fct) {
   }
 }
 
-async function userExists(userId) {
+/*async function userExists(userId) {
   const rows = await connection(conn => conn.query(
     "SELECT 1 FROM users WHERE id = ? LIMIT 1",
     [userId]
   ));
   return rows[0] || null;
-}
+}*/
 
 
 async function getAllUsers() {
@@ -39,7 +39,7 @@ async function getUserById(id) {
             'SELECT * FROM users WHERE id = ?',
             [id]
         ))
-    return rows[0]
+    return rows[0] || null //he anadido el null a ver si peta lol
 }
 
 async function getUserByName(username) {
