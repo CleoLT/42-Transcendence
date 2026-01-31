@@ -1,0 +1,26 @@
+services:
+   nginx_front:
+    container_name: nginx_front
+    build:
+      context: ./containers/nginx_front
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_BASE_URL: "http://localhost:5173"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api_gateway
+    networks:
+      - main
+    restart: always
+    volumes:
+      - ./containers/nginx_front/front:/app
+      - /app/node_modules
+
+   user-service:
+    build:
+      context: ./containers/user/user-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./containers/user/user-service:/app
+      - /app/node_modules

@@ -94,7 +94,7 @@ export default function App() {
               placeholder="Username"
               value={loginUsername}
               onChange={(e) => setLoginUsername(e.target.value)}
-              className="w-full p-2 rounded bg-gray-700 focus:outline-none"
+              className="w-full p-2 rounded bg-pink-700 focus:outline-none"
               required
             />
   
