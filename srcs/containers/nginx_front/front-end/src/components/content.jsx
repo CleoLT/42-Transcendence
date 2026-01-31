@@ -17,12 +17,13 @@
 //     )
 // }
 
-import Circle from "./circleUtils.jsx"
+import {Circle} from "./circleUtils.jsx"
 import StartScreen from "./startScreen"
 import GameContainer from "./gameContainer"
 import {IconsList} from "./icon.jsx"
 import { useState, useEffect } from "react"
-// import {PlayConnected} from "./circlePages.jsx"
+import {PlayConnected, PlayNotConnected, SignInClick} from "./circlePages.jsx"
+// import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
 export default function Content(){
     const [game, setGame] = useState(null);
@@ -39,12 +40,15 @@ export default function Content(){
             <div className="flex items-center">
                 <IconsList />
             </div>
-            <div className="flex-1 flex justify-center items-center">
-                <Circle/>
-            </div>
             {/* <div className="flex-1 flex justify-center items-center">
-                <PlayConnected onPlayClick={() => console.log("Play clicked")} />
+                <PlayConnected PlayClick={() => console.log("Play clicked")} />
             </div> */}
+            {/* <div className="flex-1 flex justify-center items-center">
+                <PlayNotConnected PlayClick={() => console.log("Play clicked")} />
+            </div> */}
+            <div className="flex-1 flex justify-center items-center">
+                <SignInClick />
+            </div>
             {/* <div className="flex-1 relative overflow-hidden w-full h-auto" >
                 <GameContainer onGameReady={setGame} />
                 <StartScreen game={game} />
