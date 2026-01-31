@@ -117,7 +117,7 @@ const getUserByName = {
   }
 };
 
-const getCredentialsCoincidence = {
+const tryLogin = {
   description: 'Validate user credentials',
   tags: ['Users'],
   summary: 'Credentials validation',
@@ -142,6 +142,38 @@ const getCredentialsCoincidence = {
     },
     401: {
       description: 'Invalid credentials',
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
+      }
+    }
+  }
+};
+
+const logOut = {
+  description: 'Logs user out',
+  tags: ['Users'],
+  summary: 'User logout',
+
+  body: {
+    type: 'object',
+    required: ['username'],
+    properties: {
+      username: { type: 'string' }
+    }
+  },
+
+  response: {
+    200: {
+      description: 'OK',
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' },
+        userId: { type: 'number' }
+      }
+    },
+    401: {
+      description: 'Not OK',
       type: 'object',
       properties: {
         error: { type: 'string' }
@@ -252,7 +284,8 @@ export default {
     postUser,
     getUserById,
     getUserByName,
-    getCredentialsCoincidence,
+    tryLogin,
+    logOut,
     updateUserById,
     deleteUserById,
     uploadAvatar
