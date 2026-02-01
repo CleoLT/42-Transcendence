@@ -61,7 +61,7 @@ fastify.register(routes)
 
 // Health check
 fastify.get('/health', async () => {
-  return { status: 'ok', service: 'user-serviceeee' };
+  return { status: 'ok', service: 'user-service' };
 });
 
 

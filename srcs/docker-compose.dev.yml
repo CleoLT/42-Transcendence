@@ -21,14 +21,20 @@ services:
     build:
       context: ./containers/user/user-service
       dockerfile: Dockerfile.dev
+    networks:
+      - main   
     volumes:
       - ./containers/user/user-service:/app
       - /app/node_modules
+    depends_on:
+      - user-db
 
    auth-service:
     build:
       context: ./containers/auth/auth-service
       dockerfile: Dockerfile.dev
+    networks:
+      - main 
     volumes:
       - ./containers/auth/auth-service:/app
       - /app/node_modules
@@ -37,6 +43,8 @@ services:
     build:
       context: ./containers/game_history/game_history-service
       dockerfile: Dockerfile.dev
+    networks:
+      - main 
     volumes:
       - ./containers/game_history/game_history-service:/app
       - /app/node_modules

@@ -27,6 +27,7 @@ restart: down up
 
 clean:
 	$(DC) down -v || true
+	find ./srcs/containers -type d -name node_modules -prune -exec rm -rf {} +
 	# anonymous volumes like /app/node_modules are removed here
 
 deep-clean: clean
