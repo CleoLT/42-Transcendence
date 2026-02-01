@@ -50,19 +50,12 @@ services:
 # GAME HISTORY MICROSERVICE
   game_history-service:
     container_name: game_history-service
-    build: ./containers/game_history/game_history-service
+    build: 
+      context: ./containers/game_history/game_history-service
+      dockerfile: Dockerfile.prod
     networks:
       - main
     restart: always
-#    depends_on:
-#      - game_history-service-db
-#
-#  game_history-db:
-#    container_name: game_history-db
-#    build: ./containers/game_history/game_history-db
-#    networks:
-#      - main
-#    restart: always
 
 networks:
    main:

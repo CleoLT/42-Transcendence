@@ -32,3 +32,11 @@ services:
     volumes:
       - ./containers/auth/auth-service:/app
       - /app/node_modules
+
+   game_history-service:
+    build:
+      context: ./containers/game_history/game_history-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./containers/game_history/game_history-service:/app
+      - /app/node_modules
