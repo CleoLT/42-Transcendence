@@ -26,7 +26,7 @@ await fastify.register(swaggerUI, {
 
 // Health check
 fastify.get('/health', async () => {
-  return { status: 'ok', service: 'game_historyyyy' };
+  return { status: 'ok', service: 'game_history' };
 });
 
 const start = async () => {
