@@ -8,8 +8,8 @@ RUN npm install
 
 RUN mkdir -p data
 
-COPY src ./src
+COPY ./ ./
 
 EXPOSE 3000
 
-CMD ["node", "src/server.js"]
+CMD ["node", "server.js"]

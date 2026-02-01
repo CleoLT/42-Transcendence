@@ -38,7 +38,9 @@ services:
 # AUTH MICROSERVICE
   auth-service:
     container_name: auth-service
-    build: ./containers/auth/auth-service
+    build: 
+      context: ./containers/auth/auth-service
+      dockerfile: Dockerfile.prod
     env_file:
       - ./containers/auth/auth-service/.auth_env
     networks:

@@ -24,3 +24,11 @@ services:
     volumes:
       - ./containers/user/user-service:/app
       - /app/node_modules
+
+   auth-service:
+    build:
+      context: ./containers/auth/auth-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./containers/auth/auth-service:/app
+      - /app/node_modules
