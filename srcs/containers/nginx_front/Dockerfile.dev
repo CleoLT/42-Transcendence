@@ -7,7 +7,7 @@ ENV VITE_BASE_URL=$VITE_BASE_URL
 WORKDIR /app
 
 # Only dependencies are baked into the image
-COPY front/package*.json ./
+COPY front-end/package*.json ./
 RUN npm install
 
 EXPOSE 5173

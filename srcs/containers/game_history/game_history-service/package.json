@@ -4,9 +4,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "dev": "nodemon server.js",
     "start": "node server.js"
   },
   "dependencies": {
+    "nodemon": "^3.0.0",
     "fastify": "^4.0.0",
     "mariadb": "^3.3.3",
     "@fastify/swagger": "^8.0.0",

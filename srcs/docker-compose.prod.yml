@@ -1,0 +1,15 @@
+services:
+  nginx_front:
+    container_name: nginx_front
+    build:
+      context: ./containers/nginx_front
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_BASE_URL: "https://localhost:8080"
+    ports:
+      - "8080:443"
+    depends_on:
+      - api_gateway
+    networks:
+      - main
+    restart: always
