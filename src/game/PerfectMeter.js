@@ -1,5 +1,7 @@
+import { PERFECT_METER_MAX } from './Constants.js';
+
 export class PerfectMeter {
-	constructor(max = 6) {
+	constructor(max = PERFECT_METER_MAX) {
 		this.max = max;
 		this.value = 0;
 	}

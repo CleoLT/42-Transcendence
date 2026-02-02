@@ -1,8 +1,10 @@
 import { Game } from './game/Game.js';
 import { InputManager } from './game/InputManager.js';
 
-const baseWidth = 1800;
-const baseHeight = 800;
+import { CANVAS_BASE_WIDTH, CANVAS_BASE_HEIGHT, DELTA_TIME_MAX, LOADING_BACKGROUND_COLOR, LOADING_TEXT_COLOR, LOADING_TEXT_FONT } from './game/Constants.js';
+
+const baseWidth = CANVAS_BASE_WIDTH;
+const baseHeight = CANVAS_BASE_HEIGHT;
 const aspectRatio = baseWidth / baseHeight;
 /**
  * Initializes the vanilla game inside a container.
@@ -19,7 +21,7 @@ export function initGame(container, onGameReady) {
   canvas.id = 'game-canvas';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
-  canvas.style.backgroundColor = '#1a0f2e'; // Fallback background color
+  canvas.style.backgroundColor = LOADING_BACKGROUND_COLOR; // Fallback background color
   canvas.style.position = 'relative';
   canvas.style.zIndex = '0'; // Behind menu overlay
   container.appendChild(canvas);
@@ -141,7 +143,7 @@ export function initGame(container, onGameReady) {
       lastTime = time;
     }
     
-    const deltaTime = Math.min((time - lastTime) / 1000, 0.1); // Cap deltaTime to prevent large jumps
+    const deltaTime = Math.min((time - lastTime) / 1000, DELTA_TIME_MAX); // Cap deltaTime to prevent large jumps
     lastTime = time;
 
     // Always render, even if not initialized (shows background)

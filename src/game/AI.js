@@ -1,26 +1,31 @@
-const AI_CAPABILITIES = {
-	easy: {
-		canPush: true,
-		canDash: false,
-		canUseAbilities: false
-	},
-	normal: {
-		canPush: true,
-		canDash: true,
-		canUseAbilities: false
-	},
-	hard: {
-		canPush: true,
-		canDash: true,
-		canUseAbilities: true
-	}
-};
-
-const AI_CONFIG = {
-	easy: { hesitationChance: 0.35, perfectChance: 0.35, aimError: 16 },
-	normal: { hesitationChance: 0.25, perfectChance: 0.55, aimError: 12 },
-	hard: { hesitationChance: 0.08, perfectChance: 0.85, aimError: 6 }
-};
+import {
+	AI_CAPABILITIES,
+	AI_CONFIG,
+	AI_REACTION_TIME,
+	AI_PERFECT_ZONE,
+	AI_PREDICTION_TIME,
+	AI_AIM_ERROR_MULTIPLIER,
+	AI_AIM_JITTER_THRESHOLD,
+	AI_IMMINENT_BLOSSOM_THRESHOLD,
+	AI_PUSH_CHANCE_EASY,
+	AI_PUSH_CHANCE_NORMAL,
+	AI_GOLDEN_BLOSSOM_SCORE,
+	AI_PERFECT_CATCH_SCORE,
+	AI_DISTANCE_PENALTY,
+	AI_OPPONENT_CLOSER_PENALTY,
+	AI_OPPONENT_BLOCKING_PENALTY,
+	AI_OPPONENT_CLOSER_THRESHOLD,
+	AI_BLOCKING_DISTANCE,
+	AI_STOP_DISTANCE,
+	AI_STEER_THRESHOLD,
+	AI_DASH_DISTANCE_THRESHOLD,
+	AI_GOLDEN_NEARBY_DISTANCE,
+	AI_LANE_STREAK_THRESHOLD,
+	AI_WIND_PREDICTION_TIME,
+	BLOSSOM_FALL_SPEED,
+	BLOSSOM_WIND_DRIFT,
+	ABILITY_COSTS
+} from './Constants.js';
 
 export class AI {
 	/**
@@ -42,7 +47,7 @@ export class AI {
 		// Targeting and reaction state
 		this.targetBlossom = null;
 		this.targetX = 0;
-		this.reactionTime = difficulty === 'easy' ? 0.1 : 0.1;
+		this.reactionTime = AI_REACTION_TIME;
 		this.reactionTimer = 0;
 		this.lastDecision = 0;
 
@@ -107,7 +112,7 @@ export class AI {
 		if (!target) return;
 
 		// Step 2: Predict landing X coordinate with a small bias towards safety
-		let predictedX = target.x + (target.vx || 0) * 0.15;
+		let predictedX = target.x + (target.vx || 0) * AI_PREDICTION_TIME;
 
 		// Step 3: Add occasional hesitation without discarding the current target
 		if (Math.random() < config.hesitationChance && this.targetX !== null) {
@@ -115,17 +120,16 @@ export class AI {
 		}
 
 		// Step 4: Decide whether this is near-perfect and adjust aim
-		const perfectZone = 18;
 		const distanceFromCenter = Math.abs(predictedX - player.x);
-		const nearPerfect = distanceFromCenter < perfectZone;
+		const nearPerfect = distanceFromCenter < AI_PERFECT_ZONE;
 
 		// Step 5: Sometimes deliberately offset away from a perfect catch
 		if (nearPerfect && Math.random() > config.perfectChance) {
-			predictedX += (Math.random() - 0.5) * config.aimError * 1.4;
+			predictedX += (Math.random() - 0.5) * config.aimError * AI_AIM_ERROR_MULTIPLIER;
 		}
 
 		// Step 6: Add aim jitter only when already close to the target
-		if (distanceFromCenter < 50) {
+		if (distanceFromCenter < AI_AIM_JITTER_THRESHOLD) {
 			predictedX += (Math.random() * 2 - 1) * config.aimError;
 		}
 
@@ -137,11 +141,11 @@ export class AI {
 
 		if (this.player.overlaps(otherPlayer)) {
 			const imminentBlossom = blossoms.some(b =>
-				Math.abs(b.y - player.y) < 60
+				Math.abs(b.y - player.y) < AI_IMMINENT_BLOSSOM_THRESHOLD
 			);
 
 			if (imminentBlossom) {
-				const pushChance = this.difficulty === 'easy' ? 0.25 : 0.45;
+				const pushChance = this.difficulty === 'easy' ? AI_PUSH_CHANCE_EASY : AI_PUSH_CHANCE_NORMAL;
 				this.pushActive = Math.random() < pushChance;
 			}
 		}
@@ -187,12 +191,12 @@ export class AI {
 
 		targetBlossoms.forEach(blossom => {
 			// Predict where the blossom will land vertically aligned with the player
-			const timeToLand = (blossom.y - this.player.y) / (blossom.vy || 150);
+			const timeToLand = (blossom.y - this.player.y) / (blossom.vy || BLOSSOM_FALL_SPEED);
 			let predictedX = blossom.x;
 
 			// Integrate wind drift over time to refine the landing estimate
 			if (windSystem && windSystem.isActive()) {
-				predictedX += windSystem.getDirection() * 80 * timeToLand;
+				predictedX += windSystem.getDirection() * BLOSSOM_WIND_DRIFT * timeToLand;
 			}
 
 			// Check if this predicted position would yield a perfect catch
@@ -201,24 +205,24 @@ export class AI {
 
 			// Combine blossom type, perfect opportunity and distance into a score
 			let score = 0;
-			if (blossom.golden) score += 100;
-			if (isPerfect) score += 50;
+			if (blossom.golden) score += AI_GOLDEN_BLOSSOM_SCORE;
+			if (isPerfect) score += AI_PERFECT_CATCH_SCORE;
 
 			const distance = Math.abs(predictedX - this.player.x);
-			score -= distance * 0.1;
+			score -= distance * AI_DISTANCE_PENALTY;
 
 			// Penalise targets where the opponent is significantly closer
 			const distToOther = Math.abs(predictedX - otherPlayer.x);
-			if (distToOther < distance * 0.8) {
-				score -= 30;
+			if (distToOther < distance * AI_OPPONENT_CLOSER_THRESHOLD) {
+				score -= AI_OPPONENT_CLOSER_PENALTY;
 			}
 
 			// Reduce desirability when the opponent is physically blocking the path
-			if (Math.abs(otherPlayer.x - predictedX) < 50 && otherPlayer.x > this.player.x && predictedX > this.player.x) {
-				score -= 20;
+			if (Math.abs(otherPlayer.x - predictedX) < AI_BLOCKING_DISTANCE && otherPlayer.x > this.player.x && predictedX > this.player.x) {
+				score -= AI_OPPONENT_BLOCKING_PENALTY;
 			}
-			if (Math.abs(otherPlayer.x - predictedX) < 50 && otherPlayer.x < this.player.x && predictedX < this.player.x) {
-				score -= 20;
+			if (Math.abs(otherPlayer.x - predictedX) < AI_BLOCKING_DISTANCE && otherPlayer.x < this.player.x && predictedX < this.player.x) {
+				score -= AI_OPPONENT_BLOCKING_PENALTY;
 			}
 
 			// Keep track of the best-scoring blossom candidate
@@ -241,10 +245,10 @@ export class AI {
 		// Layer lane-control behaviour on top: try to intercept streak lanes
 		const lanes = laneSystem.lanes;
 		lanes.forEach(lane => {
-			if (lane.catchStreak.player1 > 3 && this.player.id === 2) {
+			if (lane.catchStreak.player1 > AI_LANE_STREAK_THRESHOLD && this.player.id === 2) {
 				// Look for blossoms falling within this lane's horizontal bounds
 				const laneBlossoms = activeBlossoms.filter(b => {
-					const predictedX = b.x + (windSystem && windSystem.isActive() ? windSystem.getDirection() * 80 * 0.5 : 0);
+					const predictedX = b.x + (windSystem && windSystem.isActive() ? windSystem.getDirection() * BLOSSOM_WIND_DRIFT * AI_WIND_PREDICTION_TIME : 0);
 					return predictedX >= lane.leftEdge && predictedX <= lane.rightEdge;
 				});
 				if (laneBlossoms.length > 0) {
@@ -308,7 +312,7 @@ export class AI {
 	 */
 	useAbilities(otherPlayer, laneSystem, blossoms) {
 		// Reverse Push: counter an aggressively pushing opponent once enough meter is built
-		if (otherPlayer.pushActive && this.player.perfectMeter.value >= 3 &&
+		if (otherPlayer.pushActive && this.player.perfectMeter.value >= ABILITY_COSTS.reversePush &&
 			this.player.abilities.reversePush.cooldown <= 0) {
 			this.player.useAbility('reversePush');
 		}
@@ -317,16 +321,16 @@ export class AI {
 		const nearbyGolden = blossoms.find(b => {
 			if (!b.golden || !b.active) return false;
 			const dx = Math.abs(b.x - otherPlayer.x);
-			return dx < 100;
+			return dx < AI_GOLDEN_NEARBY_DISTANCE;
 		});
-		if (nearbyGolden && this.player.perfectMeter.value >= 6 &&
+		if (nearbyGolden && this.player.perfectMeter.value >= ABILITY_COSTS.inkFreeze &&
 			this.player.abilities.inkFreeze.cooldown <= 0) {
 			this.player.useAbility('inkFreeze');
 		}
 
 		// Momentum Surge: grab or contest lane control when behind on lane ownership
 		const ownedLanes = laneSystem.lanes.filter(l => l.owner === this.player.id);
-		if (ownedLanes.length < 2 && this.player.perfectMeter.value >= 9 &&
+		if (ownedLanes.length < 2 && this.player.perfectMeter.value >= ABILITY_COSTS.momentumSurge &&
 			this.player.abilities.momentumSurge.cooldown <= 0) {
 			this.player.useAbility('momentumSurge');
 		}
@@ -361,12 +365,12 @@ export class AI {
 		inputManager.simulateKeyRelease(keys.right);
 
 		// Stop issuing movement input once we are close enough
-		if (distance < 10) {
+		if (distance < AI_STOP_DISTANCE) {
 			return;
 		}
 
 		// Gently steer left or right towards the target without snapping
-		if (Math.abs(dx) > 5) {
+		if (Math.abs(dx) > AI_STEER_THRESHOLD) {
 			if (dx < 0) {
 				inputManager.simulateKeyPress(keys.left);
 			} else {
@@ -379,7 +383,7 @@ export class AI {
 
 		if (caps.canDash && this.player.dashCooldown <= 0 && !this.player.dashing) {
 			// Offensive dash to reach distant golden blossoms
-			if (distance > 150 && this.targetBlossom && this.targetBlossom.golden) {
+			if (distance > AI_DASH_DISTANCE_THRESHOLD && this.targetBlossom && this.targetBlossom.golden) {
 				if (inputManager.wasKeyJustPressed(keys.dash)) {
 					inputManager.consumeKey(keys.dash);
 				} else {
