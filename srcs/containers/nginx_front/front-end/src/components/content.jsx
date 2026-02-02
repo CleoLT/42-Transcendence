@@ -46,13 +46,13 @@ export default function Content(){
             {/* <div className="flex-1 flex justify-center items-center">
                 <PlayNotConnected PlayClick={() => console.log("Play clicked")} />
             </div> */}
-            <div className="flex-1 flex justify-center items-center">
+            {/* <div className="flex-1 flex justify-center items-center">
                 <SignInClick />
-            </div>
-            {/* <div className="flex-1 relative overflow-hidden w-full h-auto" >
+            </div> */}
+            <div className="flex-1 relative overflow-hidden w-full h-auto" >
                 <GameContainer onGameReady={setGame} />
                 <StartScreen game={game} />
-            </div> */}
+            </div>
         </div>
     )
 }

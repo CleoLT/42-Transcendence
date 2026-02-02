@@ -660,7 +660,7 @@ export class Renderer {
 			let drawY;
 			if (typeof this.tableTop === 'number' && typeof this.tableHeight === 'number') {
 				// Center bowl vertically in the middle of the table
-				drawY = this.tableTop + this.tableHeight / 2;
+				drawY = this.tableTop + 10;
 			} else {
 				drawY = player.getY();
 			}
