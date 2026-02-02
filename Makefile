@@ -81,6 +81,8 @@ help:
 	@echo "  make down           : stop + remove containers"
 	@echo "  make clean          : stop + remove containers & volumes"
 	@echo "  make deep-clean     : clean + remove images + prune"
+	@echo "  make dev-deep-clean : clean + remove images + prune for DEV mode"
+	@echo "  make prod-deep-clean: clean + remove images + prune for PROD mode"
 	@echo "  make restart        : remove + restart containers"
 	@echo "  make remake         : remove containers + remove images + restart"
 	@echo "  make rebuild        : deep-clean and start containers"
