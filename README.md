@@ -75,7 +75,7 @@ At the end of the section, you can find out more about how we approached the use
 
 #### Node & npm
 - https://www.npmjs.com/package/nodemon
-###### Youtube video: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69)
+###### Youtube video: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69) | [Nodemon setup](https://www.youtube.com/watch?v=kV6MJ9W4whM&t=53s)
 
 #### Web
 ###### Youtube videos: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0)
