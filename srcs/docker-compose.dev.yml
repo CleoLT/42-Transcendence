@@ -1,0 +1,50 @@
+services:
+   nginx_front:
+    container_name: nginx_front
+    build:
+      context: ./containers/nginx_front
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_BASE_URL: "http://localhost:5173"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api_gateway
+    networks:
+      - main
+    restart: always
+    volumes:
+      - ./containers/nginx_front/front-end:/app
+      - /app/node_modules
+
+   user-service:
+    build:
+      context: ./containers/user/user-service
+      dockerfile: Dockerfile.dev
+    networks:
+      - main   
+    volumes:
+      - ./containers/user/user-service:/app
+      - /app/node_modules
+    depends_on:
+      - user-db
+
+   auth-service:
+    build:
+      context: ./containers/auth/auth-service
+      dockerfile: Dockerfile.dev
+    networks:
+      - main 
+    volumes:
+      - ./containers/auth/auth-service:/app
+      - /app/node_modules
+
+   game_history-service:
+    build:
+      context: ./containers/game_history/game_history-service
+      dockerfile: Dockerfile.dev
+    networks:
+      - main 
+    volumes:
+      - ./containers/game_history/game_history-service:/app
+      - /app/node_modules
