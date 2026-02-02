@@ -1,45 +1,85 @@
 import {useState} from "react"
-import {Circle, CutText, LogInButton} from "./circleUtils.jsx"
+import {Circle, CenterText, LogInInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
+
 
 export function PlayConnected({PlayClick}){
   return(
-    <div className="relative flex justify-center items-center h-full w-full">
-      <Circle/>
-      <CutText text ="PLAY" onClick={PlayClick} />
+    <div className="flex justify-center items-center h-full w-full">
+      <Circle>
+        <CenterText text ="PLAY" onClick={PlayClick} className="text-5xl md:text-7xl xl:text-9xl" />
+      </Circle>
     </div>
   )
 }
+
 
 export function PlayNotConnected(){
   return(
-    <div className="relative flex flex-col justify-center items-center h-full w-full">
-      <Circle/>
-      <Sixtyfour className="absolute text-l top-[37%] md:text-2xl md:top-[38%] lg:top-[32%] xl:top-[30%] xl:text-4xl text-shell cursor-pointer hover:text-red-900">Guest</Sixtyfour>
-      {/* onClick={GuestClick} */}
-      <CutText text ="PLAY" onClick={null} />
-      <Sixtyfour className="absolute text-l bottom-[37%] md:text-2xl md:bottom-[38%] lg:bottom-[32%] xl:bottom-[30%] xl:text-4xl text-shell cursor-pointer  hover:text-red-900">Sign in</Sixtyfour>
-      {/* onClick={SignInClick} */}
+    <div className="flex flex-col justify-center items-center h-full w-full">
+      <Circle>
+        <Sixtyfour className="
+          absolute top-1/4 cursor-pointer
+          text-l md:text-2xl xl:text-4xl
+          text-shell
+          hover:text-red-900">
+            Guest
+        </Sixtyfour>
+        {/* onClick={GuestClick} */}
+        <CenterText text ="PLAY" onClick={null} className="text-5xl md:text-7xl xl:text-9xl"/>
+        <Sixtyfour onClick={SignInClick} className="
+          absolute bottom-1/4 cursor-pointer
+          text-l md:text-2xl xl:text-4xl
+          text-shell
+          hover:text-red-900">
+            Sign in
+        </Sixtyfour>
+      </Circle>
     </div>
   )
 }
 
-//connexion page
 
-export function SignInClick (){
+//--> connexion page
+export function SignInClick({PlayClick}){
   return(
-    <div className="relative flex flex-col justify-center items-center h-full w-full">
-      <Circle/>
-      <LogInButton text="Username" />
-      <CutText text ="CONNECT" />
-      {/* onClick={PlayConnected} */}
-      <LogInButton text="Password" />
-      <CorbenRegular className="absolute flex text-shell justify-center items-center text-xs" children="Create an account" />
+    <div className="relative flex justify-center items-center h-full w-full">
+      <Circle>
+        <LogInInput placeholder="Username" className="top-1/4" />
+        <CenterText text ="CONNECT" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
+       {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
+        <LogInInput placeholder="Password" className="bottom-1/4" />
+        <CorbenRegular className="
+          absolute bottom-[8%]
+          text-[10px] md:text-base
+          text-shell
+          hover:text-red-900
+          cursor-pointer">
+            Create an account
+        </CorbenRegular>
+      </Circle>
     </div>
   )
 }
-//reduire "connect" a  text-4xl xl:text-8xl md:text-6xl
+// + link to create an account
 
+
+
+export function AccountClick({PlayClick}){
+  return(
+    <div className="relative flex justify-center items-center h-full w-full">
+    <Circle>
+      <LogInInput placeholder="Username" className="top-1/4" />
+      <CenterText text ="CREATE" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
+     {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
+      <LogInInput placeholder="Password" className="bottom-1/4" />
+      <LogInInput placeholder="Repeat password" className=" bottom-[16%] md:bottom-[14%]" />
+    </Circle>
+  </div>
+  )
+}
+
+//SignInClick --> aller sur la page Sign In (via Sign In on top et rond rouge)
 
 //GuestClick --> aller sur la page PlayClick
 
