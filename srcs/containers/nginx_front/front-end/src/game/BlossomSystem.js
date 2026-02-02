@@ -1,4 +1,17 @@
 // BlossomSystem - Free-falling blossoms with natural physics
+import {
+	BLOSSOM_SPAWN_INTERVAL,
+	BLOSSOM_FALL_SPEED,
+	BLOSSOM_GOLDEN_CHANCE,
+	BLOSSOM_SIZE_NORMAL,
+	BLOSSOM_SIZE_GOLDEN,
+	BLOSSOM_WIND_DRIFT,
+	BLOSSOM_SWAY_AMOUNT,
+	BLOSSOM_SPAWN_Y,
+	BLOSSOM_DESPAWN_Y_OFFSET,
+	BLOSSOM_DESPAWN_X_OFFSET
+} from './Constants.js';
+
 export class BlossomSystem {
 	/**
 	 * Creates a system that manages spawning and simulating falling blossoms.
@@ -16,9 +29,9 @@ export class BlossomSystem {
 		// Initialise blossom collection and spawn tuning
 		this.blossoms = [];
 		this.spawnTimer = 0;
-		this.spawnInterval = 1.0;
-		this.fallSpeed = 150;
-		this.goldenChance = 0.1;
+		this.spawnInterval = BLOSSOM_SPAWN_INTERVAL;
+		this.fallSpeed = BLOSSOM_FALL_SPEED;
+		this.goldenChance = BLOSSOM_GOLDEN_CHANCE;
 
 		// Track horizontal wind influence for all active blossoms
 		this.windDrift = 0;
@@ -41,7 +54,7 @@ export class BlossomSystem {
 
 		// Refresh wind drift based on current wind state
 		if (windActive) {
-			this.windDrift = windDirection * 80;
+			this.windDrift = windDirection * BLOSSOM_WIND_DRIFT;
 		} else {
 			this.windDrift *= 0.95;
 		}
@@ -55,16 +68,16 @@ export class BlossomSystem {
 			blossom.x += this.windDrift * deltaTime;
 
 			// Add small random sway for a natural falling path
-			blossom.x += (Math.random() - 0.5) * 10 * deltaTime;
+			blossom.x += (Math.random() - 0.5) * BLOSSOM_SWAY_AMOUNT * deltaTime;
 
 			// Rotate blossom sprite smoothly over time
 			blossom.rotation += blossom.rotationSpeed * deltaTime;
 
 			// Deactivate blossoms that have moved outside the play area
-			if (blossom.y > this.canvasHeight + 50) {
+			if (blossom.y > this.canvasHeight + BLOSSOM_DESPAWN_Y_OFFSET) {
 				blossom.active = false;
 			}
-			if (blossom.x < -50 || blossom.x > this.canvasWidth + 50) {
+			if (blossom.x < -BLOSSOM_DESPAWN_X_OFFSET || blossom.x > this.canvasWidth + BLOSSOM_DESPAWN_X_OFFSET) {
 				blossom.active = false;
 			}
 		});
@@ -85,11 +98,11 @@ export class BlossomSystem {
 		// Push a fully-configured blossom object into the active list
 		this.blossoms.push({
 			x: spawnPos.x,
-			y: -30,
+			y: BLOSSOM_SPAWN_Y,
 			spawnLane: laneIndex,
 			active: true,
 			golden: isGolden,
-			size: isGolden ? 25 : 20,
+			size: isGolden ? BLOSSOM_SIZE_GOLDEN : BLOSSOM_SIZE_NORMAL,
 			rotation: Math.random() * Math.PI * 2,
 			rotationSpeed: (Math.random() - 0.5) * 2,
 			vx: (Math.random() - 0.5) * 20,
