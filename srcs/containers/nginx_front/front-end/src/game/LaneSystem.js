@@ -1,3 +1,15 @@
+import {
+	LANE_CENTER_RADIUS_MIN,
+	LANE_CENTER_RADIUS_FACTOR,
+	LANE_OWNERSHIP_STREAK_THRESHOLD,
+	LANE_SPAWN_EDGE_LEFT,
+	LANE_SPAWN_EDGE_RIGHT,
+	LANE_LEFT_CENTER,
+	LANE_MIDDLE_CENTER,
+	LANE_RIGHT_CENTER,
+	LANE_WIDTH
+} from './Constants.js';
+
 export class LaneSystem {
 	/**
 	 * Describes the three visual lane regions used for spawning and ownership.
@@ -12,39 +24,39 @@ export class LaneSystem {
 		this.canvasHeight = canvasHeight;
 
 		// Radius (in px) around lane center that counts as a perfect catch
-		this.centerRadius = Math.max(40, Math.round(this.canvasWidth * 0.06));
+		this.centerRadius = Math.max(LANE_CENTER_RADIUS_MIN, Math.round(this.canvasWidth * LANE_CENTER_RADIUS_FACTOR));
 
 		// Create three visually-equal zones separated by two bamboo stalks
 		this.lanes = [
 			{
 				index: 0,
-				x: canvasWidth * 0.166,
-				width: canvasWidth * 0.333,
+				x: canvasWidth * LANE_LEFT_CENTER,
+				width: canvasWidth * LANE_WIDTH,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
 				leftEdge: 0,
-				rightEdge: canvasWidth * 0.333,
-				centerX: canvasWidth * 0.166
+				rightEdge: canvasWidth * LANE_WIDTH,
+				centerX: canvasWidth * LANE_LEFT_CENTER
 			},
 			{
 				index: 1,
-				x: canvasWidth * 0.5,
-				width: canvasWidth * 0.333,
+				x: canvasWidth * LANE_MIDDLE_CENTER,
+				width: canvasWidth * LANE_WIDTH,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
-				leftEdge: canvasWidth * 0.333,
-				rightEdge: canvasWidth * 0.666,
-				centerX: canvasWidth * 0.5
+				leftEdge: canvasWidth * LANE_WIDTH,
+				rightEdge: canvasWidth * (LANE_WIDTH * 2),
+				centerX: canvasWidth * LANE_MIDDLE_CENTER
 			},
 			{
 				index: 2,
-				x: canvasWidth * 0.833,
-				width: canvasWidth * 0.333,
+				x: canvasWidth * LANE_RIGHT_CENTER,
+				width: canvasWidth * LANE_WIDTH,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
-				leftEdge: canvasWidth * 0.666,
+				leftEdge: canvasWidth * (LANE_WIDTH * 2),
 				rightEdge: canvasWidth,
-				centerX: canvasWidth * 0.833
+				centerX: canvasWidth * LANE_RIGHT_CENTER
 			}
 		];
 	}
@@ -71,10 +83,10 @@ export class LaneSystem {
 		switch(laneIndex)
 		{
 			case 0:
-				leftEdge = 133;
+				leftEdge = LANE_SPAWN_EDGE_LEFT;
 				break;
 			case 2:
-				rightEdge = 1668;		
+				rightEdge = LANE_SPAWN_EDGE_RIGHT;		
 				break;
 		}
 		const x = leftEdge + Math.random() * (rightEdge - leftEdge);
@@ -129,9 +141,9 @@ export class LaneSystem {
 		lane.catchStreak[`player${playerId}`]++;
 
 		// Claim lane when this player reaches the threshold streak
-		if (lane.catchStreak[`player${playerId}`] >= 3) {
+		if (lane.catchStreak[`player${playerId}`] >= LANE_OWNERSHIP_STREAK_THRESHOLD) {
 			lane.owner = playerId;
-		} else if (lane.catchStreak[`player${otherPlayerId}`] >= 3) {
+		} else if (lane.catchStreak[`player${otherPlayerId}`] >= LANE_OWNERSHIP_STREAK_THRESHOLD) {
 			// Preserve logic for the case where the other player was owner
 			lane.owner = otherPlayerId;
 		}

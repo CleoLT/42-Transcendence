@@ -1,4 +1,151 @@
 // Renderer.js
+import {
+	PLAYER_RADIUS,
+	BLOSSOM_SPRITE_SIZE_NORMAL,
+	BLOSSOM_SPRITE_SIZE_GOLDEN,
+	BLOSSOM_PETAL_COUNT,
+	BLOSSOM_PETAL_SIZE_NORMAL,
+	BLOSSOM_PETAL_SIZE_GOLDEN,
+	BLOSSOM_CENTER_SIZE_NORMAL,
+	BLOSSOM_CENTER_SIZE_GOLDEN,
+	BLOSSOM_PINK_FILL,
+	BLOSSOM_PINK_STROKE,
+	BLOSSOM_PINK_CENTER,
+	BLOSSOM_GOLDEN_FILL,
+	BLOSSOM_GOLDEN_STROKE,
+	BLOSSOM_GOLDEN_CENTER,
+	BLOSSOM_GOLDEN_GLOW_BLUR,
+	BLOSSOM_GOLDEN_GLOW_COLOR,
+	BLOSSOM_STROKE_WIDTH_NORMAL,
+	BLOSSOM_STROKE_WIDTH_GOLDEN,
+	PAPER_TEXTURE_POINTS,
+	PAPER_TEXTURE_SIZE_MIN,
+	PAPER_TEXTURE_SIZE_MAX,
+	PAPER_TEXTURE_COLOR,
+	PAPER_BACKGROUND_COLOR,
+	BAMBOO_SEPARATOR_WIDTH,
+	BAMBOO_SEPARATOR_STROKE_WIDTH,
+	BAMBOO_SEPARATOR_COLOR,
+	BAMBOO_SEPARATOR_INK_BLEED,
+	BAMBOO_SEPARATOR_SPLOTCH_CHANCE,
+	BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN,
+	BAMBOO_SEPARATOR_SPLOTCH_SIZE_MAX,
+	BAMBOO_SEPARATOR_SPLOTCH_COLOR,
+	BAMBOO_SEPARATOR_WASH_COLOR,
+	BAMBOO_SEPARATOR_WASH_WIDTH,
+	BAMBOO_SEPARATOR_STEP,
+	BAMBOO_SEPARATOR_VARIATION_FACTOR,
+	BAMBOO_SEPARATOR_WASH_STEP,
+	PERFECT_METER_CAPSULE_COUNT,
+	PERFECT_METER_CAPSULE_WIDTH,
+	PERFECT_METER_CAPSULE_HEIGHT,
+	PERFECT_METER_CAPSULE_GAP,
+	PERFECT_METER_CAPSULE_RADIUS,
+	PERFECT_METER_CAPSULE_COLORS,
+	PERFECT_METER_INACTIVE_COLOR,
+	PERFECT_METER_BAR_Y_FACTOR,
+	ABILITY_INDICATOR_RADIUS,
+	ABILITY_INDICATOR_SPACING,
+	ABILITY_INDICATOR_OFFSET,
+	ABILITY_INDICATOR_AVAILABLE_COLOR,
+	ABILITY_INDICATOR_UNAVAILABLE_COLOR,
+	ABILITY_INDICATOR_STROKE_COLOR,
+	ABILITY_SPRITE_SIZE,
+	ABILITY_SPRITE_Y_OFFSET,
+	PAUSE_BUTTON_SIZE,
+	PAUSE_BUTTON_X_OFFSET,
+	PAUSE_BUTTON_Y_OFFSET,
+	PAUSE_BUTTON_COLOR,
+	PAUSE_BUTTON_TEXT_COLOR,
+	PAUSE_BUTTON_FONT,
+	ROUND_INDICATOR_BG_ALPHA,
+	ROUND_INDICATOR_TEXT_COLOR,
+	ROUND_INDICATOR_TITLE_FONT,
+	ROUND_INDICATOR_CONTROLS_FONT,
+	ROUND_INDICATOR_CONTROLS_SMALL_FONT,
+	ROUND_INDICATOR_SCORE_FONT,
+	ROUND_INDICATOR_SCORE_SUB_FONT,
+	ROUND_INDICATOR_TIMER_FONT,
+	ROUND_INDICATOR_TIMER_ALPHA,
+	ROUND_INDICATOR_Y_OFFSET,
+	ROUND_INDICATOR_CONTROLS_Y_OFFSET,
+	ROUND_INDICATOR_SCORE_Y_OFFSET,
+	PAUSE_OVERLAY_ALPHA,
+	PAUSE_TEXT_FONT,
+	PAUSE_TEXT_Y_OFFSET,
+	PAUSE_TIMER_FONT,
+	PAUSE_TIMER_COLOR,
+	PAUSE_TIMER_Y_OFFSET,
+	TABLE_WIDTH_FACTOR,
+	TABLE_HEIGHT_FACTOR,
+	TABLE_INSET_FACTOR,
+	TABLE_BOTTOM_OFFSET,
+	TABLE_MIN_INSET,
+	TABLE_LEG_COUNT,
+	TABLE_LEG_WIDTH_FACTOR,
+	TABLE_LEG_HEIGHT_FACTOR,
+	TABLE_LEG_POSITION_LEFT,
+	TABLE_LEG_POSITION_CENTER,
+	TABLE_LEG_POSITION_RIGHT,
+	TABLE_LEG_MIN_WIDTH,
+	TABLE_LEG_RADIUS_FACTOR,
+	TABLE_LEG_MIN_RADIUS,
+	TABLE_LEG_COLOR,
+	TABLE_OUTLINE_WIDTH_FACTOR,
+	TABLE_OUTLINE_MIN_WIDTH,
+	TABLE_OUTLINE_COLOR,
+	TABLE_GRAIN_LINES,
+	TABLE_GRAIN_COLOR,
+	TABLE_GRAIN_LINE_WIDTH,
+	TABLE_GRAIN_PADDING,
+	TABLE_INK_WASHES,
+	TABLE_INK_WASH_COLOR,
+	BOWL_SHADOW_Y_OFFSET_FACTOR,
+	BOWL_SHADOW_RADIUS_X_OFFSET,
+	BOWL_SHADOW_RADIUS_Y_FACTOR,
+	BOWL_LINE_WIDTH_FACTOR,
+	BOWL_LABEL_Y_OFFSET,
+	BOWL_FONT_SIZE_FACTOR,
+	BOWL_INK_BLOOM_SIZE_FACTOR,
+	BOWL_PERFECT_WINDOW_Y_FACTOR,
+	BOWL_PERFECT_WINDOW_HEIGHT_FACTOR,
+	BOWL_PERFECT_WINDOW_ALPHA,
+	BOWL_PERFECT_WINDOW_COLOR,
+	BOWL_PERFECT_WINDOW_LINE_WIDTH,
+	BOWL_COLOR_DEFAULT_1,
+	BOWL_COLOR_DEFAULT_2,
+	BOWL_COLOR_FROZEN,
+	BOWL_COLOR_MOMENTUM,
+	BOWL_COLOR_DASHING,
+	BOWL_RIM_COLOR_DEFAULT,
+	BOWL_RIM_COLOR_FROZEN,
+	BOWL_RIM_COLOR_MOMENTUM,
+	BOWL_RIM_COLOR_DASHING,
+	BOWL_SHADOW_COLOR,
+	BOWL_STROKE_COLOR,
+	BOWL_LABEL_COLOR,
+	BOWL_LABEL_FONT,
+	INK_BLOOM_RINGS,
+	INK_BLOOM_ALPHA_BASE,
+	INK_BLOOM_COLOR,
+	PERFECT_CATCH_SPLASH_RADIUS,
+	PERFECT_CATCH_SPLASH_COLOR,
+	PERFECT_CATCH_TEXT_FONT,
+	PERFECT_CATCH_TEXT_LETTER_SPACING,
+	PERFECT_CATCH_TEXT_STROKE_COLOR,
+	PERFECT_CATCH_TEXT_COLOR_NORMAL,
+	PERFECT_CATCH_TEXT_COLOR_GOLDEN,
+	PERFECT_CATCH_TEXT_Y_OFFSET,
+	WIND_STREAK_SPAWN_CHANCE,
+	WIND_STREAK_SPEED,
+	WIND_STREAK_LENGTH_MIN,
+	WIND_STREAK_LENGTH_MAX,
+	WIND_STREAK_LINE_WIDTH,
+	WIND_STREAK_COLOR,
+	WIND_STREAK_BOUNDS_OFFSET,
+	PERFECT_CATCH_FACTOR
+} from './Constants.js';
+
 export class Renderer {
 	/**
 	 * Handles all canvas-based drawing for the game: background, lanes,
@@ -32,24 +179,25 @@ export class Renderer {
 	createBlossomSprites() {
 		// Create pink sakura blossom sprite
 		const pinkCanvas = document.createElement('canvas');
-		pinkCanvas.width = 40;
-		pinkCanvas.height = 40;
+		pinkCanvas.width = BLOSSOM_SPRITE_SIZE_NORMAL;
+		pinkCanvas.height = BLOSSOM_SPRITE_SIZE_NORMAL;
 		const pinkCtx = pinkCanvas.getContext('2d');
 
 		// Draw 5-petal sakura blossom
-		pinkCtx.fillStyle = 'rgba(255, 192, 203, 0.9)';
-		pinkCtx.strokeStyle = 'rgba(219, 112, 147, 0.8)';
-		pinkCtx.lineWidth = 2;
+		pinkCtx.fillStyle = BLOSSOM_PINK_FILL;
+		pinkCtx.strokeStyle = BLOSSOM_PINK_STROKE;
+		pinkCtx.lineWidth = BLOSSOM_STROKE_WIDTH_NORMAL;
 
-		const petals = 5;
+		const petals = BLOSSOM_PETAL_COUNT;
 		const angleStep = (Math.PI * 2) / petals;
-		const size = 18;
+		const size = BLOSSOM_PETAL_SIZE_NORMAL;
 
 		pinkCtx.beginPath();
+		const center = BLOSSOM_SPRITE_SIZE_NORMAL / 2;
 		for (let i = 0; i < petals; i++) {
 			const angle = i * angleStep;
-			const x = 20 + Math.cos(angle) * size;
-			const y = 20 + Math.sin(angle) * size;
+			const x = center + Math.cos(angle) * size;
+			const y = center + Math.sin(angle) * size;
 
 			if (i === 0) {
 				pinkCtx.moveTo(x, y);
@@ -62,28 +210,29 @@ export class Renderer {
 		pinkCtx.stroke();
 
 		// Center
-		pinkCtx.fillStyle = 'rgba(255, 20, 147, 0.6)';
+		pinkCtx.fillStyle = BLOSSOM_PINK_CENTER;
 		pinkCtx.beginPath();
-		pinkCtx.arc(20, 20, 6, 0, Math.PI * 2);
+		pinkCtx.arc(center, center, BLOSSOM_CENTER_SIZE_NORMAL, 0, Math.PI * 2);
 		pinkCtx.fill();
 
 		this.pinkBlossomSprite = pinkCanvas;
 
 		// Create golden blossom sprite
 		const goldenCanvas = document.createElement('canvas');
-		goldenCanvas.width = 50;
-		goldenCanvas.height = 50;
+		goldenCanvas.width = BLOSSOM_SPRITE_SIZE_GOLDEN;
+		goldenCanvas.height = BLOSSOM_SPRITE_SIZE_GOLDEN;
 		const goldenCtx = goldenCanvas.getContext('2d');
 
-		goldenCtx.fillStyle = 'rgba(255, 215, 0, 0.9)';
-		goldenCtx.strokeStyle = 'rgba(255, 140, 0, 0.9)';
-		goldenCtx.lineWidth = 3;
+		goldenCtx.fillStyle = BLOSSOM_GOLDEN_FILL;
+		goldenCtx.strokeStyle = BLOSSOM_GOLDEN_STROKE;
+		goldenCtx.lineWidth = BLOSSOM_STROKE_WIDTH_GOLDEN;
 
+		const goldenCenter = BLOSSOM_SPRITE_SIZE_GOLDEN / 2;
 		goldenCtx.beginPath();
 		for (let i = 0; i < petals; i++) {
 			const angle = i * angleStep;
-			const x = 25 + Math.cos(angle) * 22;
-			const y = 25 + Math.sin(angle) * 22;
+			const x = goldenCenter + Math.cos(angle) * BLOSSOM_PETAL_SIZE_GOLDEN;
+			const y = goldenCenter + Math.sin(angle) * BLOSSOM_PETAL_SIZE_GOLDEN;
 
 			if (i === 0) {
 				goldenCtx.moveTo(x, y);
@@ -96,11 +245,11 @@ export class Renderer {
 		goldenCtx.stroke();
 
 		// Golden center with glow
-		goldenCtx.shadowBlur = 10;
-		goldenCtx.shadowColor = '#ffd700';
-		goldenCtx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+		goldenCtx.shadowBlur = BLOSSOM_GOLDEN_GLOW_BLUR;
+		goldenCtx.shadowColor = BLOSSOM_GOLDEN_GLOW_COLOR;
+		goldenCtx.fillStyle = BLOSSOM_GOLDEN_CENTER;
 		goldenCtx.beginPath();
-		goldenCtx.arc(25, 25, 10, 0, Math.PI * 2);
+		goldenCtx.arc(goldenCenter, goldenCenter, BLOSSOM_CENTER_SIZE_GOLDEN, 0, Math.PI * 2);
 		goldenCtx.fill();
 		goldenCtx.shadowBlur = 0;
 
@@ -116,16 +265,16 @@ export class Renderer {
 	 */
 	renderBackground(ctx, width, height) {
 		// Step 1: Fill with a light cream colour for the base paper
-		ctx.fillStyle = '#fffef0'; // Light cream/yellow
+		ctx.fillStyle = PAPER_BACKGROUND_COLOR;
 		ctx.fillRect(0, 0, width, height);
 
 		// Step 2: Sprinkle a few random specks to suggest paper grain
 		if (!this.paperTextureGenerated) {
-			ctx.fillStyle = 'rgba(139, 115, 85, 0.02)';
-			for (let i = 0; i < 200; i++) {
+			ctx.fillStyle = PAPER_TEXTURE_COLOR;
+			for (let i = 0; i < PAPER_TEXTURE_POINTS; i++) {
 				const x = Math.random() * width;
 				const y = Math.random() * height;
-				const size = 1 + Math.random() * 2;
+				const size = PAPER_TEXTURE_SIZE_MIN + Math.random() * (PAPER_TEXTURE_SIZE_MAX - PAPER_TEXTURE_SIZE_MIN);
 				ctx.fillRect(x, y, size, size);
 			}
 			this.paperTextureGenerated = true;
@@ -161,14 +310,14 @@ export class Renderer {
 		const bambooSprite = this.spriteLibrary && this.spriteLibrary.getBambooSprite(index);
 
 		if (bambooSprite) {
-			const spriteWidth = 30;
+			const spriteWidth = BAMBOO_SEPARATOR_WIDTH;
 			const spriteHeight = this.canvasHeight;
 			ctx.translate(x, 0);
 			ctx.drawImage(bambooSprite, -spriteWidth / 2, 0, spriteWidth, spriteHeight);
 		} else {
 			// Fallback: vertical, slightly irregular stroke with ink specks
-			ctx.strokeStyle = '#2a2a2a';
-			ctx.lineWidth = 4;
+			ctx.strokeStyle = BAMBOO_SEPARATOR_COLOR;
+			ctx.lineWidth = BAMBOO_SEPARATOR_STROKE_WIDTH;
 			ctx.lineCap = 'round';
 			ctx.lineJoin = 'round';
 
@@ -177,19 +326,19 @@ export class Renderer {
 			let currentX = x;
 			ctx.moveTo(currentX, 0);
 
-			for (let y = 0; y < this.canvasHeight; y += 8) {
+			for (let y = 0; y < this.canvasHeight; y += BAMBOO_SEPARATOR_STEP) {
 				// Add natural variation and small ink bleed to the path
-				const variation = (Math.sin(y * 0.03) + Math.cos(y * 0.05)) * 2;
-				const inkBleed = Math.random() * 1.5; // Soft ink bleed
+				const variation = (Math.sin(y * BAMBOO_SEPARATOR_VARIATION_FACTOR) + Math.cos(y * 0.05)) * 2;
+				const inkBleed = Math.random() * BAMBOO_SEPARATOR_INK_BLEED;
 				currentX = x + variation + inkBleed;
 
 				ctx.lineTo(currentX, y);
 
 				// Add ink splotches occasionally
-				if (Math.random() < 0.1) {
-					ctx.fillStyle = 'rgba(42, 42, 42, 0.3)';
+				if (Math.random() < BAMBOO_SEPARATOR_SPLOTCH_CHANCE) {
+					ctx.fillStyle = BAMBOO_SEPARATOR_SPLOTCH_COLOR;
 					ctx.beginPath();
-					ctx.arc(currentX, y, 2 + Math.random() * 2, 0, Math.PI * 2);
+					ctx.arc(currentX, y, BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN + Math.random() * (BAMBOO_SEPARATOR_SPLOTCH_SIZE_MAX - BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN), 0, Math.PI * 2);
 					ctx.fill();
 				}
 			}
@@ -197,15 +346,15 @@ export class Renderer {
 			ctx.stroke();
 
 			// Add a faint ink wash around the separator
-			ctx.fillStyle = 'rgba(42, 42, 42, 0.1)';
+			ctx.fillStyle = BAMBOO_SEPARATOR_WASH_COLOR;
 			ctx.beginPath();
-			ctx.moveTo(x - 3, 0);
-			ctx.lineTo(x + 3, 0);
-			for (let y = 0; y < this.canvasHeight; y += 20) {
+			ctx.moveTo(x - BAMBOO_SEPARATOR_WASH_WIDTH, 0);
+			ctx.lineTo(x + BAMBOO_SEPARATOR_WASH_WIDTH, 0);
+			for (let y = 0; y < this.canvasHeight; y += BAMBOO_SEPARATOR_WASH_STEP) {
 				ctx.lineTo(x + 2 + Math.sin(y * 0.02) * 1, y);
 			}
-			ctx.lineTo(x + 3, this.canvasHeight);
-			ctx.lineTo(x - 3, this.canvasHeight);
+			ctx.lineTo(x + BAMBOO_SEPARATOR_WASH_WIDTH, this.canvasHeight);
+			ctx.lineTo(x - BAMBOO_SEPARATOR_WASH_WIDTH, this.canvasHeight);
 			ctx.closePath();
 			ctx.fill();
 		}
@@ -280,14 +429,12 @@ export class Renderer {
 
 		// Position dots below the score (which is at y + 18)
 		const dotY = y + 18;
-		const dotRadius = 9;
-		const dotSpacing = 30;
 		
 		// For left player (right-aligned text), dots start from nameX and go left
 		// For right player (left-aligned text), dots start from nameX and go right
 		const dotStartX = isLeft 
-			? nameX + (dotSpacing * 4) // Right-align: start from nameX, go left
-			: nameX - (dotSpacing * 4); // Left-align: start from nameX, go right
+			? nameX + (ABILITY_INDICATOR_SPACING * ABILITY_INDICATOR_OFFSET) // Right-align: start from nameX, go left
+			: nameX - (ABILITY_INDICATOR_SPACING * ABILITY_INDICATOR_OFFSET); // Left-align: start from nameX, go right
 
 		ctx.save();
 
@@ -298,8 +445,8 @@ export class Renderer {
 			const ability = player.abilities[abilityName];
 			// For left player, subtract to go left; for right player, add to go right
 			const dotX = isLeft 
-				? dotStartX - (index * dotSpacing)
-				: dotStartX + (index * dotSpacing);
+				? dotStartX - (index * ABILITY_INDICATOR_SPACING)
+				: dotStartX + (index * ABILITY_INDICATOR_SPACING);
 
 			// Ability is available if cooldown is 0 and player has enough perfect meter
 			const isAvailable = ability && 
@@ -308,28 +455,28 @@ export class Renderer {
 
 			// Draw dot - lit if available, dim if on cooldown
 			ctx.beginPath();
-			ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
+			ctx.arc(dotX, dotY, ABILITY_INDICATOR_RADIUS, 0, Math.PI * 2);
 			
 			if (isAvailable) {
 				// Lit: glowing/filled circle
-				ctx.fillStyle = '#00ff11'; // Green when available
+				ctx.fillStyle = ABILITY_INDICATOR_AVAILABLE_COLOR;
 				ctx.fill();
 				// Add a subtle glow effect
 				ctx.shadowBlur = 10;
-				ctx.shadowColor = '#00ff11';
+				ctx.shadowColor = ABILITY_INDICATOR_AVAILABLE_COLOR;
 				ctx.fill();
 				ctx.shadowBlur = 0;
 			} else {
 				// Dim: outline only
-				ctx.fillStyle = '#CCCCCC'; // Gray when unavailable
+				ctx.fillStyle = ABILITY_INDICATOR_UNAVAILABLE_COLOR;
 				ctx.fill();
-				ctx.strokeStyle = '#999999';
+				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
 				ctx.lineWidth = 1;
 				ctx.stroke();
 			}
 
 			// Draw ability sprite below the dot
-			const spriteY = dotY + dotRadius + 12;
+			const spriteY = dotY + ABILITY_INDICATOR_RADIUS + ABILITY_SPRITE_Y_OFFSET;
 			this.drawAbilitySprite(ctx, abilityName, dotX, spriteY, isAvailable);
 		});
 
@@ -346,7 +493,7 @@ export class Renderer {
 	 * @param {boolean} isAvailable - Whether the ability is available.
 	 */
 	drawAbilitySprite(ctx, abilityName, x, y, isAvailable) {
-		const spriteSize = 16;
+		const spriteSize = ABILITY_SPRITE_SIZE;
 		const alpha = isAvailable ? 1.0 : 0.4;
 
 		ctx.save();
@@ -414,17 +561,6 @@ export class Renderer {
 	}
 
 	renderPerfectMeter(ctx, player, centerX, y) {
-		const CAPSULE_COUNT = 6;
-		const CAPSULE_WIDTH = 40;
-		const CAPSULE_HEIGHT = 75;
-		const CAPSULE_GAP = 10;
-		const CAPSULE_RADIUS = 100;
-
-		const FIRST_COLOR = '#FEEBEB';
-		const SECOND_COLOR = '#F9BEBE';
-		const THIRD_COLOR = '#FDD28B';
-		const INACTIVE_COLOR = '#D9D9D9';
-		const CAPSULE_COLORS = [FIRST_COLOR, FIRST_COLOR, SECOND_COLOR, SECOND_COLOR, THIRD_COLOR, THIRD_COLOR];
 
 		const meter = player.perfectMeter;
 		if (!meter) return;
@@ -433,46 +569,39 @@ export class Renderer {
 		const filled = meter.value;
 	
 		const totalWidth =
-			CAPSULE_COUNT * CAPSULE_WIDTH +
-			(CAPSULE_COUNT - 1) * CAPSULE_GAP;
+			PERFECT_METER_CAPSULE_COUNT * PERFECT_METER_CAPSULE_WIDTH +
+			(PERFECT_METER_CAPSULE_COUNT - 1) * PERFECT_METER_CAPSULE_GAP;
 	
 			// Capsules grow outward from center
 			const startX = isLeft
 			? (centerX - 50) - totalWidth
 			: (centerX + 50);
 			
-			const yTop = y - CAPSULE_HEIGHT / 2;
+			const yTop = y - PERFECT_METER_CAPSULE_HEIGHT / 2;
 	
-		for (let i = 0; i < CAPSULE_COUNT; i++) {
+		for (let i = 0; i < PERFECT_METER_CAPSULE_COUNT; i++) {
 			const index = isLeft
-				? CAPSULE_COUNT - 1 - i // fill from center outward
+				? PERFECT_METER_CAPSULE_COUNT - 1 - i // fill from center outward
 				: i;
 	
 			const active = index < filled;
 	
 			const x =
 				startX +
-				i * (CAPSULE_WIDTH + CAPSULE_GAP);
+				i * (PERFECT_METER_CAPSULE_WIDTH + PERFECT_METER_CAPSULE_GAP);
 	
 			this.drawCapsule(
 				ctx,
 				x,
 				yTop,
-				CAPSULE_WIDTH,
-				CAPSULE_HEIGHT,
-				CAPSULE_RADIUS,
-				active ? CAPSULE_COLORS[index] : INACTIVE_COLOR
+				PERFECT_METER_CAPSULE_WIDTH,
+				PERFECT_METER_CAPSULE_HEIGHT,
+				PERFECT_METER_CAPSULE_RADIUS,
+				active ? PERFECT_METER_CAPSULE_COLORS[index] : PERFECT_METER_INACTIVE_COLOR
 			);
 		}
 	}
 
-	renderLaneBar() {
-		/**
-		 * Deprecated helper kept for API compatibility; lane bar visuals are
-		 * now driven by the perfect meter renderer directly.
-		 */
-		return;
-	}
 
 	/**
 	 * Renders all active blossoms using sprites or canvas-based fallbacks.
@@ -530,18 +659,17 @@ export class Renderer {
 			// Prefer renderer table position for visual Y so bowls sit on the table
 			let drawY;
 			if (typeof this.tableTop === 'number' && typeof this.tableHeight === 'number') {
-				// place bowl slightly into the top area of the table
-				drawY = this.tableTop + 5;
+				// Center bowl vertically in the middle of the table
+				drawY = this.tableTop + this.tableHeight / 2;
 			} else {
 				drawY = player.getY();
 			}
 
 			// Clamp bowl visuals within the horizontal bounds of the table
 			let drawX = px;
-			const bowlRadius = 36;
 			if (typeof this.tableX === 'number' && typeof this.tableWidth === 'number' && typeof this.tableInset === 'number') {
-				const minX = this.tableX + this.tableInset + (bowlRadius - 40);
-				const maxX = this.tableX + this.tableWidth - this.tableInset - (bowlRadius - 40);
+				const minX = this.tableX + this.tableInset + (PLAYER_RADIUS - 40);
+				const maxX = this.tableX + this.tableWidth - this.tableInset - (PLAYER_RADIUS - 40);
 				drawX = Math.max(minX, Math.min(maxX, px));
 			}
 
@@ -559,15 +687,14 @@ export class Renderer {
 	drawTable(players) {
 		if (!players || players.length === 0) return;
 		const ctx = this.ctx;
-		const bowlRadius = 36; // should match drawBowl default radius
 
 		// Compute table rectangle and top edge so bowls can rest on it
-		const tableHeight = Math.round(bowlRadius * 1.2);
-		const tableWidth = Math.round(this.canvasWidth * 0.95);
+		const tableHeight = Math.round(PLAYER_RADIUS * TABLE_HEIGHT_FACTOR);
+		const tableWidth = Math.round(this.canvasWidth * TABLE_WIDTH_FACTOR);
 		const tableX = (this.canvasWidth - tableWidth) / 2 ;
-		const tableTop = this.canvasHeight - tableHeight - 20;
+		const tableTop = this.canvasHeight - tableHeight - TABLE_BOTTOM_OFFSET;
 		// Compute inset early so callers can clamp horizontally
-		const _inset = Math.max(4, Math.round(tableWidth * 0.03));
+		const _inset = Math.max(TABLE_MIN_INSET, Math.round(tableWidth * TABLE_INSET_FACTOR));
 		// Expose metrics so `renderPlayers` can align and clamp bowls
 		this.tableTop = tableTop;
 		this.tableHeight = tableHeight;
@@ -593,7 +720,7 @@ export class Renderer {
 		
 
 		// Tabletop trapezoid with subtle perspective and ink washes
-		const inset = Math.max(4, Math.round(tableWidth * 0.03));
+		const inset = Math.max(TABLE_MIN_INSET, Math.round(tableWidth * TABLE_INSET_FACTOR));
 		const topLeftX = tableX + inset;
 		const topRightX = tableX + tableWidth - inset;
 		const topY = tableTop;
@@ -607,41 +734,38 @@ export class Renderer {
 		ctx.closePath();
 
 		// Layer multiple ink washes for a richer, sumi-e-style top
-		const washes = [1, 0.4, 0.2];
-		for (let i = 0; i < washes.length; i++) {
+		for (let i = 0; i < TABLE_INK_WASHES.length; i++) {
 			ctx.save();
 			ctx.translate(0, (i - 1) * 1); // slight vertical offset per layer
-			// ctx.fillStyle = `rgba(8,8,8,${washes[i]})`;
-			ctx.fillStyle = `rgba(139, 115, 85, ${washes[i]})`;
+			ctx.fillStyle = `rgba(139, 115, 85, ${TABLE_INK_WASHES[i]})`;
 			ctx.fill();
 			ctx.restore();
 		}
 
 		// Bold brush-like outline around the tabletop
-		ctx.lineWidth = Math.max(4, Math.round(bowlRadius * 0.18));
-		ctx.strokeStyle = 'rgba(10,10,10,0.95)';
+		ctx.lineWidth = Math.max(TABLE_OUTLINE_MIN_WIDTH, Math.round(PLAYER_RADIUS * TABLE_OUTLINE_WIDTH_FACTOR));
+		ctx.strokeStyle = TABLE_OUTLINE_COLOR;
 		ctx.stroke();
 
 
 		// Add gentle horizontal grain lines across tabletop
-		ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-		ctx.lineWidth = 1;
-		const grainLines = 4;
-		for (let g = 0; g < grainLines; g++) {
-			const gy = topY + 4 + (g / (grainLines - 1)) * (tableHeight - 8);
+		ctx.strokeStyle = TABLE_GRAIN_COLOR;
+		ctx.lineWidth = TABLE_GRAIN_LINE_WIDTH;
+		for (let g = 0; g < TABLE_GRAIN_LINES; g++) {
+			const gy = topY + TABLE_GRAIN_PADDING + (g / (TABLE_GRAIN_LINES - 1)) * (tableHeight - TABLE_GRAIN_PADDING * 2);
 			ctx.beginPath();
-			ctx.moveTo(topLeftX + 4, gy);
-			ctx.lineTo(topRightX - 4, gy);
+			ctx.moveTo(topLeftX + TABLE_GRAIN_PADDING, gy);
+			ctx.lineTo(topRightX - TABLE_GRAIN_PADDING, gy);
 			ctx.stroke();
 		}
 
 		// Draw three sturdy legs as ink silhouettes
-		const legWidth = Math.max(10, Math.round(bowlRadius * 0.32));
-		const legHeight = Math.round(tableHeight * 1.25);
-		const leftLegX = topLeftX + Math.round(tableWidth * 0.08);
-		const centerLegX = tableX + Math.round(tableWidth * 0.5);
-		const rightLegX = topRightX - Math.round(tableWidth * 0.08);
-		ctx.fillStyle = 'rgba(12,12,12,0.95)';
+		const legWidth = Math.max(TABLE_LEG_MIN_WIDTH, Math.round(PLAYER_RADIUS * TABLE_LEG_WIDTH_FACTOR));
+		const legHeight = Math.round(tableHeight * TABLE_LEG_HEIGHT_FACTOR);
+		const leftLegX = topLeftX + Math.round(tableWidth * TABLE_LEG_POSITION_LEFT);
+		const centerLegX = tableX + Math.round(tableWidth * TABLE_LEG_POSITION_CENTER);
+		const rightLegX = topRightX - Math.round(tableWidth * (1 - TABLE_LEG_POSITION_RIGHT));
+		ctx.fillStyle = TABLE_LEG_COLOR;
 
 		// Helper: build a rounded-rectangle path for leg silhouettes
 		function roundedRectPath(ctx, x, y, w, h, r) {
@@ -662,11 +786,11 @@ export class Renderer {
 		[ leftLegX, centerLegX, rightLegX ].forEach(lx => {
 			const lx0 = Math.round(lx - legWidth / 2);
 			const ly0 = Math.round(bottomY);
-			roundedRectPath(ctx, lx0, ly0, legWidth, legHeight, Math.max(6, Math.round(legWidth * 0.4)));
+			roundedRectPath(ctx, lx0, ly0, legWidth, legHeight, Math.max(TABLE_LEG_MIN_RADIUS, Math.round(legWidth * TABLE_LEG_RADIUS_FACTOR)));
 			ctx.fill();
 			// Small shadow to visually connect leg to the underside of the table
 			
-			ctx.fillStyle = 'rgba(12,12,12,0.95)';
+			ctx.fillStyle = TABLE_LEG_COLOR;
 		});
 
 		ctx.restore();
@@ -679,35 +803,35 @@ export class Renderer {
 		ctx.translate(x, y);
 
 		// Scale and layout configuration for the bowl and surrounding FX
-		const bowlRadius = 36;
+		const bowlRadius = PLAYER_RADIUS;
 		const scale = bowlRadius / 25;
-		const shadowYOffset = bowlRadius * 0.5; // ~5 -> ~7.2
-		const shadowRadiusX = bowlRadius - 6; // ~19 at default
-		const shadowRadiusY = bowlRadius * 0.22; // ~8 at default
-		const lineWidth = Math.max(2, bowlRadius * 0.08);
-		const labelYOffset = 10;
-		const fontSize = Math.round(bowlRadius * 0.3);
-		const inkBloomSize = bowlRadius * 2;
+		const shadowYOffset = bowlRadius * BOWL_SHADOW_Y_OFFSET_FACTOR;
+		const shadowRadiusX = bowlRadius - BOWL_SHADOW_RADIUS_X_OFFSET;
+		const shadowRadiusY = bowlRadius * BOWL_SHADOW_RADIUS_Y_FACTOR;
+		const lineWidth = Math.max(2, bowlRadius * BOWL_LINE_WIDTH_FACTOR);
+		const labelYOffset = BOWL_LABEL_Y_OFFSET;
+		const fontSize = Math.round(bowlRadius * BOWL_FONT_SIZE_FACTOR);
+		const inkBloomSize = bowlRadius * BOWL_INK_BLOOM_SIZE_FACTOR;
 
 		// Pick colours based on player state and ID
-		let bowlColor = '#2a2a2a';
-		let rimColor = 'rgba(139, 115, 85, 0.5)';
+		let bowlColor = BOWL_COLOR_DEFAULT_1;
+		let rimColor = BOWL_RIM_COLOR_DEFAULT;
 
 		if (player.frozen) {
-			bowlColor = 'rgba(74, 144, 226, 0.8)';
-			rimColor = '#4a90e2';
+			bowlColor = BOWL_COLOR_FROZEN;
+			rimColor = BOWL_RIM_COLOR_FROZEN;
 		} else if (player.momentumActive) {
-			bowlColor = 'rgba(212, 175, 55, 0.9)';
-			rimColor = '#d4af37';
+			bowlColor = BOWL_COLOR_MOMENTUM;
+			rimColor = BOWL_RIM_COLOR_MOMENTUM;
 		} else if (player.dashing) {
-			bowlColor = 'rgba(255, 100, 100, 0.9)';
-			rimColor = '#ff6666';
+			bowlColor = BOWL_COLOR_DASHING;
+			rimColor = BOWL_RIM_COLOR_DASHING;
 		} else {
-			bowlColor = playerId === 1 ? '#2a2a2a' : '#3a2a2a';
+			bowlColor = playerId === 1 ? BOWL_COLOR_DEFAULT_1 : BOWL_COLOR_DEFAULT_2;
 		}
 
 		// Drop shadow under the bowl to anchor it to the table
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+		ctx.fillStyle = BOWL_SHADOW_COLOR;
 		ctx.beginPath();
 		ctx.ellipse(0, shadowYOffset, shadowRadiusX, shadowRadiusY, 0, 0, Math.PI * 2);
 		ctx.fill();
@@ -722,7 +846,7 @@ export class Renderer {
 		} else {
 			// Draw bowl body as a dark, rounded shape
 			ctx.fillStyle = bowlColor;
-			ctx.strokeStyle = '#1a1a1a';
+			ctx.strokeStyle = BOWL_STROKE_COLOR;
 			ctx.lineWidth = lineWidth;
 
 			ctx.beginPath();
@@ -746,15 +870,14 @@ export class Renderer {
 
 		// Visualise the horizontal "perfect" catch window as a subtle band
 		// centred over the bowl. This mirrors the logic in Game.isPerfectCatch.
-		const perfectFactor = 0.2;
-		const perfectHalfWidth = bowlRadius * perfectFactor;
-		const center_Y = -bowlRadius * 0.45;
+		const perfectHalfWidth = bowlRadius * PERFECT_CATCH_FACTOR;
+		const center_Y = -bowlRadius * BOWL_PERFECT_WINDOW_Y_FACTOR;
 
-		const perfectHalfHeight = perfectHalfWidth * 0.2;
+		const perfectHalfHeight = perfectHalfWidth * BOWL_PERFECT_WINDOW_HEIGHT_FACTOR;
 
 		ctx.save();
-		ctx.strokeStyle = 'rgba(255, 196, 0, 0.65)';
-		ctx.lineWidth = 3;
+		ctx.strokeStyle = BOWL_PERFECT_WINDOW_COLOR;
+		ctx.lineWidth = BOWL_PERFECT_WINDOW_LINE_WIDTH;
 
 		ctx.beginPath();
 		ctx.ellipse(
@@ -770,8 +893,8 @@ export class Renderer {
 		ctx.restore();
 
 		// Draw player label inside the bowl
-		ctx.fillStyle = '#f5f5dc';
-		ctx.font = 'bold ' + fontSize + 'px Georgia';
+		ctx.fillStyle = BOWL_LABEL_COLOR;
+		ctx.font = BOWL_LABEL_FONT + ' ' + fontSize + 'px Georgia';
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		ctx.fillText(`P${playerId}`, 0, labelYOffset);
@@ -793,9 +916,9 @@ export class Renderer {
 	 */
 	drawInkBloom(x, y, size) {
 		const ctx = this.ctx;
-		for (let i = 3; i > 0; i--) {
-			const radius = size * (i / 3);
-			const alpha = 0.3 * (i / 3);
+		for (let i = INK_BLOOM_RINGS; i > 0; i--) {
+			const radius = size * (i / INK_BLOOM_RINGS);
+			const alpha = INK_BLOOM_ALPHA_BASE * (i / INK_BLOOM_RINGS);
 
 			ctx.fillStyle = `rgba(212, 175, 55, ${alpha})`;
 			ctx.beginPath();
@@ -856,42 +979,48 @@ export class Renderer {
 	 * @param {WindSystem} windSystem - Wind system used for direction/status.
 	 */
 	renderWindEffect(windSystem) {
-		if (!windSystem.isActive()) return;
 		const ctx = this.ctx;
-
+		const windActive = windSystem.isActive();
 		const direction = windSystem.getDirection();
-		const intensity = 0.15;
 
 		// Lazily create list that stores individual wind streaks
 		if (!this.windStreaks) {
 			this.windStreaks = [];
 		}
 
-		// Move existing streaks horizontally over time
+		// Update existing streaks
 		this.windStreaks.forEach(streak => {
-			streak.x += direction * 20; // Slow movement
+			// Move streaks regardless of wind state
+			streak.x += direction * WIND_STREAK_SPEED;
+			// Initialize fade timer if not set
+			if (streak.fadeTimer === undefined) {
+				streak.fadeTimer = 1.0; // Full opacity
+			}
 		});
 
-		// Remove streaks that have scrolled outside the view
-		this.windStreaks = this.windStreaks.filter(streak => 
-			streak.x < this.canvasWidth + 50 && streak.x > -50
-		);
+		// Remove streaks that have scrolled outside the view or fully faded
+		this.windStreaks = this.windStreaks.filter(streak => {
+			const inBounds = streak.x < this.canvasWidth + WIND_STREAK_BOUNDS_OFFSET && streak.x > -WIND_STREAK_BOUNDS_OFFSET;
+			const visible = streak.fadeTimer === undefined || streak.fadeTimer > 0;
+			return inBounds && visible;
+		});
 
-		// Occasionally spawn a new streak near one edge
-		if (Math.random() < 0.2) { // Lower spawn rate for longer visibility
+		// Spawn new streaks only when wind is active
+		if (windActive && Math.random() < WIND_STREAK_SPAWN_CHANCE) {
 			this.windStreaks.push({
 				x: direction > 0 ? -30 : this.canvasWidth + 30,
 				y: Math.random() * this.canvasHeight,
-				length: 30 + Math.random() * 40
+				length: WIND_STREAK_LENGTH_MIN + Math.random() * (WIND_STREAK_LENGTH_MAX - WIND_STREAK_LENGTH_MIN),
+				fadeTimer: 1.0 // Start at full opacity
 			});
 		}
 
-		// Draw all visible streaks as short horizontal lines
-		const a = 'rgba(141, 141, 141, 1)';
-		ctx.strokeStyle = a;
-		ctx.lineWidth = 2;
+		// Draw all visible streaks as short horizontal lines with fade
+		ctx.lineWidth = WIND_STREAK_LINE_WIDTH;
 
 		this.windStreaks.forEach(streak => {
+			const alpha = streak.fadeTimer !== undefined ? streak.fadeTimer : 1.0;
+			ctx.strokeStyle = `rgba(141, 141, 141, ${alpha})`;
 			ctx.beginPath();
 			ctx.moveTo(streak.x, streak.y);
 			ctx.lineTo(streak.x + streak.length, streak.y);
@@ -936,11 +1065,4 @@ export class Renderer {
 		});
 	}
 
-	/**
-	 * Safe no-op kept for compatibility; perfect meters are rendered directly
-	 * from `Game.render` using `renderPerfectMeter`.
-	 */
-	renderPerfectMeters(perfectMeters) {
-		// Intentionally empty.
-	}
 }

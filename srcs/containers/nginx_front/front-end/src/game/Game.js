@@ -9,6 +9,57 @@ import { SpriteLibrary } from './SpriteLibrary.js';
 import { LaneTint } from './LaneTint.js';
 import { PerfectMeter } from './PerfectMeter.js';
 import { InputManager } from './InputManager.js';
+import {
+	PLAYER_RADIUS,
+	PERFECT_METER_MAX,
+	PERFECT_CATCH_FACTOR,
+	PERFECT_CATCH_EFFECT_DURATION,
+	PERFECT_CATCH_EFFECT_SCALE,
+	PERFECT_METER_GOLDEN_BONUS,
+	MISS_EFFECT_DURATION,
+	MISS_EFFECT_Y_OFFSET,
+	MISS_EFFECT_SIZE_MIN,
+	MISS_EFFECT_SIZE_MAX,
+	MISS_EFFECT_ALPHA,
+	ROUND_INDICATOR_DURATION,
+	ROUND_RESET_DELAY,
+	TABLE_WIDTH_FACTOR,
+	TABLE_HEIGHT_FACTOR,
+	TABLE_INSET_FACTOR,
+	TABLE_BOTTOM_OFFSET,
+	TABLE_MIN_INSET,
+	COLLISION_WALL_THRESHOLD,
+	PLAYER_COLLISION_TARGET_DISTANCE,
+	PAUSE_BUTTON_X_OFFSET,
+	PAUSE_BUTTON_Y_OFFSET,
+	PAUSE_BUTTON_SIZE,
+	PAUSE_BUTTON_COLOR,
+	PAUSE_BUTTON_TEXT_COLOR,
+	PAUSE_BUTTON_FONT,
+	LOADING_BACKGROUND_COLOR,
+	LOADING_TEXT_COLOR,
+	LOADING_TEXT_FONT,
+	ROUND_INDICATOR_BG_ALPHA,
+	ROUND_INDICATOR_TEXT_COLOR,
+	ROUND_INDICATOR_TITLE_FONT,
+	ROUND_INDICATOR_CONTROLS_FONT,
+	ROUND_INDICATOR_CONTROLS_SMALL_FONT,
+	ROUND_INDICATOR_SCORE_FONT,
+	ROUND_INDICATOR_SCORE_SUB_FONT,
+	ROUND_INDICATOR_TIMER_FONT,
+	ROUND_INDICATOR_TIMER_ALPHA,
+	ROUND_INDICATOR_Y_OFFSET,
+	ROUND_INDICATOR_CONTROLS_Y_OFFSET,
+	ROUND_INDICATOR_SCORE_Y_OFFSET,
+	PAUSE_OVERLAY_ALPHA,
+	PAUSE_TEXT_FONT,
+	PAUSE_TEXT_Y_OFFSET,
+	PAUSE_TIMER_FONT,
+	PAUSE_TIMER_COLOR,
+	PAUSE_TIMER_Y_OFFSET,
+	MAX_ROUNDS,
+	BLOSSOM_DESPAWN_Y_OFFSET
+} from './Constants.js';
 
 export class Game {
 	/**
@@ -29,7 +80,6 @@ export class Game {
 		this.blossomSystem = null;
 		this.windSystem = null;
 		this.roundSystem = null;
-		// this.uiManager = null;
 		this.renderer = null;
 		this.perfectCatchEffects = [];
 		this.missEffects = []; // Water stain effects for misses
@@ -41,6 +91,8 @@ export class Game {
 		this.arenaLeft = 0;
 		this.arenaRight = 0;
 		this.pauseButtonBounds = null;
+		this.roundIndicatorTimer = 0;
+		this.showRoundIndicator = false;
 	}
 
 	/**
@@ -53,7 +105,7 @@ export class Game {
 			new Player(2, 'right', this.canvas.width, this.canvas.height)
 		];
 		this.players.forEach(p => {
-			p.perfectMeter = new PerfectMeter(9);
+			p.perfectMeter = new PerfectMeter(PERFECT_METER_MAX);
 		});
 
 		// Build and populate sprite library used by the renderer
@@ -66,8 +118,6 @@ export class Game {
 		this.blossomSystem = new BlossomSystem(this.laneSystem, this.canvas.width, this.canvas.height);
 		this.windSystem = new WindSystem();
 		this.roundSystem = new RoundSystem(this.players);
-		// this.uiManager = new UIManager(this);
-		// this.uiManager.init(this.canvas.width, this.canvas.height);
 		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint);
 
 	  
@@ -77,11 +127,19 @@ export class Game {
 
 		// Wire up input needed at the game level (e.g. start-from-menu)
 		this.setupEventListeners();
-		const tableWidth = Math.round(this.canvas.width * 0.95);
-		const tableInset = Math.max(4, Math.round(tableWidth * 0.03));
+		const tableWidth = Math.round(this.canvas.width * TABLE_WIDTH_FACTOR);
+		const tableInset = Math.max(TABLE_MIN_INSET, Math.round(tableWidth * TABLE_INSET_FACTOR));
 		const tableX = ((this.canvas.width - tableWidth) / 2);
-		this.arenaLeft = tableX + tableInset + 36;
-		this.arenaRight = tableX + tableWidth - tableInset - 36;
+		this.arenaLeft = tableX + tableInset + PLAYER_RADIUS;
+		this.arenaRight = tableX + tableWidth - tableInset - PLAYER_RADIUS;
+		
+		// Calculate table center Y position and set it for all players
+		const tableHeight = Math.round(PLAYER_RADIUS * TABLE_HEIGHT_FACTOR);
+		const tableTop = this.canvas.height - tableHeight - TABLE_BOTTOM_OFFSET;
+		const tableCenterY = tableTop + tableHeight / 2;
+		this.players.forEach(player => {
+			player.y = tableCenterY;
+		});
 	}
 
 	/**
@@ -134,7 +192,7 @@ export class Game {
 	}
 
 	/**
-	 * Limpia los event listeners del juego.
+	 * Cleans up event listeners for the game.
 	 */
 	cleanup() {
 		if (this.spaceKeyHandler) {
@@ -177,6 +235,9 @@ export class Game {
 
 		// Begin the first round
 		this.roundSystem.startRound();
+		// Show round indicator
+		this.showRoundIndicator = true;
+		this.roundIndicatorTimer = ROUND_INDICATOR_DURATION;
 	}
 
 	/**
@@ -218,13 +279,12 @@ export class Game {
 			this.inputManager = inputManager;
 		}
 
-		// Only run gameplay logic when state is 'playing'
-		if (this.state === 'playing') {
-			// 1. Update lógico de jugadores (sin clamp)
+		// Only run gameplay logic when state is 'playing' and round indicator is not showing
+		if (this.state === 'playing' && !this.showRoundIndicator) {
+			// Update player logic
 			this.players.forEach((player, index) => {
 				const otherPlayer = this.players[1 - index];
 				player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
-				//player.perfectMeter.update(dt);
 			});
 			
 			this.resolvePlayerCollision();
@@ -277,8 +337,8 @@ export class Game {
 		// Animate and fade perfect catch feedback sprites (always runs for visual continuity)
 		this.perfectCatchEffects.forEach(e => {
 			e.timer -= dt;
-			e.alpha = e.timer / 0.6;
-			e.scale = 1 + (1 - e.alpha) * 0.3;
+			e.alpha = e.timer / PERFECT_CATCH_EFFECT_DURATION;
+			e.scale = 1 + (1 - e.alpha) * PERFECT_CATCH_EFFECT_SCALE;
 		});
 
 		this.perfectCatchEffects =
@@ -287,10 +347,19 @@ export class Game {
 		// Animate and fade miss (water stain) effects (always runs for visual continuity)
 		this.missEffects.forEach(e => {
 			e.timer -= dt;
-			e.alpha = Math.max(0, e.timer / 2.0);
+			e.alpha = Math.max(0, e.timer / MISS_EFFECT_DURATION);
 		});
 
 		this.missEffects = this.missEffects.filter(e => e.timer > 0);
+
+		// Update round indicator timer
+		if (this.showRoundIndicator) {
+			this.roundIndicatorTimer -= dt;
+			if (this.roundIndicatorTimer <= 0) {
+				this.showRoundIndicator = false;
+				this.roundIndicatorTimer = 0;
+			}
+		}
 
 	}
 
@@ -307,8 +376,8 @@ export class Game {
 		const right = left === p1 ? p2 : p1;
 	
 		const minDistance = left.radius + right.radius;
-		const targetDistance = minDistance * 0.99;
-	
+		const targetDistance = minDistance * PLAYER_COLLISION_TARGET_DISTANCE;
+
 		const distance = right.x - left.x;
 		if (distance >= targetDistance) {
 			left.blockedRight = right.blockedLeft = false;
@@ -320,17 +389,17 @@ export class Game {
 		const minLeftX = this.arenaLeft;
 		const maxRightX = this.arenaRight;
 		
-		const leftAtWall = left.x <= minLeftX + 0.5;
-		const rightAtWall = right.x >= maxRightX - 0.5;
+		const leftAtWall = left.x <= minLeftX + COLLISION_WALL_THRESHOLD;
+		const rightAtWall = right.x >= maxRightX - COLLISION_WALL_THRESHOLD;
 
 
 		
 		if (leftAtWall && !rightAtWall) {
-			// todo el ajuste va al de la derecha
+			// All adjustment goes to the right player
 			left.x = minLeftX;
 			right.x = left.x + targetDistance;
 		} else if (rightAtWall && !leftAtWall) {
-			// todo el ajuste va al de la izquierda
+			// All adjustment goes to the left player
 			right.x = maxRightX;
 			left.x = right.x - targetDistance;
 		} else {
@@ -377,7 +446,7 @@ export class Game {
 			});
 
 			// Handle blossoms that fall beyond the canvas as misses
-			if (blossom.y > this.canvas.height + 20) {
+			if (blossom.y > this.canvas.height + BLOSSOM_DESPAWN_Y_OFFSET) {
 				this.handleMiss(blossom);
 				blossom.active = false;
 			}
@@ -398,11 +467,8 @@ export class Game {
 		const dx = Math.abs(blossomX - player.getX());
 
 		// Treat only the inner portion of the bowl as a perfect window.
-		// Example: with factor 0.4, the perfect width is 80% of the bowl
-		// diameter centred on the bowl.
 		const radius = player.getRadius();
-		const perfectFactor = 0.2;
-		const perfectHalfWidth = radius * perfectFactor;
+		const perfectHalfWidth = radius * PERFECT_CATCH_FACTOR;
 
 		return dx <= perfectHalfWidth;
 	}
@@ -423,12 +489,12 @@ export class Game {
 
 		// Charge perfect meter and spawn visual feedback when applicable
 		if (isPerfect) {
-			if (blossom.golden) player.perfectMeter.add(2);
+			if (blossom.golden) player.perfectMeter.add(PERFECT_METER_GOLDEN_BONUS);
 			else player.perfectMeter.add();
 			this.perfectCatchEffects.push({
 				x: player.getX(),
 				y: player.getY() - 40,
-				timer: 0.6,
+				timer: PERFECT_CATCH_EFFECT_DURATION,
 				alpha: 1,
 				scale: 1,
 				golden: blossom.golden
@@ -450,29 +516,13 @@ export class Game {
 		// Add a new miss effect instance near the bottom of the canvas
 		this.missEffects.push({
 			x: blossom.x,
-			y: this.canvas.height - 50,
-			timer: 2.0,
-			alpha: 0.6,
-			size: 30 + Math.random() * 20
+			y: this.canvas.height - MISS_EFFECT_Y_OFFSET,
+			timer: MISS_EFFECT_DURATION,
+			alpha: MISS_EFFECT_ALPHA,
+			size: MISS_EFFECT_SIZE_MIN + Math.random() * (MISS_EFFECT_SIZE_MAX - MISS_EFFECT_SIZE_MIN)
 		});
 	}
 
-	/**
-	 * Applies the result of a player ability to its intended target.
-	 *
-	 * @param {Player} player - Player that used the ability.
-	 * @param {string|null} abilityResult - Logical effect tag from Player.useAbility.
-	 * @param {number} playerIndex - Index of the casting player in players array.
-	 */
-	handleAbility(player, abilityResult, playerIndex) {
-		// Look up the opposing player for ability targeting
-		const otherPlayer = this.players[1 - playerIndex];
-
-		if (abilityResult === 'freeze') {
-			// Apply Ink Freeze stun to the opponent for a brief duration
-			otherPlayer.freeze(0.4);
-		}
-	}
 
 	/**
 	 * Determines which player successfully performs a push when they overlap.
@@ -485,8 +535,10 @@ export class Game {
 			return;
 		}
 
-		const p1Pushing = this.players[0].pushActive;
-		const p2Pushing = this.players[1].pushActive;
+		const p1 = this.players[0];
+		const p2 = this.players[1];
+		const p1Pushing = p1.pushActive;
+		const p2Pushing = p2.pushActive;
 
 		// Ignore checks when neither player is actively pushing
 		if (!p1Pushing && !p2Pushing) {
@@ -494,33 +546,41 @@ export class Game {
 		}
 
 		// Determine which lane region both players are standing in
-		const p1Lane = this.players[0].getLaneRegion(this.laneSystem);
-		const p2Lane = this.players[1].getLaneRegion(this.laneSystem);
+		const p1Lane = p1.getLaneRegion(this.laneSystem);
+		const p2Lane = p2.getLaneRegion(this.laneSystem);
+		const sameLane = p1Lane >= 0 && p1Lane === p2Lane;
 
-		// If both are in the same lane, lane ownership can break ties
-		if (p1Lane >= 0 && p1Lane === p2Lane) {
+		// Handle same-lane pushes with ownership priority
+		if (sameLane) {
 			const lane = this.laneSystem.getLane(p1Lane);
-
-			// Give priority to the lane owner when pushes happen together
-			if (lane.owner === 1 && p1Pushing) {
-				this.players[0].push(this.players[1], this.laneSystem);
-			} else if (lane.owner === 2 && p2Pushing) {
-				this.players[1].push(this.players[0], this.laneSystem);
-			} else if (p1Pushing && p2Pushing) {
-				// Simultaneous push with no owner results in no movement
+			
+			// Lane owner gets priority in simultaneous pushes
+			if (p1Pushing && p2Pushing) {
+				if (lane.owner === 1) {
+					p1.push(p2, this.laneSystem);
+				} else if (lane.owner === 2) {
+					p2.push(p1, this.laneSystem);
+				}
+				// No owner = no push (stalemate)
 				return;
-			} else if (p1Pushing) {
-				this.players[0].push(this.players[1], this.laneSystem);
-			} else if (p2Pushing) {
-				this.players[1].push(this.players[0], this.laneSystem);
 			}
-		} else {
-			// When in different lanes, treat pushes independently
-			if (p1Pushing && !p2Pushing) {
-				this.players[0].push(this.players[1], this.laneSystem);
-			} else if (p2Pushing && !p1Pushing) {
-				this.players[1].push(this.players[0], this.laneSystem);
+			
+			// Single push in owned lane: owner wins
+			if (p1Pushing && lane.owner === 1) {
+				p1.push(p2, this.laneSystem);
+				return;
 			}
+			if (p2Pushing && lane.owner === 2) {
+				p2.push(p1, this.laneSystem);
+				return;
+			}
+		}
+
+		// Default: whoever is pushing wins (different lanes or no ownership)
+		if (p1Pushing && !p2Pushing) {
+			p1.push(p2, this.laneSystem);
+		} else if (p2Pushing && !p1Pushing) {
+			p2.push(p1, this.laneSystem);
 		}
 	}
 
@@ -539,7 +599,10 @@ export class Game {
 			this.resetRound();
 			setTimeout(() => {
 				this.roundSystem.startRound();
-			}, 2000);
+				// Show round indicator
+				this.showRoundIndicator = true;
+				this.roundIndicatorTimer = ROUND_INDICATOR_DURATION;
+			}, ROUND_RESET_DELAY);
 		}
 	}
 
@@ -550,7 +613,6 @@ export class Game {
 		// Record game-end state and figure out the winner
 		this.state = 'gameEnd';
 		const winner = this.roundSystem.getWinner();
-		// this.uiManager.showGameEnd(winner);
 
 		// Reveal reset button so players can start over
 		const resetBtn = document.getElementById('reset-button');
@@ -574,6 +636,8 @@ export class Game {
 		this.perfectCatchEffects = [];
 		this.missEffects = [];
 		this.roundSystem = new RoundSystem(this.players);
+		this.showRoundIndicator = false;
+		this.roundIndicatorTimer = 0;
 		this.players.forEach(player => {
 			player.reset();
 		});
@@ -594,19 +658,7 @@ export class Game {
 		// Restore initial lane ownership and tint for the first round
 		this.laneSystem.lanes[0].owner = 1;
 		this.laneSystem.lanes[2].owner = 2;
-
-		// Seed tint visuals to match initial ownership state
-		if (this.laneTint) {
-			this.laneTint.tints[0].owner = 1;
-			this.laneTint.tints[0].targetAlpha = 0.5;
-			this.laneTint.tints[0].alpha = 0.5;
-			this.laneTint.tints[0].color = this.laneTint.playerColors[1];
-
-			this.laneTint.tints[2].owner = 2;
-			this.laneTint.tints[2].targetAlpha = 0.5;
-			this.laneTint.tints[2].alpha = 0.5;
-			this.laneTint.tints[2].color = this.laneTint.playerColors[2];
-		}
+		this.setupInitialLaneTints();
 	}
 
 	/**
@@ -637,16 +689,7 @@ export class Game {
 			// Apply a fresh visual tint to match new lane owners
 			if (this.laneTint) {
 				this.laneTint.reset();
-
-				this.laneTint.tints[0].owner = 1;
-				this.laneTint.tints[0].targetAlpha = 0.5;
-				this.laneTint.tints[0].alpha = 0.5;
-				this.laneTint.tints[0].color = this.laneTint.playerColors[1];
-
-				this.laneTint.tints[2].owner = 2;
-				this.laneTint.tints[2].targetAlpha = 0.5;
-				this.laneTint.tints[2].alpha = 0.5;
-				this.laneTint.tints[2].color = this.laneTint.playerColors[2];
+				this.setupInitialLaneTints();
 			}
 		} else {
 			// For other rounds, simply reset lanes and tint helpers
@@ -658,8 +701,16 @@ export class Game {
 
 		this.perfectCatchEffects = [];
 		this.missEffects = [];
+		
+		// Calculate table center Y and update player positions
+		const tableHeight = Math.round(PLAYER_RADIUS * TABLE_HEIGHT_FACTOR);
+		const tableTop = this.canvas.height - tableHeight - TABLE_BOTTOM_OFFSET;
+		const tableCenterY = tableTop + tableHeight / 2;
+		
 		this.players.forEach(player => {
 			player.resetPosition();
+			// Set Y position to table center for proper collision detection
+			player.y = tableCenterY;
 
 			// Clear temporary status effects and ability state
 			player.frozen = false;
@@ -673,10 +724,6 @@ export class Game {
 			});
 		});
 
-		// Ensure meters are back to zero at the start of the round
-		//this.players.forEach(p => {
-		//	p.perfectMeter.reset();
-		//});
 	}
 
 	/**
@@ -688,11 +735,11 @@ export class Game {
 		// Skip rendering until the renderer has been initialised
 		if (!this.renderer) {
 			// Draw a simple background while waiting for renderer to initialize
-			ctx.fillStyle = '#1a0f2e';
+			ctx.fillStyle = LOADING_BACKGROUND_COLOR;
 			ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 			// Draw a simple loading indicator
-			ctx.fillStyle = '#ffffff';
-			ctx.font = '24px Arial';
+			ctx.fillStyle = LOADING_TEXT_COLOR;
+			ctx.font = LOADING_TEXT_FONT;
 			ctx.textAlign = 'center';
 			ctx.fillText('Loading...', this.canvas.width / 2, this.canvas.height / 2);
 			return;
@@ -714,44 +761,34 @@ export class Game {
 			this.renderer.renderPlayers(this.players);
 			this.renderer.renderBlossoms(this.blossomSystem);
 
-			// Render lane bar, perfect meters and visual effects
-			this.renderer.renderLaneBar();
+			// Render perfect meters and visual effects
 			const centerX = this.canvas.width / 2;
-			const barY = this.canvas.height * 0.15;
+			const barY = this.canvas.height * 0.1;
 			
-			
-			// this.renderer.renderPerfectMeterBackplate(this.ctx, centerX, barY);
 			// Pause button (red circle) - store position for click detection
-			const pauseButtonX = centerX - 40;
-			const pauseButtonY = barY - 40;
-			const pauseButtonSize = 80;
+			const pauseButtonX = centerX - PAUSE_BUTTON_X_OFFSET;
+			const pauseButtonY = barY - PAUSE_BUTTON_Y_OFFSET;
 			this.pauseButtonBounds = {
 				x: pauseButtonX,
 				y: pauseButtonY,
-				width: pauseButtonSize,
-				height: pauseButtonSize
+				width: PAUSE_BUTTON_SIZE,
+				height: PAUSE_BUTTON_SIZE
 			};
 			
 			// Draw pause button first (red circle)
-			const red = '#FF0000';
-			this.renderer.drawCapsule(ctx, pauseButtonX, pauseButtonY, pauseButtonSize, pauseButtonSize, 100, red);
+			this.renderer.drawCapsule(ctx, pauseButtonX, pauseButtonY, PAUSE_BUTTON_SIZE, PAUSE_BUTTON_SIZE, 100, PAUSE_BUTTON_COLOR);
 			
 			// Render timer INSIDE the pause button (centered, always visible during gameplay)
 			if (this.roundSystem && this.roundSystem.roundActive) {
 				const timeRemaining = this.roundSystem.getTimeRemaining();
 				ctx.save();
 				// Draw text with outline for better visibility on red background
-				ctx.font = 'bold 30px corben';
+				ctx.font = PAUSE_BUTTON_FONT;
 				ctx.textAlign = 'center';
 				ctx.textBaseline = 'middle';
 				
-				// Draw black outline first
-				// ctx.strokeStyle = '#000000';
-				// ctx.lineWidth = 2;
-				// ctx.strokeText(`${timeRemaining}s`, centerX, pauseButtonY + 40);
-				
-				// Draw white text on top
-				ctx.fillStyle = '#000000';
+				// Draw black text on top
+				ctx.fillStyle = PAUSE_BUTTON_TEXT_COLOR;
 				ctx.fillText(`${timeRemaining}s`, centerX, pauseButtonY + 45);
 				ctx.restore();
 			}
@@ -770,34 +807,145 @@ export class Game {
 
 			// Overlay catch FX sprites and meter highlights
 			this.renderer.renderPerfectCatchEffects(this.perfectCatchEffects);
-			//this.renderer.renderPerfectMeters(this.players);
+
+			// Show round indicator when starting a new round
+			if (this.showRoundIndicator && this.roundSystem) {
+				this.renderRoundIndicator(ctx);
+			}
 
 			// Show pause indicator when paused
 			if (this.state === 'paused') {
-				ctx.save();
-				ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-				ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-				
-				// Display "PAUSED" text
-				ctx.fillStyle = '#FFFFFF';
-				ctx.font = 'bold 64px Arial';
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
-				ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 - 60);
-				
-				// Display remaining time
-				if (this.roundSystem && this.roundSystem.roundActive) {
-					const timeRemaining = this.roundSystem.getTimeRemaining();
-					ctx.fillStyle = '#FFD700';
-					ctx.font = 'bold 48px Arial';
-					ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + 40);
-				}
-				
-				ctx.restore();
+				this.renderPauseOverlay(ctx);
 			}
 
 		} else if (this.state === 'menu') {
 			// When in menu, background is sufficient; rest is HTML-driven
 		}
+	}
+
+	/**
+	 * Renders the round indicator overlay with round number and controls/scores.
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 */
+	renderRoundIndicator(ctx) {
+		ctx.save();
+		const centerX = this.canvas.width / 2;
+		const centerY = this.canvas.height / 2;
+		
+		// Semi-transparent background overlay
+		ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
+		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		// Display round number
+		const currentRound = this.roundSystem.getCurrentRound();
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_TITLE_FONT;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText(`Round ${currentRound} / ${MAX_ROUNDS}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
+		
+		// Display time remaining in background
+		const timeRemaining = Math.ceil(this.roundIndicatorTimer);
+		ctx.fillStyle = `rgba(255, 255, 255, ${ROUND_INDICATOR_TIMER_ALPHA})`;
+		ctx.font = ROUND_INDICATOR_TIMER_FONT;
+		ctx.fillText(`${timeRemaining}   ${timeRemaining}`, centerX, centerY);
+		
+		// Display round-specific content
+		if (currentRound === 1) {
+			this.renderRound1Controls(ctx, centerX, centerY);
+		} else if (currentRound === 2) {
+			this.renderRound2Scores(ctx, centerX, centerY);
+		}
+		
+		ctx.restore();
+	}
+
+	/**
+	 * Renders control instructions for round 1.
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 * @param {number} centerX - Center X coordinate.
+	 * @param {number} centerY - Center Y coordinate.
+	 */
+	renderRound1Controls(ctx, centerX, centerY) {
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_CONTROLS_FONT;
+		ctx.fillText('Player 1 Controls:', centerX, centerY + ROUND_INDICATOR_CONTROLS_Y_OFFSET);
+		ctx.font = ROUND_INDICATOR_CONTROLS_SMALL_FONT;
+		ctx.fillText('Move: A / D', centerX, centerY);
+		ctx.fillText('Push: Left Shift', centerX, centerY + 30);
+		ctx.fillText('Dash: Space', centerX, centerY + 60);
+		ctx.fillText('Abilities: 1 / 2 / 3', centerX, centerY + 90);
+		
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_CONTROLS_FONT;
+		ctx.fillText('Player 2 Controls:', centerX, centerY + 150);
+		ctx.font = ROUND_INDICATOR_CONTROLS_SMALL_FONT;
+		ctx.fillText('Move: ← / →', centerX, centerY + 200);
+		ctx.fillText('Push: Right Ctrl', centerX, centerY + 230);
+		ctx.fillText('Dash: Right Shift', centerX, centerY + 260);
+		ctx.fillText('Abilities: Numpad 1 / 2 / 3', centerX, centerY + 290);
+	}
+
+	/**
+	 * Renders current scores for round 2.
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 * @param {number} centerX - Center X coordinate.
+	 * @param {number} centerY - Center Y coordinate.
+	 */
+	renderRound2Scores(ctx, centerX, centerY) {
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_SCORE_FONT;
+		ctx.fillText('Current Scores:', centerX, centerY + ROUND_INDICATOR_SCORE_Y_OFFSET);
+		ctx.font = ROUND_INDICATOR_SCORE_SUB_FONT;
+		ctx.fillText(`${this.players[0].name}: ${this.players[0].score} points`, centerX, centerY + 30);
+		ctx.fillText(`${this.players[1].name}: ${this.players[1].score} points`, centerX, centerY + 80);
+	}
+
+	/**
+	 * Renders the pause overlay with "PAUSED" text and remaining time.
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 */
+	renderPauseOverlay(ctx) {
+		ctx.save();
+		ctx.fillStyle = `rgba(0, 0, 0, ${PAUSE_OVERLAY_ALPHA})`;
+		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		// Display "PAUSED" text
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = PAUSE_TEXT_FONT;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 + PAUSE_TEXT_Y_OFFSET);
+		
+		// Display remaining time
+		if (this.roundSystem && this.roundSystem.roundActive) {
+			const timeRemaining = this.roundSystem.getTimeRemaining();
+			ctx.fillStyle = PAUSE_TIMER_COLOR;
+			ctx.font = PAUSE_TIMER_FONT;
+			ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + PAUSE_TIMER_Y_OFFSET);
+		}
+		
+		ctx.restore();
+	}
+
+	/**
+	 * Sets up initial lane tints for players (left lane = player 1, right lane = player 2).
+	 */
+	setupInitialLaneTints() {
+		if (!this.laneTint) return;
+
+		const setupLaneTint = (laneIndex, playerId) => {
+			this.laneTint.tints[laneIndex].owner = playerId;
+			this.laneTint.tints[laneIndex].targetAlpha = 0.5;
+			this.laneTint.tints[laneIndex].alpha = 0.5;
+			this.laneTint.tints[laneIndex].color = this.laneTint.playerColors[playerId];
+		};
+
+		setupLaneTint(0, 1); // Left lane = Player 1
+		setupLaneTint(2, 2); // Right lane = Player 2
 	}
 }

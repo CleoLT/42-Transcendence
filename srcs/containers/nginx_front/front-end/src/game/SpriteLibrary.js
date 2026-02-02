@@ -23,12 +23,12 @@ export class SpriteLibrary {
 
 		// Preferred paths for each sprite; can be overridden by pre-set fields
 		const spritePaths = {
-			BambooSprite: '/src/assets/sprites/bamboo.png',
-			BlossomSprite: '/src/assets/sprites/blossom.png',
-			GoldenBlossomSprite: '/src/assets/sprites/golden.png',
-			FillSprite: '/src/assets/sprites/bar.png',
-			BowlSprite: '/src/assets/sprites/bowl.png'
-			,TableSprite: '/src/assets/sprites/table.png'
+			BambooSprite: '/src/sprites/bamboo.png',
+			BlossomSprite: '/src/sprites/blossom.png',
+			GoldenBlossomSprite: '/src/sprites/golden.png',
+			FillSprite: '/src/sprites/bar.png',
+			BowlSprite: '/src/sprites/bowl.png'
+			,TableSprite: '/src/sprites/table.png'
 		};
 
 		// Attempt to load any missing sprites from disk

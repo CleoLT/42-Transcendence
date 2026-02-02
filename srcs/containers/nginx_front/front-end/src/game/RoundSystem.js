@@ -1,3 +1,8 @@
+import {
+	ROUND_TIME,
+	MAX_ROUNDS
+} from './Constants.js';
+
 export class RoundSystem {
 	/**
 	 * Handles timed rounds and determines winners across multiple rounds.
@@ -8,8 +13,8 @@ export class RoundSystem {
 		// Store participants and configure round rules
 		this.players = players;
 		this.currentRound = 0;
-		this.maxRounds = 2;
-		this.roundTime = 20;
+		this.maxRounds = MAX_ROUNDS;
+		this.roundTime = ROUND_TIME;
 		this.timeRemaining = 0;
 		this.roundActive = false;
 
