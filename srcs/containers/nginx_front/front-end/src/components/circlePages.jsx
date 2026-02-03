@@ -43,7 +43,7 @@ export function PlayNotConnected(){
 //--> connexion page
 export function SignInClick({PlayClick}){
   return(
-    <div className="relative flex justify-center items-center h-full w-full">
+    <form className="relative flex justify-center items-center h-full w-full">
       <Circle>
         <LogInInput placeholder="Username" className="top-1/4" />
         <CenterText text ="CONNECT" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
@@ -58,7 +58,7 @@ export function SignInClick({PlayClick}){
             Create an account
         </CorbenRegular>
       </Circle>
-    </div>
+    </form>
   )
 }
 // + link to create an account
@@ -69,7 +69,8 @@ export function AccountClick({PlayClick}){
   return(
     <div className="relative flex justify-center items-center h-full w-full">
     <Circle>
-      <LogInInput placeholder="Username" className="top-1/4" />
+      <LogInInput placeholder="Username" className="top-[16%]  md:top-[14%]" />
+      <LogInInput placeholder="Email" className="top-1/4" />
       <CenterText text ="CREATE" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
      {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
       <LogInInput placeholder="Password" className="bottom-1/4" />
