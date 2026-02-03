@@ -3,10 +3,7 @@ import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import routes from './routes.js'
-//import { waitForDb } from './db.js'
-
-//await waitForDb()
-await import('./seedUsers.js')
+import seed from './seedUsers.js'
 
 const fastify = Fastify({
   logger: true,
@@ -63,5 +60,6 @@ fastify.register(swaggerUI, {
 
 fastify.register(routes)
 
-
 fastify.listen({ port: 3000, host: "0.0.0.0" });
+
+await seed()

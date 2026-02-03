@@ -6,7 +6,7 @@ const pool = mariadb.createPool({
   user: process.env.DB_USER || 'user',
   password: process.env.DB_PASSWORD || 'userpassword',
   database: process.env.DB_NAME || 'transcendance_db',
-  connectionLimit: 5
+  connectionLimit: 10
 })
 
 async function connection(fct) {
@@ -17,20 +17,5 @@ async function connection(fct) {
     conn.release()
   }
 }
-/*
-async function waitForDb(retries = 10, delay = 2000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const conn = await pool.getConnection()
-      await conn.release()
-      console.log('✅ DB ready')
-      return
-    } catch {
-      console.log('⏳ Waiting for DB...')
-      await new Promise(r => setTimeout(r, delay))
-    }
-  }
-  throw new Error('DB not ready after retries')
-}
-*/
+
 export default connection

@@ -1,15 +1,6 @@
 import  connection  from '../db.js'
 import bcrypt from 'bcrypt'
 
-/*async function connection(fct) {
-  const conn = await pool.getConnection()
-  try {
-    return await fct(conn)
-  } finally {
-    conn.release()
-  }
-}*/
-
 async function getAllUsers() {
     return connection(conn => conn.query('SELECT * FROM users'))
 }
