@@ -67,7 +67,7 @@ export function SignInClick({PlayClick}){
 
 export function AccountClick({PlayClick}){
   return(
-    <div className="relative flex justify-center items-center h-full w-full">
+    <form className="relative flex justify-center items-center h-full w-full">
     <Circle>
       <LogInInput placeholder="Username" className="top-[16%]  md:top-[14%]" />
       <LogInInput placeholder="Email" className="top-1/4" />
@@ -76,7 +76,7 @@ export function AccountClick({PlayClick}){
       <LogInInput placeholder="Password" className="bottom-1/4" />
       <LogInInput placeholder="Repeat password" className=" bottom-[16%] md:bottom-[14%]" />
     </Circle>
-  </div>
+  </form>
   )
 }
 
