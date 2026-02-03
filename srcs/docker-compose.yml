@@ -1,53 +1,9 @@
 name: transcendence
 
 services:
-  nginx_front_dev:
-    profiles: ["dev"]
-    container_name: nginx_front
-    build: 
-      context: ./containers/nginx_front
-      dockerfile: Dockerfile.dev
-      args:
-        VITE_BASE_URL: "http://localhost:5173"
-    ports:
-      - "5173:5173"
-    depends_on:
-      - api_gateway
-    networks:
-      - main
-    restart: always
-    volumes:
-      - ./containers/nginx_front/front:/app  # bind mount
-      - /app/node_modules # anonymous volume
-
-#INFO: Source code → from host (live edits)
-#      Dependencies → from Docker volume (stable, Linux-built)
-#This works because '/app/node_modules' is more specific than '/app'
-      #Docker overlays it on top.
-
-#    command: npm run dev -- --host
-
-  nginx_front_prod:
-    profiles: ["prod"]
-    container_name: nginx_front
-    build: 
-      context: ./containers/nginx_front
-      dockerfile: Dockerfile.prod
-      args:
-        VITE_BASE_URL: "https://localhost:8080"
-    ports:
-      - "8080:443"
-    depends_on:
-      - api_gateway
-    networks:
-      - main
-    restart: always
-
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-#    ports:
-#     - "3000:3000"
     networks:
       - main
     depends_on:
@@ -59,7 +15,9 @@ services:
 # USER MICROSERVICE
   user-service:
     container_name: user-service
-    build: ./containers/user/user-service
+    build: 
+      context: ./containers/user/user-service
+      dockerfile: Dockerfile.prod
     env_file:
       - .user_env
     networks:
@@ -80,7 +38,11 @@ services:
 # AUTH MICROSERVICE
   auth-service:
     container_name: auth-service
-    build: ./containers/auth/auth-service
+    build: 
+      context: ./containers/auth/auth-service
+      dockerfile: Dockerfile.prod
+    env_file:
+      - ./containers/auth/auth-service/.auth_env
     networks:
       - main
     restart: always
@@ -88,19 +50,12 @@ services:
 # GAME HISTORY MICROSERVICE
   game_history-service:
     container_name: game_history-service
-    build: ./containers/game_history/game_history-service
+    build: 
+      context: ./containers/game_history/game_history-service
+      dockerfile: Dockerfile.prod
     networks:
       - main
     restart: always
-#    depends_on:
-#      - game_history-service-db
-#
-#  game_history-db:
-#    container_name: game_history-db
-#    build: ./containers/game_history/game_history-db
-#    networks:
-#      - main
-#    restart: always
 
 networks:
    main:

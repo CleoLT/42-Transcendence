@@ -4,12 +4,14 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
+    "nodemon": "^3.0.0",
     "fastify": "^4.26.0",
     "jsonwebtoken": "^9.0.2",
-    "bcrypt": "^5.1.0"
+    "bcrypt": "^5.1.0",
+    "@fastify/cookie": "^9.0.0"
   }
 }

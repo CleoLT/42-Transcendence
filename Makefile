@@ -1,10 +1,16 @@
-DEV_PROFILE  = dev
-PROD_PROFILE = prod
 
-# Default profile
-PROFILE ?= $(DEV_PROFILE)
+# Default mode
+MODE ?= dev
 
-DC = docker-compose -f srcs/docker-compose.yml --profile $(PROFILE)
+#echo "Active mode: $(MODE)"
+
+
+# Compose command selector
+ifeq ($(MODE),prod)
+DC = docker compose -f srcs/docker-compose.yml -f srcs/docker-compose.prod.yml
+else
+DC = docker compose -f srcs/docker-compose.yml -f srcs/docker-compose.dev.yml
+endif
 
 all: build up
 
@@ -21,6 +27,7 @@ restart: down up
 
 clean:
 	$(DC) down -v || true
+	find ./srcs/containers -type d -name node_modules -prune -exec rm -rf {} +
 	# anonymous volumes like /app/node_modules are removed here
 
 deep-clean: clean
@@ -34,49 +41,54 @@ remake:
 
 rebuild: deep-clean build up
 
-# profile shortcuts
+# Mode shortcuts
 dev:
-	$(MAKE) PROFILE=$(DEV_PROFILE) all
+	$(MAKE) MODE=dev all
 
 prod:
-	$(MAKE) PROFILE=$(PROD_PROFILE) all
+	$(MAKE) MODE=prod all
 
 dev-up:
-	$(MAKE) PROFILE=$(DEV_PROFILE) up
+	$(MAKE) MODE=dev up
 
 prod-up:
-	$(MAKE) PROFILE=$(PROD_PROFILE) up
+	$(MAKE) MODE=prod up
 
 dev-clean:
-	$(MAKE) PROFILE=$(DEV_PROFILE) clean
+	$(MAKE) MODE=dev clean
 
 prod-clean:
-	$(MAKE) PROFILE=$(PROD_PROFILE) clean
+	$(MAKE) MODE=prod clean
+
+dev-deep-clean:
+	$(MAKE) MODE=dev deep-clean
+
+prod-deep-clean:
+	$(MAKE) MODE=prod deep-clean
 
 logs:
 	$(DC) logs -f || true
 
-profile:
-	@echo "Active profile: $(PROFILE)"
+mode:
+	@echo "Active mode: $(MODE)"
 
 help:
 	@echo "Makefile rules:"
-	@echo "  make dev            : build + up (DEV profile)"
-	@echo "  make prod           : build + up (PROD profile)"
-	@echo "  make up             : up using current profile (default: dev)"
+	@echo "  make dev            : build + up (DEV mode)"
+	@echo "  make prod           : build + up (PROD mode)"
+	@echo "  make up             : up using current mode (default: dev)"
 	@echo "  make build          : build images"
 	@echo "  make down           : stop + remove containers"
 	@echo "  make clean          : stop + remove containers & volumes"
 	@echo "  make deep-clean     : clean + remove images + prune"
-	@echo "  make restart        : remove + restart containers (same images)"
-	@echo "  make remake         : remove containers + remove images + restart conatiners"
+	@echo "  make restart        : remove + restart containers"
+	@echo "  make remake         : remove containers + remove images + restart"
 	@echo "  make rebuild        : deep-clean and start containers"
 	@echo "  make logs           : follow logs"
-	@echo "  make profile        : show active profile"
+	@echo "  make mode           : show active mode"
 	@echo ""
-	@echo "Override profile manually:"
-	@echo "  make PROFILE=prod up"
+	@echo "Override mode manually:"
+	@echo "  make MODE=prod up"
 
 .PHONY: all build up down restart clean deep-clean remake rebuild \
-        dev prod dev-up prod-up dev-clean prod-clean logs profile help
-
+	dev prod dev-up prod-up dev-clean prod-clean logs mode help

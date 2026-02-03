@@ -7,12 +7,12 @@ ENV VITE_BASE_URL=$VITE_BASE_URL
 # lo que va detras de 'AS' es el nombre de esa stage del Dockerfile
 WORKDIR /app
 
-COPY front/package*.json .
+COPY front-end/package*.json .
 
 # instalamos react y lo que haya en el package.json con el comando:
 RUN npm install
 
-COPY front/ .
+COPY front-end/ .
 RUN npm run build   
 
 # creates /app/dist + vite converts .jsx to .html, .css $ .js
