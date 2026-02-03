@@ -1,15 +1,15 @@
-import  connection  from '../db.js'
+import db  from '../db.js'
 import bcrypt from 'bcrypt'
 
 async function getAllUsers() {
-    return connection(conn => conn.query('SELECT * FROM users'))
+    return db.connection(conn => conn.query('SELECT * FROM users'))
 }
 
 async function addUser(username, password, email) {
 
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
 
-    return connection(conn => conn.query(
+    return db.connection(conn => conn.query(
         `INSERT INTO users (username, email, password) 
         VALUES (?, ?, ?)`,
         [username, email, hashedPassword]
@@ -17,7 +17,7 @@ async function addUser(username, password, email) {
 }
 
 async function getUserById(id) {
-    const rows = await connection(conn => conn.query(
+    const rows = await db.connection(conn => conn.query(
             `SELECT * FROM users WHERE id = ?
             LIMIT 1`,
             [id]
@@ -27,7 +27,7 @@ async function getUserById(id) {
 }
 
 async function getUserByName(username) {
-    const rows = await connection(conn => conn.query(
+    const rows = await db.connection(conn => conn.query(
             `SELECT * FROM users WHERE username = ?
             LIMIT 1`,
             [username]
@@ -36,7 +36,7 @@ async function getUserByName(username) {
 }
 
 async function getUserByEmail(email) {
-    const rows = await connection(conn => conn.query(
+    const rows = await db.connection(conn => conn.query(
             `SELECT * FROM users WHERE email = ?
             LIMIT 1`,
             [email]
@@ -46,7 +46,7 @@ async function getUserByEmail(email) {
 
 async function tryLogin(username, password) {
     
-    const rows = await connection(conn =>
+    const rows = await db.connection(conn =>
         conn.query('SELECT * FROM users WHERE username = ?', [username])
     );
 
@@ -65,7 +65,7 @@ async function updateUserById(id, modifiedData) {
     const values = keys.map(key => modifiedData[key])
     const params = [...values, id]
     
-    const rows = await connection(conn => conn.query(
+    const rows = await db.connection(conn => conn.query(
         `UPDATE users
         SET ${setStmt}
         WHERE id = ?`, 
@@ -74,7 +74,7 @@ async function updateUserById(id, modifiedData) {
 }
 
 async function deleteUserById(userId) {
-    await connection(conn => conn.query(
+    await db.connection(conn => conn.query(
             `DELETE FROM users WHERE id = ?
             LIMIT 1`,
             [userId]

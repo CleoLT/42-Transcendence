@@ -33,7 +33,7 @@ const username = {
     type: 'string',
     minLength: 2,
     maxLength: 20,
-    pattern: '^[a-zA-Z][a-zA-Z0-9_]*$' //empieza x una letra,contiene solo letras num o _
+    pattern: '^[a-zA-Z][a-zA-Z0-9_-]*$' //empieza x una letra,contiene solo letras num o _
 }
 
 const password = {

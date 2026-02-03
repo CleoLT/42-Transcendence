@@ -18,4 +18,18 @@ async function connection(fct) {
   }
 }
 
-export default connection
+async function waitForDb(pool) {
+  for (let i = 0; i < 10; i++) {
+    try {
+      const conn = await pool.getConnection()
+      conn.release()
+      return
+    } catch {
+      console.log('Waiting for DB...')
+      await new Promise(r => setTimeout(r, 3000))
+    }
+  }
+  throw new Error('DB not ready')
+}
+
+export default { connection, waitForDb }

@@ -1,13 +1,11 @@
 import { faker } from '@faker-js/faker'
-import connection from './db.js'
+import db from './db.js'
 import usersQueries from './queries/users.js'
 
 export default async function seedUsers() {
-    await connection(async (conn) => {
+    await db.connection(async (conn) => {
 
         const rows = await usersQueries.getAllUsers()
-
-        console.log(rows)
 
         if (rows[0]) {
             console.log('Users already exist, skipping seed')

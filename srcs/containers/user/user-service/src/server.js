@@ -4,6 +4,7 @@ import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import routes from './routes.js'
 import seed from './seedUsers.js'
+import db from './db.js'
 
 const fastify = Fastify({
   logger: true,
@@ -66,6 +67,11 @@ fastify.get('/health', async () => {
 });
 
 
+
+//await db.waitForDb()
+
+await seed()
+
 // Check to avoid leaving sockets open with nodemon
 const start = async () => {
   try {
@@ -78,4 +84,4 @@ const start = async () => {
 
 start()
 
-await seed()
+
