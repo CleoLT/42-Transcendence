@@ -194,7 +194,6 @@ const logOut = {
   }
 };
 
-
 const updateUserById = {
     description: 'Partially update user by id',
     tags: ['Users'],
@@ -245,7 +244,7 @@ const deleteUserById = {
 const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
- // consumes: ['multipart/form-data'], // for swagger only
+  consumes: ['multipart/form-data'], // for swagger only
   summary: 'upload avatar',
 
   params: {
@@ -256,29 +255,18 @@ const uploadAvatar = {
     required: ['userId']
   },
 
- /*body: {
-    type: "object",
-    required: ["avatar"],
-    properties: {
-      avatar: { type: 'object'
-      //  type: 'string',
-      //  format: 'binary'
-      }
-    }
-  },*/
-
   response: {
     200: {
-      description: 'upload info',
+      description: 'file uploaded',
       type: 'object',
       properties: {
         id: { type: 'number' },
         avatar: { type: 'string' },
       }
-    }
+    },
+    400: errorResponse
   }
-};
-
+}
 
 export default {
     getAllUsers,

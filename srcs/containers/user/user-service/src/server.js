@@ -26,7 +26,7 @@ fastify.setErrorHandler((err, req, reply) => {
   })
 })
 
-fastify.register(multipart, {
+await fastify.register(multipart/*, {
   limits: {
     fieldNameSize: 100, // Max field name size in bytes
     fieldSize: 100,     // Max field value size in bytes
@@ -37,7 +37,7 @@ fastify.register(multipart, {
     parts: 1000         // For multipart forms, the max number of parts (fields + files)
   }//,
   //attachFieldsToBody: true
-});
+}*/);
 
 fastify.register(swagger, {
    openapi: {

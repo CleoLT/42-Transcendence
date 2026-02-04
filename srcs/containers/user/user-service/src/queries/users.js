@@ -81,11 +81,13 @@ async function deleteUserById(userId) {
         ))
 }
 
-function uploadAvatar(userId, filepath) {
-    const stmt = db.prepare('UPDATE users SET avatar = ? WHERE id = ?')
-    stmt.run(filepath, userId)
-
-    return getUserById(userId)
+async function uploadAvatar(userId, filepath) {
+    const rows = await db.connection(conn => conn.query(
+        `UPDATE users
+        SET avatar = ?
+        WHERE id = ?`, 
+        [filepath, userId]
+    ))
     
 }
 

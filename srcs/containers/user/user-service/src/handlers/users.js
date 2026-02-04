@@ -6,6 +6,13 @@ import path from 'node:path'
 
 const pump = util.promisify(pipeline)
 
+function noFileUploadedError() {
+    const err = new Error('No file uploaded')
+    err.statusCode = 400
+    err.name = 'Bad Request'
+    throw err
+}
+
 function userNotFoundError() {
     const err = new Error('User not found')
     err.statusCode = 404
@@ -131,6 +138,7 @@ async function deleteUserById(req, reply) {
         await checkIfUserExists(userId)
         
         //poner anonymous los partidos en la database de games de este user ????
+        //delete avatar file
         await query.deleteUserById(userId)
         reply.code(204).send('user deleted')
     } catch (error) {
@@ -139,34 +147,30 @@ async function deleteUserById(req, reply) {
 }
 
 async function uploadAvatar(req, reply) {
-    const userId = req.params
+    try {
+        const { userId } = req.params
 
-    const data = await req.file()
+        const data = await req.file()
 
-  //  const data = req.body.avatar
+        if (!data) noFileUploadedError()
 
-    if (!data) {
-        return reply.code(400).send({ error: "No file uploaded" })
+        const uploadDir = path.join('/app', 'uploads', 'avatars');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const filename = `${Date.now()}_${data.filename}`
+        const filepath = path.join(uploadDir, filename)
+
+        await pump(data.file, fs.createWriteStream(filepath))
+
+        await query.uploadAvatar(userId, filepath)
+
+        const result = await query.getUserById(userId)
+        reply.code(200).send(result)
+    } catch(error) {
+        reply.send(error)
     }
-
-    const uploadDir = path.join('/app', 'uploads', 'avatars');
-    if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const filename = `${Date.now()}_${data.filename}`
-    const filepath = path.join(uploadDir, filename)
-
-  //  await pipeline(data.file, fs.createWriteStream(filepath))
-    await pump(data.file, fs.createWriteStream(filepath))
-
-
-    const query = uploadAvatar(userId, filepath)
-
-    reply.code(200).send({ 
-        userId,
-        avatar: query.avatar 
-    })
+    
 }
 
 export default { 
