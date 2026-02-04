@@ -14,20 +14,19 @@ export function PlayConnected({PlayClick}){
 }
 
 
-export function PlayNotConnected(){
+export function PlayNotConnected({setScreen}){
   return(
     <div className="flex flex-col justify-center items-center h-full w-full">
       <Circle>
-        <Sixtyfour className="
+        <Sixtyfour onClick={() =>setScreen("homePlay")} className="
           absolute top-1/4 cursor-pointer
           text-l md:text-2xl xl:text-4xl
           text-shell
           hover:text-red-900">
             Guest
         </Sixtyfour>
-        {/* onClick={GuestClick} */}
         <CenterText text ="PLAY" onClick={null} className="text-5xl md:text-7xl xl:text-9xl"/>
-        <Sixtyfour onClick={SignInClick} className="
+        <Sixtyfour onClick={() => setScreen("signIn")} className="
           absolute bottom-1/4 cursor-pointer
           text-l md:text-2xl xl:text-4xl
           text-shell
@@ -41,15 +40,15 @@ export function PlayNotConnected(){
 
 
 //--> connexion page
-export function SignInClick({PlayClick}){
+export function SignInClick({setScreen}){
   return(
     <form className="relative flex justify-center items-center h-full w-full">
       <Circle>
         <LogInInput placeholder="Username" className="top-1/4" />
-        <CenterText text ="CONNECT" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
+        <CenterText text ="CONNECT" className="text-4xl md:text-6xl xl:text-7xl" />
        {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
         <LogInInput placeholder="Password" className="bottom-1/4" />
-        <CorbenRegular className="
+        <CorbenRegular onClick={() => setScreen("createAccount")} className="
           absolute bottom-[8%]
           text-[10px] md:text-base
           text-shell
@@ -65,13 +64,13 @@ export function SignInClick({PlayClick}){
 
 
 
-export function AccountClick({PlayClick}){
+export function AccountClick({setScreen}){
   return(
     <form className="relative flex justify-center items-center h-full w-full">
     <Circle>
       <LogInInput placeholder="Username" className="top-[16%]  md:top-[14%]" />
       <LogInInput placeholder="Email" className="top-1/4" />
-      <CenterText text ="CREATE" onClick={PlayClick} className="text-4xl md:text-6xl xl:text-7xl" />
+      <CenterText text ="CREATE" onClick={() => setScreen("homePlay")} className="text-4xl md:text-6xl xl:text-7xl" />
      {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
       <LogInInput placeholder="Password" className="bottom-1/4" />
       <LogInInput placeholder="Repeat password" className=" bottom-[16%] md:bottom-[14%]" />

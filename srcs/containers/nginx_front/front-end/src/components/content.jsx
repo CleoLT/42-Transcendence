@@ -1,9 +1,5 @@
 // --> center in middle of the page
 
-// import {IconsList} from "./icon.jsx"
-// import Circle from "./circle.jsx"
-
-
 // export default function Content(){
 //     return (
 //         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black relative" >
@@ -23,11 +19,10 @@ import GameContainer from "./gameContainer"
 import {IconsList} from "./icon.jsx"
 import { useState, useEffect } from "react"
 import {PlayConnected, PlayNotConnected, SignInClick, AccountClick} from "./circlePages.jsx"
-// import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
-export default function Content(){
+export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
-
+    // const [screen, setScreen] = useState("playNC")
     // // Debug: log when game state changes
     // useEffect(() => {
     //   console.log('📦 Content: game state changed', {
@@ -38,18 +33,15 @@ export default function Content(){
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black" >
             <IconsList />
-            {/* <div className="flex-1 flex justify-center items-center">
-                <PlayConnected PlayClick={() => console.log("Play clicked")} />
-            </div> */}
-            {/* <div className="flex-1 flex justify-center items-center">
-                <PlayNotConnected />
-            </div> */}
-            {/* <div className="flex-1 flex justify-center items-center">
-                <SignInClick PlayClick={() => console.log("SignIn clicked")}/>
-            </div> */}
             <div className="flex-1 flex justify-center items-center">
-                <AccountClick PlayClick={() => console.log("Account clicked")} />
+                {screen === "homePlay" && (<PlayConnected PlayClick={() => console.log("Play clicked")} /> )}
+                {screen === "playNC" && (<PlayNotConnected setScreen={setScreen}/> )}
+                {screen === "signIn" && (<SignInClick setScreen={setScreen} /> )}
+                {screen === "createAccount" && (<AccountClick setScreen={setScreen} /> )}
             </div>
+            {/* <div className="flex-1 flex justify-center items-center">
+                <AccountClick PlayClick={() => console.log("Account clicked")} />
+            </div> */}
             {/* <div className="flex-1 relative overflow-hidden w-full h-auto" >
                 <GameContainer onGameReady={setGame} />
                 <StartScreen game={game} /> 
