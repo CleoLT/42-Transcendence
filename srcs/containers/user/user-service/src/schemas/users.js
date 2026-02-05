@@ -152,15 +152,10 @@ const tryLogin = {
               userId: { type: 'number' }
             }
         },
-        401: {
-            description: 'Invalid credentials',
-            type: 'object',
-            properties: {
-              error: { type: 'string' }
-            }
-        }
+        401: errorResponse,
+        404: errorResponse
     }
-};
+}
 
 const logOut = {
   description: 'Logs user out',
@@ -184,13 +179,7 @@ const logOut = {
         userId: { type: 'number' }
       }
     },
-    401: {
-      description: 'Not OK',
-      type: 'object',
-      properties: {
-        error: { type: 'string' }
-      }
-    }
+    404: errorResponse
   }
 };
 
@@ -245,15 +234,9 @@ const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
   consumes: ['multipart/form-data'], // for swagger only
-  summary: 'upload avatar',
+  summary: 'upload avatar. delete old avatar if exists',
 
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
+  params: paramId,
 
   response: {
     200: {
@@ -261,12 +244,32 @@ const uploadAvatar = {
       type: 'object',
       properties: {
         id: { type: 'number' },
-        avatar: { type: 'string' },
+        avatar: { type: 'string' }
       }
     },
     400: errorResponse
   }
 }
+
+const deleteAvatar = {
+    description: 'Delete avatar by id',
+    tags: ['Users'],
+    summary: 'Delete avatar path from database, delete avatar file',
+
+    params: paramId,
+
+    response: {
+        201: { 
+            description: 'delete avatar',
+            type: 'object',
+            properties: {
+                id: { type: 'number' },
+                avatar: { type: 'string' }
+            }
+        },
+        404: errorResponse
+    }
+};
 
 export default {
     getAllUsers,
@@ -277,5 +280,6 @@ export default {
     logOut,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    deleteAvatar
 }

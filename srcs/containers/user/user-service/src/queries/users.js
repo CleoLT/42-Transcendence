@@ -44,6 +44,15 @@ async function getUserByEmail(email) {
     return rows[0] || null
 }
 
+async function getAvatarByUserId(id) {
+    const rows = await db.connection(conn => conn.query(
+            `SELECT avatar FROM users WHERE id = ?
+            LIMIT 1`,
+            [id]
+        ))
+    return rows[0] || null
+}
+
 async function tryLogin(username, password) {
     
     const rows = await db.connection(conn =>
@@ -88,7 +97,16 @@ async function uploadAvatar(userId, filepath) {
         WHERE id = ?`, 
         [filepath, userId]
     ))
-    
+}
+
+async function deleteAvatar(userId) {
+    await db.connection(conn => conn.query(
+        `UPDATE users
+        SET avatar = NULL
+        WHERE id = ?
+        LIMIT 1`,
+        [userId]
+        ))
 }
 
 export default { 
@@ -97,8 +115,10 @@ export default {
     getUserById,
     getUserByName,
     getUserByEmail,
+    getAvatarByUserId,
     tryLogin,
     updateUserById,
     deleteUserById,
-    uploadAvatar 
+    uploadAvatar,
+    deleteAvatar
 }

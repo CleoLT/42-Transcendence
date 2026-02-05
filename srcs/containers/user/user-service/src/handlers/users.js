@@ -2,6 +2,7 @@ import query from '../queries/users.js'
 import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
+import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 
 const pump = util.promisify(pipeline)
@@ -10,6 +11,13 @@ function noFileUploadedError() {
     const err = new Error('No file uploaded')
     err.statusCode = 400
     err.name = 'Bad Request'
+    throw err
+}
+
+function invalidCredentialsError() {
+    const err = new Error('Invalid username or password')
+    err.statusCode = 401
+    err.name = 'Unauthorized'
     throw err
 }
 
@@ -27,6 +35,19 @@ function userConflictError() {
     throw err
 }
 
+async function deleteAvatarFile(userId) {
+    try {
+        const oldAvatar = await query.getAvatarByUserId(userId)
+
+        if (oldAvatar === null) return
+
+        await access(oldAvatar.avatar, constants.F_OK)
+        await unlink(oldAvatar.avatar)
+        console.log('unlink avatar')
+    } catch (error) {
+        console.log("avatar do not exists")
+    }
+}
 /*----------------HANDLERS-------------------------*/
 
 async function getAllUsers(req, reply) {
@@ -82,35 +103,46 @@ async function postUser(req, reply) {
 }
 
 async function tryLogin(req, reply) {
-    const { username, password } = req.body;
-    const match = await query.tryLogin(username, password)
+    try {
+        const { username, password } = req.body;
 
-    if (!match)
-        return reply.code(401).send({ error: 'Usuario o contraseña incorrecta' });
+        const match = await query.tryLogin(username, password)
+        if (!match) invalidCredentialsError()
 
-    const user = await query.getUserByName(username);
-    if (!user || !user.id) return reply.code(500).send({ error: 'User data invalid' });
+        const user = await query.getUserByName(username);
+        if (!user || !user.id) userNotFoundError()
 
-    if (user.online_status === 1)
-        return reply.code(401).send({ error: 'Usuario ya en linea' });
+        if (user.online_status === 1)
+            return reply.code(401).send({ error: 'Usuario ya en linea' });
 
-    await query.updateUserById(user.id, { online_status: 1 });
+        await query.updateUserById(user.id, { online_status: 1 });
 
-    return reply.code(200).send({
-        valid: true,
-        userId: user.id
-    });
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id
+        });        
+    } catch (error) {
+        reply.send(error)
+    }
+ 
+ 
+
 }
 
 async function logOut(req, reply) {
-    const { username } = req.body;
-    const user = await query.getUserByName(username);
-    await query.updateUserById(user.id, { online_status: 0 });
+    try {
+        const { username } = req.body;
+        const user = await query.getUserByName(username);
+        if (user === null) userNotFoundError()
+        await query.updateUserById(user.id, { online_status: 0 });
 
-    return reply.code(200).send({
-        valid: true,
-        userId: user.id
-    });
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id
+        })
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function updateUserById(req, reply) {
@@ -138,7 +170,7 @@ async function deleteUserById(req, reply) {
         await checkIfUserExists(userId)
         
         //poner anonymous los partidos en la database de games de este user ????
-        //delete avatar file
+        await deleteAvatarFile(userId)
         await query.deleteUserById(userId)
         reply.code(204).send('user deleted')
     } catch (error) {
@@ -150,6 +182,9 @@ async function uploadAvatar(req, reply) {
     try {
         const { userId } = req.params
 
+        await checkIfUserExists(userId)
+        await deleteAvatarFile(userId)
+        
         const data = await req.file()
 
         if (!data) noFileUploadedError()
@@ -158,7 +193,7 @@ async function uploadAvatar(req, reply) {
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
-        const filename = `${Date.now()}_${data.filename}`
+        const filename = `${userId}_${data.filename}`
         const filepath = path.join(uploadDir, filename)
 
         await pump(data.file, fs.createWriteStream(filepath))
@@ -170,7 +205,21 @@ async function uploadAvatar(req, reply) {
     } catch(error) {
         reply.send(error)
     }
-    
+}
+
+async function deleteAvatar(req, reply) {
+    try {
+        const { userId } = req.params
+
+        await checkIfUserExists(userId)
+        await deleteAvatarFile(userId)
+        await query.deleteAvatar(userId)
+
+        const result = await query.getUserById(userId)
+        reply.code(201).send(result);
+    } catch(error) {
+        reply.send(error)
+    }
 }
 
 export default { 
@@ -183,5 +232,6 @@ export default {
     logOut,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    deleteAvatar
 }

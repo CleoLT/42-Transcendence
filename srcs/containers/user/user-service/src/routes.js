@@ -14,7 +14,9 @@ const routes = async function(fastify, options) {
     fastify.post('/user/logout', { schema: userSchema.logOut }, userHandler.logOut)
     fastify.patch('/:userId', { schema: userSchema.updateUserById }, userHandler.updateUserById)
     fastify.delete('/:userId', { schema: userSchema.deleteUserById }, userHandler.deleteUserById)
-    fastify.post('/:userId/avatar', { schema: userSchema.uploadAvatar },  userHandler.uploadAvatar)
+    fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar },  userHandler.uploadAvatar)
+    //fastify.post('/:userId/avatar/select', { schema: userSchema.selectAvatar },  userHandler.selectAvatar)
+    fastify.delete('/:userId/avatar', { schema: userSchema.deleteAvatar },  userHandler.deleteAvatar)
 
     fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships)
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId }, friendHandler.getAllFriendsByUserId) // sin body; auth: verificar userId parametro
