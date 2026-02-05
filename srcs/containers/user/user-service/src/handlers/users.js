@@ -112,8 +112,7 @@ async function tryLogin(req, reply) {
         const user = await query.getUserByName(username);
         if (!user || !user.id) userNotFoundError()
 
-        if (user.online_status === 1)
-            return reply.code(401).send({ error: 'Usuario ya en linea' });
+        if (user.online_status === 1) userConflictError()
 
         await query.updateUserById(user.id, { online_status: 1 });
 
@@ -124,9 +123,6 @@ async function tryLogin(req, reply) {
     } catch (error) {
         reply.send(error)
     }
- 
- 
-
 }
 
 async function logOut(req, reply) {

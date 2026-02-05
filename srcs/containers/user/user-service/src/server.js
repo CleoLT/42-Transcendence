@@ -66,11 +66,7 @@ fastify.get('/health', async () => {
   return { status: 'ok', service: 'user-service' };
 });
 
-
-
-//await db.waitForDb()
-
-await seed()
+//await seed()
 
 // Check to avoid leaving sockets open with nodemon
 const start = async () => {
