@@ -121,7 +121,7 @@ export function AccountClick({setScreen}){
 
   const handleRegister = async () => {
     try {
-      await Register(username, email, password)
+      await Register(username, password, email)
       setScreen("homePlay");
     }
     catch (error){
