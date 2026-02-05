@@ -2,143 +2,232 @@ import query from '../queries/users.js'
 import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
+import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 
 const pump = util.promisify(pipeline)
+
+function noFileUploadedError() {
+    const err = new Error('No file uploaded')
+    err.statusCode = 400
+    err.name = 'Bad Request'
+    throw err
+}
+
+function invalidCredentialsError() {
+    const err = new Error('Invalid username or password')
+    err.statusCode = 401
+    err.name = 'Unauthorized'
+    throw err
+}
+
+function userNotFoundError() {
+    const err = new Error('User not found')
+    err.statusCode = 404
+    err.name = 'Not Found'
+    throw err
+}
+
+function userConflictError() {
+    const err = new Error('User already exists')
+    err.statusCode = 409
+    err.name = 'Conflict'
+    throw err
+}
+
+async function deleteAvatarFile(userId) {
+    try {
+        const oldAvatar = await query.getAvatarByUserId(userId)
+
+        if (oldAvatar === null) return
+
+        await access(oldAvatar.avatar, constants.F_OK)
+        await unlink(oldAvatar.avatar)
+        console.log('unlink avatar')
+    } catch (error) {
+        console.log("avatar do not exists")
+    }
+}
+/*----------------HANDLERS-------------------------*/
 
 async function getAllUsers(req, reply) {
     const users = await query.getAllUsers()
     reply.send(users);
 }
 
-async function postUser(req, reply) {
-    const { username, password, email } = req.body;
+async function checkIfUserExists(userId) {
+    const user = await query.getUserById(userId)
 
-    const result = await query.addUser(username, password, email)
-
-    reply.code(201).send({ id: result.insertId, username });
-}    
+    if (user === null) userNotFoundError()
+    return user
+}
 
 async function getUserById(req, reply) {
     const { userId } =  req.params
-    const result = await query.getUserById(userId)
-    reply.code(200).send({
-        userId, 
-        username: result.username,
-        email: result.email,
-        alias: result.alias,
-        bio: result.bio,
-        avatar: result.avatar,
-        online_status: result.online_status,
-        created_at: result.created_at,
-        playing_time: result.playing_time
-    }) 
+
+    try {
+        const user = await checkIfUserExists(userId)
+        reply.code(200).send(user) 
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function getUserByName(req, reply) {
     const { username } = req.params
-    const result = await query.getUserByName(username)
-  
-    reply.code(200).send({
-      id: result.id,
-      username: result.username,
-      email: result.email,
-      alias: result.alias,
-      bio: result.bio,
-      avatar: result.avatar,
-      online_status: result.online_status,
-      created_at: result.created_at,
-      playing_time: result.playing_time
-    })
+
+    try {
+        const result = await query.getUserByName(username)
+        if (user === null) userNotFoundError()
+        reply.code(200).send(result)
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
+async function postUser(req, reply) {
+    const { username, password, email } = req.body;
+
+    try {
+        const name = await query.getUserByName(username)
+        if (name !== null) userConflictError()
+        const mail = await query.getUserByEmail(email)
+        if (mail !== null) userConflictError()
+        const user = await query.addUser(username, password, email)
+        const result = await query.getUserById(user.insertId) 
+    
+        reply.code(201).send(result);
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function tryLogin(req, reply) {
-    const { username, password } = req.body;
-    const match = await query.tryLogin(username, password)
+    try {
+        const { username, password } = req.body;
 
-    if (!match)
-        return reply.code(401).send({ error: 'Usuario o contraseña incorrecta' });
+        const match = await query.tryLogin(username, password)
+        if (!match) invalidCredentialsError()
 
-    const user = await query.getUserByName(username);
-    if (!user || !user.id) return reply.code(500).send({ error: 'User data invalid' });
+        const user = await query.getUserByName(username);
+        if (!user || !user.id) userNotFoundError()
 
-    if (user.online_status === 1)
-        return reply.code(401).send({ error: 'Usuario ya en linea' });
+        if (user.online_status === 1) userConflictError()
 
-    await query.updateUserById(user.id, { online_status: 1 });
+        await query.updateUserById(user.id, { online_status: 1 });
 
-    return reply.code(200).send({
-        valid: true,
-        userId: user.id
-    });
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id
+        });        
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function logOut(req, reply) {
-    const { username } = req.body;
-    const user = await query.getUserByName(username);
-    await query.updateUserById(user.id, { online_status: 0 });
+    try {
+        const { username } = req.body;
+        const user = await query.getUserByName(username);
+        if (user === null) userNotFoundError()
+        await query.updateUserById(user.id, { online_status: 0 });
 
-    return reply.code(200).send({
-        valid: true,
-        userId: user.id
-    });
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id
+        })
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
-function updateUserById(req, reply) {
-    const modifiedData = req.body; //TODO EL OBJETO
+async function updateUserById(req, reply) {
+    const modifiedData = req.body;
+    const { username, email } = req.body
     const { userId } = req.params;
 
-    const result = query.updateUserById(userId, modifiedData)
+    try {
+        const user = await checkIfUserExists(userId)
+        if (user.username === username) userConflictError()
+        if (user.email === email) userConflictError()
 
-    reply.code(201).send(result);
+        await query.updateUserById(userId, modifiedData)
+        const result = await query.getUserById(userId)
+        reply.code(201).send(result);
+    } catch (error) {
+        reply.send(error)
+    }
 }   
 
-function deleteUserById(req, reply) {
+async function deleteUserById(req, reply) {
     const { userId } = req.params
-    query.deleteUserById(userId)
-
-    reply.code(204).send()
+    
+    try {
+        await checkIfUserExists(userId)
+        
+        //poner anonymous los partidos en la database de games de este user ????
+        await deleteAvatarFile(userId)
+        await query.deleteUserById(userId)
+        reply.code(204).send('user deleted')
+    } catch (error) {
+        reply.send(error)
+    }
 }
 
 async function uploadAvatar(req, reply) {
-    const userId = req.params
+    try {
+        const { userId } = req.params
 
-    const data = await req.file()
+        await checkIfUserExists(userId)
+        await deleteAvatarFile(userId)
+        
+        const data = await req.file()
 
-  //  const data = req.body.avatar
+        if (!data) noFileUploadedError()
 
-    if (!data) {
-        return reply.code(400).send({ error: "No file uploaded" })
+        const uploadDir = path.join('/app', 'uploads', 'avatars');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const filename = `${userId}_${data.filename}`
+        const filepath = path.join(uploadDir, filename)
+
+        await pump(data.file, fs.createWriteStream(filepath))
+
+        await query.uploadAvatar(userId, filepath)
+
+        const result = await query.getUserById(userId)
+        reply.code(200).send(result)
+    } catch(error) {
+        reply.send(error)
     }
+}
 
-    const uploadDir = path.join('/app', 'uploads', 'avatars');
-    if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+async function deleteAvatar(req, reply) {
+    try {
+        const { userId } = req.params
+
+        await checkIfUserExists(userId)
+        await deleteAvatarFile(userId)
+        await query.deleteAvatar(userId)
+
+        const result = await query.getUserById(userId)
+        reply.code(201).send(result);
+    } catch(error) {
+        reply.send(error)
     }
-
-    const filename = `${Date.now()}_${data.filename}`
-    const filepath = path.join(uploadDir, filename)
-
-  //  await pipeline(data.file, fs.createWriteStream(filepath))
-    await pump(data.file, fs.createWriteStream(filepath))
-
-
-    const query = uploadAvatar(userId, filepath)
-
-    reply.code(200).send({ 
-        userId,
-        avatar: query.avatar 
-    })
 }
 
 export default { 
     getAllUsers, 
-    postUser, 
+    checkIfUserExists,
     getUserById,
+    postUser, 
     getUserByName,
     tryLogin,
     logOut,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    deleteAvatar
 }

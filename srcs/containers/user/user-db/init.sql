@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `avatar` TEXT,
   `online_status` TINYINT(1) DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `playing_time` INT DEFAULT 0,
   PRIMARY KEY (`id`)
 );
 
