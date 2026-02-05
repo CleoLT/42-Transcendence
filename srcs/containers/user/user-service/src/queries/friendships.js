@@ -1,13 +1,14 @@
-import pool from '../db.js'
+//import pool from '../db.js'
+import  connection  from '../db.js'
 
-async function connection(fct) {
+/*async function connection(fct) {
   const conn = await pool.getConnection()
   try {
     return await fct(conn)
   } finally {
     conn.release()
   }
-}
+}*/
 
 async function getAllFriendships() {
     return connection(conn => conn.query('SELECT * FROM friendships'))

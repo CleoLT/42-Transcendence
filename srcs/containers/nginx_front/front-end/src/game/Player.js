@@ -1,4 +1,27 @@
 import { PerfectMeter } from './PerfectMeter.js';
+import {
+	PLAYER_RADIUS,
+	PLAYER_SPEED,
+	PLAYER_INITIAL_X_LEFT,
+	PLAYER_INITIAL_X_RIGHT,
+	PLAYER_INITIAL_Y_OFFSET,
+	DASH_DURATION,
+	DASH_COOLDOWN,
+	DASH_SPEED_MULTIPLIER,
+	PUSH_COOLDOWN_NORMAL,
+	PUSH_COOLDOWN_ABILITY,
+	PUSH_IMPULSE,
+	PUSH_MAX_SPEED,
+	PUSH_DAMPING,
+	PUSH_VELOCITY_THRESHOLD,
+	ABILITY_COSTS,
+	ABILITY_COOLDOWNS,
+	PERFECT_METER_MAX,
+	FREEZE_DURATION,
+	MOMENTUM_DURATION,
+	MOMENTUM_PUSH_COUNT,
+	MOMENTUM_SPEED_MULTIPLIER
+} from './Constants.js';
 
 export class Player {
 	/**
@@ -19,15 +42,14 @@ export class Player {
 
 		// Scoring and perfect meter resource
 		this.score = 0;
-		this.perfectMeter = new PerfectMeter(6);
+		this.perfectMeter = new PerfectMeter(PERFECT_METER_MAX);
 
 		// Initial bowl position and basic movement parameters
-		this.x = side === 'left' ? canvasWidth * 0.25 : canvasWidth * 0.75;
-		this.y = canvasHeight - 60;
-		this.speed = 300;
-		this.width = 50;
-		this.height = 30;
-		this.radius = 30;
+		this.x = side === 'left' ? canvasWidth * PLAYER_INITIAL_X_LEFT : canvasWidth * PLAYER_INITIAL_X_RIGHT;
+		// Y position will be set based on table center in Game.init()
+		this.y = canvasHeight - PLAYER_INITIAL_Y_OFFSET;
+		this.speed = PLAYER_SPEED;
+		this.radius = PLAYER_RADIUS;
 
 		// Push interaction state and cooldowns
 		this.pushCooldown = 0;
@@ -36,17 +58,17 @@ export class Player {
 		// Dash state, duration and invulnerability
 		this.dashing = false;
 		this.dashTimer = 0;
-		this.dashDuration = 0.2;
+		this.dashDuration = DASH_DURATION;
 		this.dashCooldown = 0;
-		this.dashCooldownTime = 2.5;
+		this.dashCooldownTime = DASH_COOLDOWN;
 		this.dashDirection = { x: 0 };
 		this.pushInvulnerable = false;
 
 		// Ability slots and resource thresholds
 		this.abilities = {
-			reversePush: { cost: 2, cooldown: 0, active: false },
-			inkFreeze: { cost: 4, cooldown: 0, active: false },
-			momentumSurge: { cost: 6, cooldown: 0, active: false }
+			reversePush: { cost: ABILITY_COSTS.reversePush, cooldown: 0, active: false },
+			inkFreeze: { cost: ABILITY_COSTS.inkFreeze, cooldown: 0, active: false },
+			momentumSurge: { cost: ABILITY_COSTS.momentumSurge, cooldown: 0, active: false }
 		};
 		this.frozen = false;
 		this.freezeTimer = 0;
@@ -162,11 +184,11 @@ export class Player {
 		// Calculate effective movement speed before applying input
 		let moveSpeed = this.speed;
 		if (this.dashing) {
-			moveSpeed *= 2.0;
+			moveSpeed *= DASH_SPEED_MULTIPLIER;
 			this.x += this.dashDirection.x * moveSpeed * deltaTime;
 		} else {
 			if (this.momentumActive) {
-				moveSpeed *= 1.5;
+				moveSpeed *= MOMENTUM_SPEED_MULTIPLIER;
 			}
 
 			// Apply left / right input for horizontal-only motion
@@ -184,92 +206,35 @@ export class Player {
 			this.x += this.pushVelocityX * deltaTime;
 
 			// Exponential damping keeps the motion feeling like a shove
-			const damping = 6; // higher = shorter push duration
-			const decay = Math.exp(-damping * deltaTime);
+			const decay = Math.exp(-PUSH_DAMPING * deltaTime);
 			this.pushVelocityX *= decay;
 
 			// Snap to zero once the remaining speed is visually negligible
-			if (Math.abs(this.pushVelocityX) < 5) {
+			if (Math.abs(this.pushVelocityX) < PUSH_VELOCITY_THRESHOLD) {
 				this.pushVelocityX = 0;
 			}
 		}
 
-		// Clamp the bowl within the horizontal canvas limits
-		//this.x = Math.max(this.radius, Math.min(this.canvasWidth - this.radius, this.x));
 
 		// Map keyboard inputs to abilities for this player index. Abilities are
 		// also edge-triggered: a press that happens while the ability is on
 		// cooldown or unaffordable is discarded instead of being buffered.
-		if (this.id === 1) {
-			if (inputManager.wasKeyJustPressed('Digit1')) {
-				inputManager.consumeKey('Digit1');
-				abilityUsed = this.useAbility('reversePush');
-			}
-			if (inputManager.wasKeyJustPressed('Digit2')) {
-				inputManager.consumeKey('Digit2');
-				abilityUsed = this.useAbility('inkFreeze');
-			}
-			if (inputManager.wasKeyJustPressed('Digit3')) {
-				inputManager.consumeKey('Digit3');
-				abilityUsed = this.useAbility('momentumSurge');
-			}
-		} else {
-			if (inputManager.wasKeyJustPressed('Numpad1')) {
-				inputManager.consumeKey('Numpad1');
-				abilityUsed = this.useAbility('reversePush');
-			}
-			if (inputManager.wasKeyJustPressed('Numpad2')) {
-				inputManager.consumeKey('Numpad2');
-				abilityUsed = this.useAbility('inkFreeze');
-			}
-			if (inputManager.wasKeyJustPressed('Numpad3')) {
-				inputManager.consumeKey('Numpad3');
-				abilityUsed = this.useAbility('momentumSurge');
+		const abilityKeys = this.id === 1
+			? ['Digit1', 'Digit2', 'Digit3']
+			: ['Numpad1', 'Numpad2', 'Numpad3'];
+		const abilityNames = ['reversePush', 'inkFreeze', 'momentumSurge'];
+
+		for (let i = 0; i < abilityKeys.length; i++) {
+			if (inputManager.wasKeyJustPressed(abilityKeys[i])) {
+				inputManager.consumeKey(abilityKeys[i]);
+				abilityUsed = this.useAbility(abilityNames[i]);
+				break; // Only one ability per frame
 			}
 		}
 
 		return abilityUsed;
 	}
 
-	/**
-	 * Updates collision flags and resolves penetration against the other player.
-	 *
-	 * @param {Player} otherPlayer - The opposing player to test against.
-	 */
-	checkCollision(otherPlayer) {
-		// Calculate distance along the shared horizontal axis
-		const dx = this.x - otherPlayer.x;
-		const distance = Math.abs(dx);
-		const minDistance = this.radius + otherPlayer.radius;
-
-		// Use a reduced overlap threshold to keep bowls visually separated
-		const collisionThreshold = minDistance * 0.99;
-
-		if (distance < collisionThreshold) {
-			// Collision detected: identify which side is blocked
-			if (dx > 0) {
-				this.blockedLeft = true;
-				otherPlayer.blockedRight = true;
-
-				// Nudge both players apart to resolve penetration
-				const overlap = collisionThreshold - distance;
-				this.x += overlap / 2;
-				otherPlayer.x -= overlap / 2;
-			} else {
-				this.blockedRight = true;
-				otherPlayer.blockedLeft = true;
-
-				// Nudge both players apart to resolve penetration
-				const overlap = collisionThreshold - distance;
-				this.x -= overlap / 2;
-				otherPlayer.x += overlap / 2;
-			}
-		} else {
-			// Reset flags when no collision is present
-			this.blockedLeft = false;
-			this.blockedRight = false;
-		}
-	}
 
 	/**
 	 * Attempts to trigger an ability and returns its logical effect result.
@@ -298,7 +263,7 @@ export class Player {
 			return 'reversePush';
 		} else if (abilityName === 'momentumSurge') {
 			this.momentumActive = true;
-			this.momentumTimer = 1.5; // 1-2 seconds
+			this.momentumTimer = MOMENTUM_DURATION;
 			this.momentumPushCount = 0;
 			return 'momentum';
 		}
@@ -313,12 +278,7 @@ export class Player {
 	 * @returns {number} Cooldown duration in seconds.
 	 */
 	getAbilityCooldown(abilityName) {
-		const cooldowns = {
-			reversePush: 5,
-			inkFreeze: 8,
-			momentumSurge: 10
-		};
-		return cooldowns[abilityName] || 5;
+		return ABILITY_COOLDOWNS[abilityName] || 5;
 	}
 
 	/**
@@ -344,12 +304,6 @@ export class Player {
 		return distance < this.radius;
 	}
 
-	/**
-	 * Tests for overlap with another player for push detection.
-	 *
-	 * @param {Player} otherPlayer - Player to test against.
-	 * @returns {boolean} True if the two bowls are overlapping.
-	 */
 	/**
 	 * Tests for overlap with another player for push detection.
 	 *
@@ -409,18 +363,18 @@ export class Player {
 		if (this.abilities.reversePush.active) {
 			this.applyPush(otherPlayer, true);
 			this.abilities.reversePush.active = false;
-			this.pushCooldown = 0.5;
+			this.pushCooldown = PUSH_COOLDOWN_ABILITY;
 			return true;
 		} else {
 			// Momentum surge allows two rapid pushes within the buff window
-			if (this.momentumActive && this.momentumPushCount < 2) {
+			if (this.momentumActive && this.momentumPushCount < MOMENTUM_PUSH_COUNT) {
 				this.applyPush(otherPlayer, false);
 				this.momentumPushCount++;
-				this.pushCooldown = 0.5;
+				this.pushCooldown = PUSH_COOLDOWN_ABILITY;
 				return true;
 			} else {
 				this.applyPush(otherPlayer, false);
-				this.pushCooldown = 1;
+				this.pushCooldown = PUSH_COOLDOWN_NORMAL;
 				return true;
 			}
 		}
@@ -439,8 +393,6 @@ export class Player {
 
 		// Base impulse strength for the knockback; this is converted into an
 		// initial horizontal velocity that decays over subsequent frames.
-		const baseImpulse = 900;
-
 		let directionX = 0;
 		if (distance === 0) {
 			// If overlapping exactly, bias movement away from player sides
@@ -455,13 +407,12 @@ export class Player {
 		}
 
 		// Apply the impulse as an additive velocity on the target
-		const impulseX = directionX * baseImpulse;
-		const maxSpeed = 1200;
+		const impulseX = directionX * PUSH_IMPULSE;
 
 		otherPlayer.pushVelocityX += impulseX;
 		// Clamp to a sensible maximum speed so repeated pushes don't explode
-		if (otherPlayer.pushVelocityX > maxSpeed) otherPlayer.pushVelocityX = maxSpeed;
-		if (otherPlayer.pushVelocityX < -maxSpeed) otherPlayer.pushVelocityX = -maxSpeed;
+		if (otherPlayer.pushVelocityX > PUSH_MAX_SPEED) otherPlayer.pushVelocityX = PUSH_MAX_SPEED;
+		if (otherPlayer.pushVelocityX < -PUSH_MAX_SPEED) otherPlayer.pushVelocityX = -PUSH_MAX_SPEED;
 	}
 
 	/**
@@ -469,17 +420,20 @@ export class Player {
 	 *
 	 * @param {number} [duration=0.4] - How long the freeze should last.
 	 */
-	freeze(duration = 0.4) {
+	freeze(duration = FREEZE_DURATION) {
 		this.frozen = true;
 		this.freezeTimer = duration;
 	}
 
 	/**
 	 * Restores the player to their starting position and clears motion flags.
+	 * Note: Y position should be set to table center by caller (Game.resetRound)
 	 */
 	resetPosition() {
-		this.x = this.side === 'left' ? this.canvasWidth * 0.25 : this.canvasWidth * 0.75;
-		this.y = this.canvasHeight - 60;
+		this.x = this.side === 'left' ? this.canvasWidth * PLAYER_INITIAL_X_LEFT : this.canvasWidth * PLAYER_INITIAL_X_RIGHT;
+		// Y position will be set to table center by Game class
+		// Keep old value as fallback, but it should be overridden
+		this.y = this.canvasHeight - PLAYER_INITIAL_Y_OFFSET;
 		this.frozen = false;
 		this.momentumActive = false;
 		this.momentumTimer = 0;
@@ -520,15 +474,15 @@ export class Player {
 	getAbilityStatus() {
 		return {
 			reversePush: {
-				canUse: this.perfectMeter.value >= 3 && this.abilities.reversePush.cooldown <= 0,
+				canUse: this.perfectMeter.value >= ABILITY_COSTS.reversePush && this.abilities.reversePush.cooldown <= 0,
 				cooldown: this.abilities.reversePush.cooldown
 			},
 			inkFreeze: {
-				canUse: this.perfectMeter.value >= 6 && this.abilities.inkFreeze.cooldown <= 0,
+				canUse: this.perfectMeter.value >= ABILITY_COSTS.inkFreeze && this.abilities.inkFreeze.cooldown <= 0,
 				cooldown: this.abilities.inkFreeze.cooldown
 			},
 			momentumSurge: {
-				canUse: this.perfectMeter.value >= 9 && this.abilities.momentumSurge.cooldown <= 0,
+				canUse: this.perfectMeter.value >= ABILITY_COSTS.momentumSurge && this.abilities.momentumSurge.cooldown <= 0,
 				cooldown: this.abilities.momentumSurge.cooldown
 			}
 		};
@@ -536,7 +490,5 @@ export class Player {
 
 	getX() { return this.x; }
 	getY() { return this.y; }
-	getWidth() { return this.width; }
-	getHeight() { return this.height; }
 	getRadius() { return this.radius; }
 }

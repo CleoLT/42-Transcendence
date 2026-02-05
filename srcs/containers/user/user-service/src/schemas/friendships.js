@@ -1,4 +1,4 @@
-const errorResponse = {
+const errorResponse = { //duplicate
     type: 'object',
     properties: {
         statusCode: { type: 'number' },
@@ -20,7 +20,7 @@ const friendshipResponse = {
   }
 }
 
-const paramId = {
+const paramId = {  //duplicate
   type: 'object',
     properties: {
       userId: { type: 'number' }
@@ -43,7 +43,7 @@ const twoIdBody = {
 const getAllFriendships = {
     description: 'Get all friendships',
     tags: ['Friendships'],
-    summary: 'Friendships list',
+    summary: 'Friendships list. This is a tool for developpment',
 
     response: {
         200: {
