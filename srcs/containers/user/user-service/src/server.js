@@ -3,6 +3,8 @@ import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import routes from './routes.js'
+import seed from './seedUsers.js'
+import db from './db.js'
 
 const fastify = Fastify({
   logger: true,
@@ -24,7 +26,7 @@ fastify.setErrorHandler((err, req, reply) => {
   })
 })
 
-fastify.register(multipart, {
+await fastify.register(multipart/*, {
   limits: {
     fieldNameSize: 100, // Max field name size in bytes
     fieldSize: 100,     // Max field value size in bytes
@@ -35,7 +37,7 @@ fastify.register(multipart, {
     parts: 1000         // For multipart forms, the max number of parts (fields + files)
   }//,
   //attachFieldsToBody: true
-});
+}*/);
 
 fastify.register(swagger, {
    openapi: {
@@ -64,6 +66,7 @@ fastify.get('/health', async () => {
   return { status: 'ok', service: 'user-service' };
 });
 
+//await seed()
 
 // Check to avoid leaving sockets open with nodemon
 const start = async () => {
@@ -77,4 +80,4 @@ const start = async () => {
 
 start()
 
-// fastify.listen({ port: 3000, host: "0.0.0.0" });
+

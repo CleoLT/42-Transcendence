@@ -1,25 +1,67 @@
+const userResponse = {
+    type: 'object',
+    properties: {
+        id: { type: 'number' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        alias: { type: 'string' },
+        bio: { type: 'string' },
+        avatar: { type: 'string' },
+        online_status: { type: 'boolean' },
+        created_at: { type: 'string' }
+    }
+}
+
+const errorResponse = {  //duplicado
+    type: 'object',
+    properties: {
+        statusCode: { type: 'number' },
+        error: { type: 'string' },
+        message: { type: 'string' }
+    }
+}
+
+const paramId = {        //duplicado
+    type: 'object',
+      properties: {
+        userId: { type: 'number' }
+      },
+    required: ['userId']
+}
+
+const username = {
+    type: 'string',
+    minLength: 2,
+    maxLength: 20,
+    pattern: '^[a-zA-Z][a-zA-Z0-9_-]*$' //empieza x una letra,contiene solo letras num o _
+}
+
+const password = {
+    type: 'string',
+    minLength: 6,
+    maxLength: 20,
+    pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]+$'
+    //por lo menos una minuscula, una mayuscula, un decimal, un char especial
+  }
+
+const email = {
+    type: 'string',
+    format: 'email',
+    maxLength: 255
+}
+
+/*-----------------------SCHEMAS--------------------*/
+
 const getAllUsers = {
     description: 'Get all users',
-        tags: ['Users'], // agrupa rutas en Swagger
-        summary: 'User list',
+        tags: ['Users'],
+        summary: 'User list. This is a tool for developpment',
         response: {
-        200: {
-            description: 'Users list',
-            type: 'array',
-            items: {
-            type: 'object',
-            properties: {
-                id: { type: 'number' },
-                username: { type: 'string' },
-                email: { type: 'string' },
-                alias: { type: 'string' },
-                bio: { type: 'string' },
-                avatar: { type: 'string' },
-                online_status: { type: 'boolean' },
-                created_at: { type: 'string' }
+            200: {
+                description: 'Users list',
+                type: 'array',
+                items: userResponse
             }
-            }
-        }
         }
 }
 
@@ -32,9 +74,9 @@ const postUser = {
       type: 'object',
       required: ['username', 'password', 'email'],
       properties: {
-        username: { type: 'string', minLength: 3 },
-        password: { type: 'string', minLength: 6 },
-        email: { type: 'string', minLength: 6 }
+        username: username,
+        password: password,
+        email: email
       },
       additionalProperties: false
     },
@@ -42,79 +84,49 @@ const postUser = {
     response: {
       201: {
         description: 'User created',
-        type: 'object',
-        properties: {
-          id: { type: 'number' },
-          username: { type: 'string' }
-        }
-      }
+        ...userResponse
+      },
+      400: errorResponse,
+      409: errorResponse
     }
 }
 
 const getUserById = {
-  description: 'Get user by id',
-  tags: ['Users'],
-  summary: 'User info',
+    description: 'Get user by id',
+    tags: ['Users'],
+    summary: 'User info',
 
-  // 👇 Validación del parámetro de la ruta
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
+    params: paramId,
 
-  // 👇 Validación de la respuesta
-  response: {
-    200: {
-      description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
+    response: {
+        200: {
+            description: 'User info',
+            ...userResponse
+        },
+        404: errorResponse
     }
-  }
 };
 
 const getUserByName = {
-  description: 'Get user by username',
-  tags: ['Users'],
-  summary: 'User info by username',
+    description: 'Get user by username',
+    tags: ['Users'],
+    summary: 'User info by username',
 
-  params: {
-    type: 'object',
-    properties: {
-      username: { type: 'string' }
+    params: {
+        type: 'object',
+        properties: {
+            username: { type: 'string' }
+        },
+        required: ['username']
     },
-    required: ['username']
-  },
 
-  response: {
-    200: {
-      description: 'user info',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' },
-        online_status: { type: 'boolean' },
-        created_at: { type: 'string' },
-        playing_time: { type: 'number' }
-      }
+    response: {
+        200: {
+            description: 'user info',
+            ...userResponse
+        },
+        404: errorResponse
     }
-  }
 };
 
 const tryLogin = {
@@ -122,33 +134,28 @@ const tryLogin = {
   tags: ['Users'],
   summary: 'Credentials validation',
 
-  body: {
-    type: 'object',
-    required: ['username', 'password'],
-    properties: {
-      username: { type: 'string' },
-      password: { type: 'string' }
-    }
-  },
-
-  response: {
-    200: {
-      description: 'Credentials valid',
-      type: 'object',
-      properties: {
-        valid: { type: 'boolean' },
-        userId: { type: 'number' }
-      }
+    body: {
+        type: 'object',
+        required: ['username', 'password'],
+        properties: {
+          username: { type: 'string' },
+          password: { type: 'string' }
+        }
     },
-    401: {
-      description: 'Invalid credentials',
-      type: 'object',
-      properties: {
-        error: { type: 'string' }
-      }
+
+    response: {
+        200: {
+            description: 'Credentials valid',
+            type: 'object',
+            properties: {
+              valid: { type: 'boolean' },
+              userId: { type: 'number' }
+            }
+        },
+        401: errorResponse,
+        404: errorResponse
     }
-  }
-};
+}
 
 const logOut = {
   description: 'Logs user out',
@@ -172,112 +179,97 @@ const logOut = {
         userId: { type: 'number' }
       }
     },
-    401: {
-      description: 'Not OK',
-      type: 'object',
-      properties: {
-        error: { type: 'string' }
-      }
-    }
+    404: errorResponse
   }
 };
 
-
 const updateUserById = {
-  description: 'Partially update user by id',
-  tags: ['Users'],
-  summary: 'update user info',
+    description: 'Partially update user by id',
+    tags: ['Users'],
+    summary: 'update user info',
 
-  body: {
-      type: 'object',
-      properties: {
-        username: { type: 'string', minLength: 3 },
-        password: { type: 'string', minLength: 6 },
-        email: { type: 'string', minLength: 6 },
-        alias: { type: 'string', minLength: 3 },
-        bio: { type: 'string', minLength: 3, maxLength: 200 }
+    body: {
+        type: 'object',
+        minProperties: 1,
+        properties: {
+            username: username,
+            password: password,
+            email: email,
+            alias: username,
+            bio: { type: 'string', minLength: 3, maxLength: 200 }
+        },
+        additionalProperties: false
       },
-      additionalProperties: false
-    },
-    
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
+      
+    params: paramId,
 
-  response: {
-    200: {
-      description: 'user updated',
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        username: { type: 'string' },
-        email: { type: 'string' },
-        alias: { type: 'string' },
-        bio: { type: 'string' },
-        avatar: { type: 'string' }, //?
-        online_status: { type: 'boolean' }, //?
-        created_at: { type: 'string' }, //?
-        playing_time: { type: 'number' } //?
-      }
+    response: {
+        201: {
+            description: 'user updated',
+            ...userResponse
+        },
+        400: errorResponse,
+        404: errorResponse,
+        409: errorResponse
     }
-  }
 };
 
 const deleteUserById = {
-  description: 'Delete user by id',
-  tags: ['Users'],
-  summary: 'Delete user info',
+    description: 'Delete user by id',
+    tags: ['Users'],
+    summary: 'Delete all user info and friendships from database. Replace username by anonymous in  ??????',
 
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
+    params: paramId,
+
+    response: {
+        204: { 
+            description: 'User deleted',
+            type: 'null' 
+        },
+        404: errorResponse
+    }
 };
 
 const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
- // consumes: ['multipart/form-data'], // for swagger only
-  summary: 'upload avatar',
+  consumes: ['multipart/form-data'], // for swagger only
+  summary: 'upload avatar. delete old avatar if exists',
 
-  params: {
-    type: 'object',
-    properties: {
-      userId: { type: 'number' }
-    },
-    required: ['userId']
-  },
-
- /*body: {
-    type: "object",
-    required: ["avatar"],
-    properties: {
-      avatar: { type: 'object'
-      //  type: 'string',
-      //  format: 'binary'
-      }
-    }
-  },*/
+  params: paramId,
 
   response: {
     200: {
-      description: 'upload info',
+      description: 'file uploaded',
       type: 'object',
       properties: {
         id: { type: 'number' },
-        avatar: { type: 'string' },
+        avatar: { type: 'string' }
       }
-    }
+    },
+    400: errorResponse
   }
-};
+}
 
+const deleteAvatar = {
+    description: 'Delete avatar by id',
+    tags: ['Users'],
+    summary: 'Delete avatar path from database, delete avatar file',
+
+    params: paramId,
+
+    response: {
+        201: { 
+            description: 'delete avatar',
+            type: 'object',
+            properties: {
+                id: { type: 'number' },
+                avatar: { type: 'string' }
+            }
+        },
+        404: errorResponse
+    }
+};
 
 export default {
     getAllUsers,
@@ -288,5 +280,6 @@ export default {
     logOut,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    deleteAvatar
 }

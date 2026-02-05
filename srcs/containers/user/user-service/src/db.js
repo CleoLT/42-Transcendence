@@ -6,7 +6,16 @@ const pool = mariadb.createPool({
   user: process.env.DB_USER || 'user',
   password: process.env.DB_PASSWORD || 'userpassword',
   database: process.env.DB_NAME || 'transcendance_db',
-  connectionLimit: 5
+  connectionLimit: 10
 })
 
-export default pool;
+async function connection(fct) {
+  const conn = await pool.getConnection()
+  try {
+    return await fct(conn)
+  } finally {
+    conn.release()
+  }
+}
+
+export default { connection }
