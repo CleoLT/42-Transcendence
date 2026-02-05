@@ -9,7 +9,7 @@ services:
     depends_on:
       - user-service
       - auth-service
-      - game_history-service
+  #    - game_history-service
     restart: always
 
 # USER MICROSERVICE
@@ -18,19 +18,43 @@ services:
     build: 
       context: ./containers/user/user-service
       dockerfile: Dockerfile.prod
+    volumes:
+      - user_uploads_volume:/uploads/avatars
     env_file:
       - .user_env
     networks:
       - main
     restart: always
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
 
   user-db:
     container_name: user-db
     build: ./containers/user/user-db
+    
     env_file:
       - .userdb_env
+    # las variables en este archivo seran utilizadas por el contenedor user-db
+    
+    environment:
+      MARIADB_ROOT_PASSWORD: "rootpassword"
+    # las variables aqui son usadas tmb por el docker-compose
+    # docker solo añade los archivos estrictamente llamados .env para resolver variables del docker-compose
+
+    volumes:
+    - db_volume:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mariadb -u root -p\"$MARIADB_ROOT_PASSWORD\" -e 'SELECT 1' || exit 1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - main
     restart: always
@@ -48,14 +72,29 @@ services:
     restart: always
 
 # GAME HISTORY MICROSERVICE
-  game_history-service:
-    container_name: game_history-service
-    build: 
-      context: ./containers/game_history/game_history-service
-      dockerfile: Dockerfile.prod
-    networks:
-      - main
-    restart: always
+#  game_history-service:
+#    container_name: game_history-service
+#    build: 
+#      context: ./containers/game_history/game_history-service
+#      dockerfile: Dockerfile.prod
+#    networks:
+#      - main
+#    restart: always
+
+volumes:
+  db_volume:
+    driver: local
+ #   driver_opts:
+ #    type: none
+ #    o: bind
+ #    device: ./containers/user/user-db/db_volume
+
+  user_uploads_volume:
+    driver: local
+  #  driver_opts:
+  #    type: none
+  #    o: bind
+  #    device: ./containers/user/user-service/user_uploads/avatars
 
 networks:
    main:

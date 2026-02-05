@@ -25,9 +25,11 @@ services:
       - main   
     volumes:
       - ./containers/user/user-service:/app
+  #    - user_uploads_volume:/uploads/avatars
       - /app/node_modules
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
 
    auth-service:
     build:
@@ -39,12 +41,12 @@ services:
       - ./containers/auth/auth-service:/app
       - /app/node_modules
 
-   game_history-service:
-    build:
-      context: ./containers/game_history/game_history-service
-      dockerfile: Dockerfile.dev
-    networks:
-      - main 
-    volumes:
-      - ./containers/game_history/game_history-service:/app
-      - /app/node_modules
+   #game_history-service:
+   # build:
+   #   context: ./containers/game_history/game_history-service
+   #   dockerfile: Dockerfile.dev
+   # networks:
+   #   - main 
+   # volumes:
+   #   - ./containers/game_history/game_history-service:/app
+   #   - /app/node_modules

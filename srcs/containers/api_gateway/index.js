@@ -2,8 +2,21 @@ import Fastify from "fastify";
 import proxy from "@fastify/http-proxy";
 import cors from "@fastify/cors"
 
-const app = Fastify({ logger: true });
+const app = Fastify({ 
+  logger: true, 
+  trustProxy: true
+});
 // la opcion 'logger: true' muestra logs de incoming requests, redirecciones y codigos de respuesta 
+// la opcion 'trustproxy: true' confia que el proxy(nginx o vite) viene con https
+
+
+// 🔐 HTTPS enforcement
+//app.addHook('onRequest', async (req, reply) => {
+//  if (req.protocol !== 'https') {
+ //   reply.code(400).send({ error: 'HTTPS required' });
+  //}
+//});
+
 
 // printf para ver la request en los logs de la api-gateway
 app.addHook('onRequest', async (req) => {
