@@ -16,7 +16,7 @@ const routes = async function(fastify, options) {
     fastify.delete('/:userId', { schema: userSchema.deleteUserById }, userHandler.deleteUserById)
     fastify.post('/:userId/avatar', { schema: userSchema.uploadAvatar }, userHandler.uploadAvatar)
 
-    fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships)
+    fastify.get('/friendships', { schema: friendSchema.getAllFriendships, preHandler: userHandler.sessionHandler }, friendHandler.getAllFriendships)
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId }, friendHandler.getAllFriendsByUserId) // sin body; auth: verificar userId parametro
     fastify.get('/:userId/friendships/pending', { schema: friendSchema.getPendingFriendships }, friendHandler.getPendingFriendships) // sin body; auth: verificar userId parametro
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests }, friendHandler.getReceivedFriendRequests) // sin body; auth: verificar userId parametro

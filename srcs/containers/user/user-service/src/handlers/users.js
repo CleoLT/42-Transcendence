@@ -131,6 +131,19 @@ async function uploadAvatar(req, reply) {
     })
 }
 
+async function sessionHandler(request, reply) {
+    try {
+        await request.jwtVerify();
+        // payload → request.user
+        request.headers['x-user-id'] = request.user.id;
+        request.headers['x-user-role'] = request.user.role;
+    } catch (err) {
+        console.log('[sessionHandler] JWT verification failed:', err);
+        return reply.code(401).send({ message: 'No autenticado' });
+    }
+}
+  
+
 export default { 
     getAllUsers, 
     postUser, 
@@ -140,5 +153,6 @@ export default {
     logOut,
     updateUserById,
     deleteUserById,
-    uploadAvatar
+    uploadAvatar,
+    sessionHandler
 }

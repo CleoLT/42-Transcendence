@@ -3,3 +3,5 @@ DB_PORT=3306
 DB_USER=user
 DB_PASSWORD=userpassword
 DB_NAME=transcendance_db
+
+JWT_SECRET=V9r$2uN8qF!pLx7bA4tZkY1sM@dC0eR3

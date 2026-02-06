@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
+import jwt from '@fastify/jwt';
 import routes from './routes.js'
 
 const fastify = Fastify({
@@ -23,6 +24,14 @@ fastify.setErrorHandler((err, req, reply) => {
     message: err.message
   })
 })
+
+fastify.register(jwt, {
+  secret: process.env.JWT_SECRET,
+  cookie: {
+    cookieName: 'access_token',
+    signed: false
+  }
+});
 
 fastify.register(multipart, {
   limits: {
