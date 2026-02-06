@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
-import jwt from '@fastify/jwt';
+import cookie from '@fastify/cookie';
 import routes from './routes.js'
 
 const fastify = Fastify({
@@ -16,6 +16,8 @@ const fastify = Fastify({
   }
 })
 
+fastify.register(cookie);
+
 //si hay un error no encontrado fastify devuelve 500 por defecto
 fastify.setErrorHandler((err, req, reply) => {
   reply.code(err.statusCode || 500).send({
@@ -25,13 +27,6 @@ fastify.setErrorHandler((err, req, reply) => {
   })
 })
 
-fastify.register(jwt, {
-  secret: process.env.JWT_SECRET,
-  cookie: {
-    cookieName: 'access_token',
-    signed: false
-  }
-});
 
 fastify.register(multipart, {
   limits: {

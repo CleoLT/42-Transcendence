@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 import path from 'node:path'
+import jwt from 'jsonwebtoken';
 
 const pump = util.promisify(pipeline)
 
@@ -131,15 +132,22 @@ async function uploadAvatar(req, reply) {
     })
 }
 
-async function sessionHandler(request, reply) {
+
+async function verifySession(request, reply) {
+    const token = request.cookies?.access_token;
+
+    if (!token) {
+        console.log('[verifySession] No se recibió token');
+        return reply.code(401).send({ message: 'No hay una sesión iniciada' });
+    }
+
     try {
-        await request.jwtVerify();
-        // payload → request.user
+        request.user = jwt.verify(token, process.env.JWT_SECRET);
         request.headers['x-user-id'] = request.user.id;
         request.headers['x-user-role'] = request.user.role;
     } catch (err) {
-        console.log('[sessionHandler] JWT verification failed:', err);
-        return reply.code(401).send({ message: 'No autenticado' });
+        console.log('[verifySession] JWT error:', err.message);
+        return reply.code(401).send({ message: 'No hay una sesión iniciada' });
     }
 }
   
@@ -154,5 +162,5 @@ export default {
     updateUserById,
     deleteUserById,
     uploadAvatar,
-    sessionHandler
+    verifySession
 }

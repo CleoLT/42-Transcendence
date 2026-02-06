@@ -14,7 +14,8 @@
     "@fastify/swagger": "^8.0.0",
     "@fastify/swagger-ui": "^2.0.0",
     "@fastify/multipart": "^8.1.0",
-    "@fastify/jwt": "^9.0.0",
-    "bcrypt": "^5.1.0"
+    "@fastify/cookie": "^9.0.0",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }
