@@ -27,11 +27,13 @@ export function CenterText({text, onClick, className = ""}){
 }
 
 
-export function LogInInput({placeholder, className = ""}){
+export function LogInInput({placeholder, className = "", value, onChange, type}){
   return(
     <input
-      type="text"
+      type={type}
       placeholder={placeholder}
+      value={value}
+      onChange={onChange}
       className={`
         absolute cursor-text
         font-Corben
@@ -48,7 +50,6 @@ export function LogInInput({placeholder, className = ""}){
         ${className}`} />
   )
 }
-
 
 //faire les checks et pasing du create account et sign in
 //(pas de placeholder vide, verifier si deux fois le mm mot de passe pour creation de conmpte, autoriser que les char et les chiffres espace/tab?)

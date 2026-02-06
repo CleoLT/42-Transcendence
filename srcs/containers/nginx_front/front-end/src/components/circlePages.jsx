@@ -2,7 +2,7 @@ import {useState} from "react"
 import {Circle, CenterText, LogInInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 import { Login, Register, Logout } from "../services/authService"
-
+import {MessageFrame} from "./messageFrame"
 
 export function PlayConnected({setScreen}){
   return(
@@ -59,25 +59,36 @@ export function PlayNotConnected({setScreen}){
   )
 }
 
-//connexion page
-
 //--> connexion page
 export function SignInClick({setScreen}){
-  const[username, setUsername] = useState(null)
-  const[password, setPassword] = useState(null)
+  const[username, setUsername] = useState("")
+  const[password, setPassword] = useState("")
+  const[message, setMessage] = useState(null)
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     try {
-      await Register(username, password)
+      await Login(username, password)
+      setMessage("Account created! Welcome to the Blossom Clash family !")
       setScreen("homePlay");
     }
-    catch (error){
-      alert(error.message)
+    catch (err){
+      setMessage(err.message)
+      console.log(message)
+    } 
+    if (!username || !password) {
+      setMessage("All fields are required")
+      return
     }
   }
 
   return(
-    <form className="relative flex justify-center items-center h-full w-full">
+    <form 
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleLogin()
+      }}
+      className="relative flex justify-center items-center h-full w-full">
+      
       <Circle>
         <LogInInput
           placeholder="Username"
@@ -85,13 +96,8 @@ export function SignInClick({setScreen}){
           onChange={(e) => setUsername(e.target.value)}
           className="top-1/4"
         />
-        <CenterText
-          text ="CONNECT"
-          onClick={handleRegister}
-          className="text-4xl md:text-6xl xl:text-7xl"
-        />
-       {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
         <LogInInput
+          type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -108,6 +114,13 @@ export function SignInClick({setScreen}){
         >
             Create an account
         </CorbenRegular>
+        <button type="submit" className="flex items-center justify-center">
+          <CenterText
+              text ="CONNECT"
+              className="text-4xl md:text-6xl xl:text-7xl"
+          />
+        </button>
+        {message && <MessageFrame text={message} />}
       </Circle>
     </form>
   )
@@ -115,25 +128,53 @@ export function SignInClick({setScreen}){
 
 
 export function AccountClick({setScreen}){
-  const[username, setUsername] = useState(null)
-  const[email, setEmail] = useState(null)
-  const[password, setPassword] = useState(null)
+  const[username, setUsername] = useState("")
+  const[email, setEmail] = useState("")
+  const[password, setPassword] = useState("")
+  const[repeatPassword, setRepeatPassword] = useState("")
+  const[message, setMessage] = useState(null)
 
   const handleRegister = async () => {
+    setMessage(null)
+    
+    // //debug
+    // console.log("DEBUG:", {
+    //   username: username,
+    //   password: password,
+    //   email: email})
+  
+    if (!username || !email || !password || !repeatPassword) {
+      setMessage("All fields are required")
+      return
+    }
+    if (password !== repeatPassword) {
+      setMessage("Passwords do not match")
+      return
+    }
+
     try {
       await Register(username, password, email)
+      setMessage("Account created! Welcome to the Blossom Clash family !")
+      //faire une sweet alert
       setScreen("homePlay");
     }
-    catch (error){
-      alert(error.message)
+    catch (err){
+      setMessage(err.message)
+      console.log(message)
     }
+    // try {
+    //   const data = await Register(username, password, email)
+    //   setMessage(JSON.stringify(data, null, 2))
+    //   if (data.ok) setScreen("homePlay") }
+    // catch (err) {
+    //   setMessage(JSON.stringify(err, null, 2)) }
   }
 
   return(
     <form
       onSubmit={(e) => {
-        e.preventDefault();
-        handleRegister();
+        e.preventDefault()
+        handleRegister()
       }}
       className="
         relative flex
@@ -141,7 +182,7 @@ export function AccountClick({setScreen}){
         items-center
         h-full w-full"
     >
-    <Circle>
+    <Circle >
       <LogInInput
         placeholder="Username"
         value={username}
@@ -149,27 +190,33 @@ export function AccountClick({setScreen}){
         className="top-[16%]  md:top-[14%]"
       />
       <LogInInput
+        type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="top-1/4"
       />
-      <CenterText
-        text ="CREATE"
-        onClick={handleRegister}
-        className="text-4xl md:text-6xl xl:text-7xl"
-      />
-     {/* onClick={PlayConnected} + checker si c'est ok le login, faire parsing?*/}
       <LogInInput
+        type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="bottom-1/4"
       />
       <LogInInput
+        type="password"
         placeholder="Repeat password"
+        value={repeatPassword}
+        onChange={(e) => setRepeatPassword(e.target.value)}
         className=" bottom-[16%] md:bottom-[14%]"
       />
+      <button type="submit" className="flex justify-center items-center">
+        <CenterText
+          text ="CREATE"
+          className="text-4xl md:text-6xl xl:text-7xl"
+        />
+      </button>
+      {message && <MessageFrame text={message} />}
     </Circle>
   </form>
   )
