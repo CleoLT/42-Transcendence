@@ -14,39 +14,26 @@ services:
       - main
     restart: always
     volumes:
-      - ./containers/nginx_front/front-end:/app
-      - /app/node_modules
+      - ./containers/nginx_front/front-end:/app # bind mount, no aparece  en "docker volume ls" a no ser que lo declaremos como en inception imagino
+      - /app/node_modules # volumen anonimo
 
    user-service:
     build:
-      context: ./containers/user/user-service
-      dockerfile: Dockerfile.dev
-    networks:
-      - main   
+      dockerfile: Dockerfile.dev 
     volumes:
       - ./containers/user/user-service:/app
-  #    - user_uploads_volume:/uploads/avatars
       - /app/node_modules
-    depends_on:
-      user-db:
-        condition: service_healthy
 
    auth-service:
     build:
-      context: ./containers/auth/auth-service
       dockerfile: Dockerfile.dev
-    networks:
-      - main 
     volumes:
       - ./containers/auth/auth-service:/app
       - /app/node_modules
 
    #game_history-service:
    # build:
-   #   context: ./containers/game_history/game_history-service
    #   dockerfile: Dockerfile.dev
-   # networks:
-   #   - main 
    # volumes:
    #   - ./containers/game_history/game_history-service:/app
    #   - /app/node_modules

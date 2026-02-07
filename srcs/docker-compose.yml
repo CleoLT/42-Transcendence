@@ -37,20 +37,21 @@ services:
       - .userdb_env
     # las variables en este archivo seran utilizadas por el contenedor user-db
     
-    environment:
-      MARIADB_ROOT_PASSWORD: "rootpassword"
-    # las variables aqui son usadas tmb por el docker-compose
-    # docker solo añade los archivos estrictamente llamados .env para resolver variables del docker-compose
+    #environment:
+      #MARIADB_PASSWORD: "userpassword"
+    # las variables aqui son usadas tmb por el docker-compose, pero no te puedes fiar del rden si luego la quieres usar en un healthcheck
+    # docker solo añade los archivos estrictamente llamados ".env" para resolver variables del docker-compose
 
     volumes:
     - db_volume:/var/lib/mysql
 
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "mariadb -u root -p\"$MARIADB_ROOT_PASSWORD\" -e 'SELECT 1' || exit 1"
-        ]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      #test:
+      # [
+      #   "CMD-SHELL",
+      #   "mariadb -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e 'SELECT 1'"
+      # ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -84,10 +85,7 @@ services:
 volumes:
   db_volume:
     driver: local
- #   driver_opts:
- #    type: none
- #    o: bind
- #    device: ./containers/user/user-db/db_volume
+  # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
 
   user_uploads_volume:
     driver: local
@@ -95,6 +93,7 @@ volumes:
   #    type: none
   #    o: bind
   #    device: ./containers/user/user-service/user_uploads/avatars
+  # esto seria para hacer named volumes stored as bind mounts, como en inception
 
 networks:
    main:
