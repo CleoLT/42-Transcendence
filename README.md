@@ -148,6 +148,27 @@ She worked closely with Emilie in the frontend to make sure they were on the sam
 > Tools used for project management (GitHub Issues, Trello, etc.).
 
 > Communication channels used (Discord, Slack, etc.).
+
+
+Deciding how we were going to divide tasks and the work was difficult because we all had more or less the same level of knowledge.\
+All of us except Cristina(our game developer), who had animation notions, came from different areas of studies and had started 42 at aproximately the same time. Some of us had done *webserver* and *irc*, but no one had a deep understanding of how the web works. This made the task distribution harder beacuse we had to take more time to do research and we did not know how much workload each task really implied.
+
+In the end we decided to divide it like so:
+
+- Frontend design and implementation --- Emilie
+- System design and Docker management --- Marta
+- Backend user logic, including database structure --- Cléo
+- Game creation with AI oponent and customization --- Cristina
+- Authorization logic and overall security --- Manu
+
+We assigned the biggest tasks of each module and the basic mandatory rules to each member in GitHub's Backlog. We referenced the issues displayed there in our commits.\
+We created a Whatsapp group to communicate with each other and we set up weekly meetings to keep track of our progress and updates.
+
+
+
+
+
+
 <br>
 
 ## 6. Technical Stack
@@ -160,6 +181,7 @@ She worked closely with Emilie in the frontend to make sure they were on the sam
 > Any other significant technologies or libraries.
 
 > Justification for major technical choices.
+
 <br>
 
 ## 7. Database Schema
