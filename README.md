@@ -86,6 +86,17 @@ At the end of the section, you can find out more about how we approached the use
 
 #### React
 ###### Youtube video: [React beguinner tutorial](https://www.youtube.com/watch?v=SqcY0GlETPk&t=163s)
+### AI Use
+We used AI as a tool for **research**, specially in the begginner stages of the project. 
+
+Even with the extensive list you can see above, when it comes to understanding new tools, new concepts and how they play a part in the context of this project, sometimes a conversation with AI can be more fruitful and insighful towards getting started and taking the first steps to build the website than reading articles and tutorials.\
+We believe the combination of the two resources makes for the best material.
+
+In addition, AI has been very useful in **troubleshooting** issues during production that we had never seen before, and that we could not find aswers to on the web.
+
+We predominantly used Chatgpt and VS Code's Copilot.
+
+Despite being great tools, we did not rely on them completely. We used our critical thinking, executed tests and we always made sure to contrast any input given by AI with other teamates and 42 colleagues. In doing so, we were able to make the most informed, efficient and tailored decisions for the project.
   
 <br>
 
