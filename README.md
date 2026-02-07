@@ -66,6 +66,7 @@ At the end of the section, you can find out more about how we approached the use
 - https://www.datacamp.com/es/tutorial/nginx-docker
 - https://www.docker.com/blog/understanding-the-docker-user-instruction/
 - https://blog.devops.dev/understanding-how-uid-and-gid-work-in-docker-containers-9e043f6405c1
+- https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/using-healthcheck-sh
 ###### Youtube video: [Multi-stage Dockerfiles](https://www.youtube.com/watch?v=t779DVjCKCs)
 
 #### APIs
