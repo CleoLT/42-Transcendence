@@ -3,7 +3,7 @@ import StartScreen from "./startScreen"
 import GameContainer from "./gameContainer"
 import {IconsList} from "./icon.jsx"
 import { useState, useEffect } from "react"
-import {PlayConnected, PlayNotConnected, SignInClick, AccountClick} from "./circlePages.jsx"
+import {PlayConnected, PlayNotConnected, SignIn, CreateAccount} from "./circlePages.jsx"
 
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
@@ -21,8 +21,8 @@ export default function Content({screen, setScreen}){
             <div className="flex-1 flex justify-center items-center">
                 {screen === "homePlay" && (<PlayConnected setScreen={setScreen} /> )}
                 {screen === "playNC" && (<PlayNotConnected setScreen={setScreen} /> )}
-                {screen === "signIn" && (<SignInClick setScreen={setScreen} /> )}
-                {screen === "createAccount" && (<AccountClick setScreen={setScreen} /> )}
+                {screen === "signIn" && (<SignIn setScreen={setScreen} /> )}
+                {screen === "createAccount" && (<CreateAccount setScreen={setScreen} /> )}
                 {screen === "game" && (<StartScreen setScreen={setScreen} game={game} /> )}
             </div>
             {/* <div className="flex-1 relative overflow-hidden w-full h-auto" >
@@ -32,3 +32,6 @@ export default function Content({screen, setScreen}){
         </div>
     )
 }
+
+
+// backdrop-blur-xs

@@ -52,4 +52,4 @@ export function LogInInput({placeholder, className = "", value, onChange, type})
 }
 
 //faire les checks et pasing du create account et sign in
-//(pas de placeholder vide, verifier si deux fois le mm mot de passe pour creation de conmpte, autoriser que les char et les chiffres espace/tab?)
+//(pas de placeholder vide

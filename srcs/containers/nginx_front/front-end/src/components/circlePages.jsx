@@ -2,7 +2,7 @@ import {useState} from "react"
 import {Circle, CenterText, LogInInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 import { Login, Register, Logout } from "../services/authService"
-import {MessageFrame} from "./messageFrame"
+import {AlertMessage} from "../services/alertMessage"
 
 export function PlayConnected({setScreen}){
   return(
@@ -59,33 +59,35 @@ export function PlayNotConnected({setScreen}){
   )
 }
 
+
 //--> connexion page
-export function SignInClick({setScreen}){
+export function SignIn({setScreen}){
   const[username, setUsername] = useState("")
   const[password, setPassword] = useState("")
-  const[message, setMessage] = useState(null)
 
   const handleLogin = async () => {
-    try {
-      await Login(username, password)
-      setMessage("Account created! Welcome to the Blossom Clash family !")
-      setScreen("homePlay");
-    }
-    catch (err){
-      setMessage(err.message)
-      console.log(message)
-    } 
     if (!username || !password) {
-      setMessage("All fields are required")
-      return
-    }
+      throw new Error("All fields are required")}
+    await Login(username, password)
+    setScreen("homePlay");
   }
 
   return(
     <form 
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
-        handleLogin()
+      try {
+        await handleLogin()
+        AlertMessage.fire({
+          icon: "success",
+          text: "Connected! Welcome back 🌸!",
+        }) }
+        catch(err) {
+          AlertMessage.fire({
+            icon: "error",
+            text: err.message,
+          })
+        }
       }}
       className="relative flex justify-center items-center h-full w-full">
       
@@ -120,61 +122,46 @@ export function SignInClick({setScreen}){
               className="text-4xl md:text-6xl xl:text-7xl"
           />
         </button>
-        {message && <MessageFrame text={message} />}
+        {/* {message && <MessageFrame text={message} />} */}
       </Circle>
     </form>
   )
 }
 
 
-export function AccountClick({setScreen}){
+export function CreateAccount({setScreen}){
   const[username, setUsername] = useState("")
   const[email, setEmail] = useState("")
   const[password, setPassword] = useState("")
   const[repeatPassword, setRepeatPassword] = useState("")
-  const[message, setMessage] = useState(null)
 
   const handleRegister = async () => {
-    setMessage(null)
-    
-    // //debug
-    // console.log("DEBUG:", {
-    //   username: username,
-    //   password: password,
-    //   email: email})
-  
     if (!username || !email || !password || !repeatPassword) {
-      setMessage("All fields are required")
-      return
+      throw new Error("All fields are required")
     }
     if (password !== repeatPassword) {
-      setMessage("Passwords do not match")
-      return
+      throw new Error("Passwords do not match")
     }
-
-    try {
-      await Register(username, password, email)
-      setMessage("Account created! Welcome to the Blossom Clash family !")
-      //faire une sweet alert
-      setScreen("homePlay");
-    }
-    catch (err){
-      setMessage(err.message)
-      console.log(message)
-    }
-    // try {
-    //   const data = await Register(username, password, email)
-    //   setMessage(JSON.stringify(data, null, 2))
-    //   if (data.ok) setScreen("homePlay") }
-    // catch (err) {
-    //   setMessage(JSON.stringify(err, null, 2)) }
+    await Register(username, password, email)
+    setScreen("homePlay");
   }
 
   return(
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
-        handleRegister()
+        try {
+          await handleRegister()
+          AlertMessage.fire({
+            icon: "success",
+            text: "Account created! Welcome to the Blossom Clash family 🌸!",
+          }) }
+        catch(err) {
+          AlertMessage.fire({
+            icon: "error",
+            text: err.message,
+          })
+        }
       }}
       className="
         relative flex
@@ -216,21 +203,118 @@ export function AccountClick({setScreen}){
           className="text-4xl md:text-6xl xl:text-7xl"
         />
       </button>
-      {message && <MessageFrame text={message} />}
     </Circle>
   </form>
   )
 }
 
 
-//SignInClick --> aller sur la page Sign In (via Sign In on top et rond rouge)
 
-//GuestClick --> aller sur la page PlayClick
+// export function CreateAccount({setScreen}){
+//   const[username, setUsername] = useState("")
+//   const[email, setEmail] = useState("")
+//   const[password, setPassword] = useState("")
+//   const[repeatPassword, setRepeatPassword] = useState("")
+//   // const[message, setMessage] = useState(null)
 
-//PlayClick --> ouvrir le jeu
+//   const handleRegister = async () => {
+//     // setMessage(null)
+    
+//     // //debug
+//     // console.log("DEBUG:", {
+//     //   username: username,
+//     //   password: password,
+//     //   email: email})
+  
+//     if (!username || !email || !password || !repeatPassword) {
+//       // setMessage("All fields are required")
+//       throw new Error("All fields are required")
+//     }
+//     if (password !== repeatPassword) {
+//       // setMessage("Passwords do not match")
+//       throw new Error("Passwords do not match")
+//     }
 
-//AccountClick --> ouvrir la page pour creer un compte
+//     // try {
+//     await Register(username, password, email)
+//     setScreen("homePlay");
+//       // return ("Account created! Welcome to the Blossom Clash family !")
+//       //faire une sweet alert
+//     // }
+//     // catch (err){
+//     //   return(err.message)
+//       // console.log(message)
+//     // }
+//     // try {
+//     //   const data = await Register(username, password, email)
+//     //   setMessage(JSON.stringify(data, null, 2))
+//     //   if (data.ok) setScreen("homePlay") }
+//     // catch (err) {
+//     //   setMessage(JSON.stringify(err, null, 2)) }
+//   }
 
-//idem all icons..
-
-
+//   return(
+//     <form
+//       onSubmit={async (e) => {
+//         e.preventDefault()
+//         // const message = handleRegister()
+//           // if (message) {
+//         //   AlertMessage.fire({text: message})
+//         try {
+//           await handleRegister()
+//           AlertMessage.fire({
+//             icon: "success",
+//             text: "Account created! Welcome to the Blossom Clash family 🌸!",
+//           }) }
+//         catch(err) {
+//           AlertMessage.fire({
+//             icon: "error",
+//             text: err.message,
+//           })
+//         }
+//       }}
+//       className="
+//         relative flex
+//         justify-center
+//         items-center
+//         h-full w-full"
+//     >
+//     <Circle >
+//       <LogInInput
+//         placeholder="Username"
+//         value={username}
+//         onChange={(e) => setUsername(e.target.value)}
+//         className="top-[16%]  md:top-[14%]"
+//       />
+//       <LogInInput
+//         type="email"
+//         placeholder="Email"
+//         value={email}
+//         onChange={(e) => setEmail(e.target.value)}
+//         className="top-1/4"
+//       />
+//       <LogInInput
+//         type="password"
+//         placeholder="Password"
+//         value={password}
+//         onChange={(e) => setPassword(e.target.value)}
+//         className="bottom-1/4"
+//       />
+//       <LogInInput
+//         type="password"
+//         placeholder="Repeat password"
+//         value={repeatPassword}
+//         onChange={(e) => setRepeatPassword(e.target.value)}
+//         className=" bottom-[16%] md:bottom-[14%]"
+//       />
+//       <button type="submit" className="flex justify-center items-center">
+//         <CenterText
+//           text ="CREATE"
+//           className="text-4xl md:text-6xl xl:text-7xl"
+//         />
+//       </button>
+//       {/* {message && <MessageFrame text={message} />} */}
+//     </Circle>
+//   </form>
+//   )
+// }
