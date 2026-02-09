@@ -122,7 +122,6 @@ export function SignIn({setScreen}){
               className="text-4xl md:text-6xl xl:text-7xl"
           />
         </button>
-        {/* {message && <MessageFrame text={message} />} */}
       </Circle>
     </form>
   )

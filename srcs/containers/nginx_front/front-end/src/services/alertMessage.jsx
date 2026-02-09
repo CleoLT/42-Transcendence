@@ -14,7 +14,7 @@ export const AlertMessage = Swal.mixin({
       bg-shell text-black
       rounded-2xl shadow-xl
       p-4 m-5 sm:m-10
-      w-[50%] sm:w-[15%]
+      w-[50%] sm:w-[40%] md:w-[30%] lg:w-[25%] xl:w-[15%]
       text-xs sm:text-sm lg:text-base
       font-Corben`,
     // icon: "scale-50"
