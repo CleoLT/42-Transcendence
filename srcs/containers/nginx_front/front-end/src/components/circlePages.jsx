@@ -13,6 +13,7 @@ export function PlayConnected({setScreen}){
         <CenterText
           text ="PLAY"
           onClick={() =>setScreen("game")}
+          // interactive={true}
           className="
             text-5xl
             md:text-7xl
@@ -30,7 +31,7 @@ export function PlayNotConnected({setScreen}){
       <Circle>
         <Sixtyfour
           onClick={() =>setScreen("homePlay")}
-          className="
+            className="
             absolute top-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
             text-shell
@@ -41,6 +42,7 @@ export function PlayNotConnected({setScreen}){
         <CenterText
           text ="PLAY"
           onClick={null}
+          interactive={false}
           className="
             text-5xl
             md:text-7xl

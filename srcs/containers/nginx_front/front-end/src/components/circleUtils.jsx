@@ -26,12 +26,12 @@ export function SmallCircle(){
 }
 
 
-export function CenterText({text, onClick, className = ""}){
+export function CenterText({text, onClick, className = "", interactive = true}){
   return(
       <button 
-        onClick={() => onClick?.()} //only if onClick isn't null
-        className={"absolute flex items-center justify-center " + (onClick ? "cursor-pointer" : "cursor-default")}>
-        <Sixtyfour className={"text-center text-shell " + (onClick ? "hover:text-red-900 " : "") + className}>
+        onClick={() => onClick?.()} //call onClick only if onClick exist (no null)
+        className={"absolute flex items-center justify-center " + (interactive ? "cursor-pointer" : "cursor-default")}>
+        <Sixtyfour className={"text-center text-shell " + (interactive ? "hover:text-red-900 " : "") + className}>
           {text}
         </Sixtyfour>
       </button>
