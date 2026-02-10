@@ -1,10 +1,12 @@
 import {createContext, useContext, useEffect, useState} from "react"
+import {Login, Logout} from "./authService"
+import { AlertMessage } from "./alertMessage"
 
 const AuthContext = createContext()
 
 export function AuthProvider({children}){
     const [log, setLog] = useState(false)
-    const [userName, setUserName] = useState(null)
+    const [username, setUsername] = useState(null)
     // const [loading, setLoading] = useState(true)
 
     // --> checking in the API if a cookie token is saved
@@ -17,11 +19,11 @@ export function AuthProvider({children}){
 
             const data = await res.json()
             setLog(true)
-            setUserName(data.userId)
+            setUsername(data.username)
         }
         catch {
             setLog(false)
-            setUserName(null)
+            setUsername(null)
         }
         // finally {
         //     setLoading(false)
@@ -36,31 +38,28 @@ export function AuthProvider({children}){
     // --> if login    
     const login = async (username, password) => {
         await Login(username, password)
-        // setLog(true)
-        // setUserName(username)
-        await checkCookie()
+        setLog(true)
+        setUsername(username)
+        // await checkCookie()
     }
 
     // --> if logout (erase cookie)
-    const logout = async () => {
-        await fetch("${baseUrl}/api/auth/logout",
-            {method: "POST", credentials: "include"})
+    const logout = async (setScreen) => {
+        await Logout(username)
         setLog(false)
-        setUserName(null)
+        setUsername(null)
+        AlertMessage.fire({
+            icon: "success",
+            text: "Disconnected! See you soon 🌸!",
+          })
     }
 
-    // --> if creating an account ?
-//     await Register(...)
-//     setLog(true)
-//     setUserName(username)
-
-
-    // all child component can access to this values
+    // give the access to all child to this values
     return(
         <AuthContext.Provider
             value={{
                 log,
-                userName,
+                username,
                 login,
                 logout
             }} >
@@ -71,9 +70,15 @@ export function AuthProvider({children}){
 
 // function helper to call easily Authprovider function
 //  with less import in other pages
-export function useAuthProvider() {
+export function useAuth() {
     return useContext(AuthContext)
 }
+
+
+// --> if creating an account ?
+//     await Register(...)
+//     setLog(true)
+//     setUserName(username)
     
 
 // credentials: "include" = send cookie's token
