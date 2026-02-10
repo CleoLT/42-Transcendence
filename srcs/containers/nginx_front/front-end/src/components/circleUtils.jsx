@@ -14,6 +14,18 @@ export function Circle({children}){
 }
 
 
+export function SmallCircle(){
+  return(
+      <div className="
+        w-[4vmin] max-w-[20px] md:max-w-[30px]
+        lg:min-w-[30px] xl:max-w-[6vmin]
+        aspect-square rounded-full
+        bg-red-600">
+      </div>
+  )
+}
+
+
 export function CenterText({text, onClick, className = ""}){
   return(
       <button 
