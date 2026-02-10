@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
+import cookie from '@fastify/cookie';
 import routes from './routes.js'
 import seed from './seedUsers.js'
 import db from './db.js'
@@ -16,6 +17,8 @@ const fastify = Fastify({
     }
   }
 })
+
+fastify.register(cookie);
 
 //si hay un error no encontrado fastify devuelve 500 por defecto
 fastify.setErrorHandler((err, req, reply) => {
