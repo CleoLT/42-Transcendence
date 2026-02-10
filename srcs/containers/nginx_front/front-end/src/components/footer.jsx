@@ -1,0 +1,32 @@
+import { SmallCircle } from "./circleUtils.jsx"
+import {Sixtyfour} from "./typography.jsx"
+
+export function Footer({screen, setScreen}){
+
+    return(
+        <footer className="flex justify-between w-[95%] mt-1 sm:mt-2">
+            <FooterButton text="Contacts" onClick={() => setScreen("homePlay")}/>
+            <FooterButton text="Terms & Conditions" onClick={() => setScreen("homePlay")}/>
+            <FooterButton text="Project" onClick={() => setScreen("homePlay")}/>
+        </footer>
+    )
+}
+
+export function FooterButton({text, onClick}){
+    return(
+        <button
+            className="flex items-center"
+            onClick={onClick}
+        >
+        <SmallCircle />
+        <Sixtyfour
+            className="
+                ml-[-0.6rem] md:ml-[-0.9rem] lg:ml-[-1rem]
+                text-[0.55rem] sm:text-sm lg:text-base
+                text-black hover:text-red-900"
+        >
+            {text}
+        </Sixtyfour>
+        </button>
+    )
+}

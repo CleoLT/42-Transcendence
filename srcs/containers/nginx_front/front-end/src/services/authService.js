@@ -1,7 +1,5 @@
 const baseUrl = import.meta.env.VITE_BASE_URL
 
-
-
 export async function Login(username, password) {
   const res = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
@@ -32,7 +30,6 @@ export async function Register(username, password, email) {
   // console.log(respond)
 
   if (!res.ok) {
-    // throw new Error(respond.error || "Registration failed")
     throw new Error(respond.message)
   }
   return respond

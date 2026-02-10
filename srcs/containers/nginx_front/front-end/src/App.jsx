@@ -1,5 +1,7 @@
 import Content from "./components/content.jsx"
 import Header from "./components/header.jsx"
+import {Footer} from "./components/footer.jsx"
+
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./components/typography.jsx"
 import {useState} from "react"
 
@@ -19,10 +21,8 @@ export default function App() {
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
         <Header screen={screen} setScreen={setScreen} />
         <Content screen={screen} setScreen={setScreen} />
-        {/* <Footer /> */}
+        <Footer screen={screen} setScreen={setScreen}/>
       </div>
     </div>
   )
 }
-
-
