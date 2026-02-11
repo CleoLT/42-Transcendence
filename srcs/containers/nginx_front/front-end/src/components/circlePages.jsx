@@ -131,7 +131,10 @@ export function SignIn({setScreen}){
     </form>
   )
 }
-
+  // to fix the register log out display
+  // const {login} = useAuth()
+  // await login(username, password)
+  // setScreen("homePlay");
 
 export function CreateAccount({setScreen}){
   const[username, setUsername] = useState("")
