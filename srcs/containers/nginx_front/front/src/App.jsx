@@ -31,6 +31,7 @@ export default function App() {
 
       const res = await fetch(url, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -126,9 +127,13 @@ export default function App() {
             type="button"
             onClick={async () => {
               try {
-                const res = await fetch("https://localhost:8080/api/auth/logout", {
+                const url = `${baseUrl}/api/auth/logout`;
+                const res = await fetch(url, {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
                   body: JSON.stringify({ username: loginUsername }),
                 });
                 const data = await res.json();

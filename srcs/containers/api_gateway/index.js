@@ -18,6 +18,7 @@ const app = Fastify({
 //});
 
 
+
 // printf para ver la request en los logs de la api-gateway
 app.addHook('onRequest', async (req) => {
   console.log(`[GATEWAY] ${req.method} ${req.url}`);
@@ -27,6 +28,7 @@ app.addHook('onRequest', async (req) => {
 //Cross-origin ressource sharing para que el front pueda hacer fetch
 app.register(cors, {
   origin: "https://localhost:8080",
+  credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE"]
 });
 
@@ -49,6 +51,8 @@ app.register(cors, {
 //  credentials: true // if you plan to use cookies/auth
 //});
 
+
+
 app.register(proxy, {
   upstream: "http://user-service:3000",
   prefix: "/api/users",
@@ -58,13 +62,13 @@ app.register(proxy, {
 app.register(proxy, {
   upstream: "http://auth-service:3000",
   prefix: "/api/auth/",
-  rewritePrefix: "/"
+  rewritePrefix: "/",
 });
 
 app.register(proxy, {
   upstream: "http://game_history-service:3000",
   prefix: "/api/game_history/",
-  rewritePrefix: "/"
+  rewritePrefix: "/",
 });
 
 app.get("/health", async () => ({ ok: true }));

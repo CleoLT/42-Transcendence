@@ -1,11 +1,11 @@
 import Fastify from 'fastify';
 import auth from './auth.js';
 import jwt from 'jsonwebtoken';
-import fycookie from '@fastify/cookie';
+import cookie from '@fastify/cookie';
 
 const fastify = Fastify({ logger: true });
 
-fastify.register(fycookie);
+fastify.register(cookie);
 
 fastify.get('/', async () => {
   return { service: 'auth', status: 'running' };

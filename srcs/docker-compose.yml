@@ -4,6 +4,8 @@ services:
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
+    env_file:
+      - .jwt_env
     networks:
       - main
     depends_on:
@@ -22,6 +24,7 @@ services:
       - user_uploads_volume:/uploads/avatars
     env_file:
       - .user_env
+      - .jwt_env
     networks:
       - main
     restart: always
@@ -67,7 +70,7 @@ services:
       context: ./containers/auth/auth-service
       dockerfile: Dockerfile.prod
     env_file:
-      - ./containers/auth/auth-service/.auth_env
+      - .jwt_env
     networks:
       - main
     restart: always

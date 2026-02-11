@@ -217,6 +217,7 @@ async function deleteAvatar(req, reply) {
         reply.send(error)
     }
 }
+  
 
 export default { 
     getAllUsers, 

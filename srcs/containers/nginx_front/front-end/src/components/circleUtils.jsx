@@ -1,31 +1,67 @@
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
-export function Circle(){
+export function Circle({children}){
   return(
-      <div className="h-1/2 relative max-h-[270px] md:max-h-[400px] lg:min-h-[350px] xl:min-h-[80%] aspect-square rounded-full bg-red-600" />
+      <div className="
+        flex items-center justify-center relative
+        w-[60vmin] max-w-[270px] md:max-w-[400px]
+        lg:min-w-[350px] xl:max-w-[80vmin]
+        aspect-square rounded-full
+        bg-red-600">
+        {children}
+      </div>
   )
 }
 
-export function CutText({text, onClick}){
+
+export function SmallCircle(){
+  return(
+      <div className="
+        w-[4vmin] max-w-[20px] md:max-w-[30px]
+        lg:min-w-[30px] xl:max-w-[6vmin]
+        aspect-square rounded-full
+        bg-red-600">
+      </div>
+  )
+}
+
+
+export function CenterText({text, onClick, className = "", interactive = true}){
   return(
       <button 
-        onClick={() => onClick?.()} //only if onClick isn't null
-        className={"absolute flex justify-center items-center " + (onClick ? "cursor-pointer" : "cursor-default")}>
-        <Sixtyfour className="text-5xl xl:text-9xl md:text-7xl text-shell">{text}</Sixtyfour>
+        onClick={() => onClick?.()} //call onClick only if onClick exist (no null)
+        className={"absolute flex items-center justify-center " + (interactive ? "cursor-pointer" : "cursor-default")}>
+        <Sixtyfour className={"text-center text-shell " + (interactive ? "hover:text-red-900 " : "") + className}>
+          {text}
+        </Sixtyfour>
       </button>
   )
 }
 
-export function LogInButton({text}){
+
+export function LogInInput({placeholder, className = "", value, onChange, type}){
   return(
-    <button className="absolute flex justify-center items-center bg-greyish rounded-xl text-xs px-11 py-0 md:px-25 lg:px-20 xl:px-40 xl:py-1 ">
-      <CorbenRegular className="text-shell " >
-        {text}
-      </CorbenRegular>
-    </button>
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className={`
+        absolute cursor-text
+        font-Corben
+        text-red-900
+        text-center
+        text-[10px] md:text-base
+        placeholder:font-Corben
+        placeholder:text-shell
+        placeholder:text-center
+        placeholder:text-[10px] md:placeholder:text-base
+        bg-greyish
+        rounded-3xl 
+        w-[150px] h-[17px] md:w-[250px] md:h-[35px] xl:w-[300px] xl:h-[40px]
+        ${className}`} />
   )
 }
 
-
-//icons --> ajouter le hover avec le texte des icones
-
+//faire les checks et pasing du create account et sign in
+//(pas de placeholder vide

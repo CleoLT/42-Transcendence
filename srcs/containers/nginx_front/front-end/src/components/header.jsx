@@ -1,14 +1,26 @@
 import {Sixtyfour} from "./typography.jsx"
+import {useAuth} from "../services/authProvider"
 
-export default function Header(){
+export default function Header({screen, setScreen}){
+    const {log, logout} = useAuth()
+
     return(
-        <button  className="w-full pr-[5%] pb-[1%]">
-            <Sixtyfour className="lg:text-2xl sm:text-lg text-xs text-right hover:text-red-900">
-                {/* onClick={SignInClick} */}
-            Sign in
-            </Sixtyfour>
-        </button>
+        <header className="w-full">
+            <button className="w-full pr-[5%] pb-[1%]">
+                {log ? (
+                    <Sixtyfour
+                        onClick={async () => {
+                            await logout()
+                            setScreen("playNC")}}
+                        className="lg:text-2xl sm:text-lg text-xs text-right hover:text-red-900">
+                        Log out
+                    </Sixtyfour>
+                ) : (
+                    <Sixtyfour onClick={() => setScreen("signIn")} className="lg:text-2xl sm:text-lg text-xs text-right hover:text-red-900">
+                         Sign in
+                    </Sixtyfour>
+                )}
+            </button>
+        </header>
     )
 }
-
-//will be a text-button , to change
