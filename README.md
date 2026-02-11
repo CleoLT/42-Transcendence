@@ -285,7 +285,12 @@ Given that we chose the frontend framework module, and Emilie learned how React 
 
 <br>
 
-### :green_book: Total point count - 15 points
+### MINOR | A complete notification system for all creation, update, and deletion actions (1p)
+(to be completed)
+
+<br>
+
+### :green_book: Total point count - 16 points
 With these modules we have the 14 mandatory points and one extra, just in case we fail one of them during evaluation.
 
 <br>
@@ -295,7 +300,6 @@ With these modules we have the 14 mandatory points and one extra, just in case w
 ####  MINOR | Health check and status page system with automated backups and disaster recovery procedures (1p) - MARTA
 ####  MINOR | User activity analytics and insights dashboard (1p) - EMILIE + CLÉO
 ####  MINOR | Support for additional browsers (1p) - EMILIE
-####  MAJOR | Figma design (2p) - EMILIE 
 
 <br>
 
