@@ -60,13 +60,13 @@ const getAllUsers = {
             200: {
                 description: 'Users list',
                 type: 'array',
-                items: {
+                items: /*{
                   type: 'object',
                   properties: {
                       id: { type: 'number' },
                       username: { type: 'string' }
                   }
-              }
+              }*/ userResponse
             }
         }
 }
@@ -109,6 +109,28 @@ const getUserById = {
             description: 'User info',
             ...userResponse
         },
+        401: errorResponse,
+        404: errorResponse
+    }
+};
+
+const getAvatarById = {
+    description: 'Get avatar by id',
+    tags: ['Users'],
+    summary: 'User avatar info',
+
+    params: paramId,
+
+    response: {
+        201: {
+            description: 'User Avatar',
+            type: 'object',
+            properties: {
+                id: { type: 'number' },
+                avatar: { type: 'string' }
+            }
+        },
+        401: errorResponse,
         404: errorResponse
     }
 };
@@ -281,6 +303,7 @@ export default {
     getAllUsers,
     postUser,
     getUserById,
+    getAvatarById,
     getUserByName,
     tryLogin,
     logOut,

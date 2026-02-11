@@ -208,6 +208,18 @@ async function uploadAvatar(req, reply) {
     }
 }
 
+async function getAvatarById(req, reply) {
+    try {
+        const { userId } = req.params
+
+        await checkIfUserExists(userId)
+        const result = await query.getAvatarByUserId(userId)
+        reply.code(201).send({ id: userId, ...result });
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
 async function deleteAvatar(req, reply) {
     try {
         const { userId } = req.params
@@ -222,7 +234,6 @@ async function deleteAvatar(req, reply) {
         reply.send(error)
     }
 }
-
 
 async function verifySession(request, reply) {
     const token = request.cookies?.access_token;
@@ -271,7 +282,6 @@ async function verifySessionFromPath(request, reply) {
     }
 }
 
-
 async function verifySessionFromBody(request, reply) {
     const token = request.cookies?.access_token;
 
@@ -309,6 +319,7 @@ export default {
     updateUserById,
     deleteUserById,
     uploadAvatar,
+    getAvatarById,
     deleteAvatar,
     verifySession,
     verifySessionFromPath,
