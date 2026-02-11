@@ -96,6 +96,7 @@ async function postUser(req, reply) {
         const user = await query.addUser(username, password, email)
         const result = await query.getUserById(user.insertId) 
     
+        await query.updateUserById(user.insertId, { online_status: 1 });
         reply.code(201).send(result);
     } catch (error) {
         reply.send(error)
@@ -139,6 +140,10 @@ async function logOut(req, reply) {
     } catch (error) {
         reply.send(error)
     }
+}
+
+async function validate(req, reply) {
+    return reply.code(200).send({ valid: true });
 }
 
 async function updateUserById(req, reply) {
@@ -227,6 +232,7 @@ export default {
     getUserByName,
     tryLogin,
     logOut,
+    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,

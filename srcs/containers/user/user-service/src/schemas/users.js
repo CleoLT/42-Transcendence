@@ -189,6 +189,37 @@ const logOut = {
   }
 };
 
+export const validate = {
+  body: {
+    type: 'object',
+    required: ['username'],
+    properties: {
+      username: { type: 'string', minLength: 1 }
+    },
+    additionalProperties: false
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' }
+      }
+    },
+    401: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    },
+    403: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    }
+  }
+};
+
 const updateUserById = {
     description: 'Partially update user by id',
     tags: ['Users'],
@@ -284,6 +315,7 @@ export default {
     getUserByName,
     tryLogin,
     logOut,
+    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,
