@@ -1,8 +1,8 @@
 //import pool from '../db.js'
-import  connection  from '../db.js'
+import  db  from '../db.js'
 
-/*async function connection(fct) {
-  const conn = await pool.getConnection()
+/*async function db.connection(fct) {
+  const conn = await pool.getdb.Connection()
   try {
     return await fct(conn)
   } finally {
@@ -11,11 +11,11 @@ import  connection  from '../db.js'
 }*/
 
 async function getAllFriendships() {
-    return connection(conn => conn.query('SELECT * FROM friendships'))
+    return db.connection(conn => conn.query('SELECT * FROM friendships'))
 }
 
 async function getFriendshipById(id1, id2) {
-   const rows = await connection(conn => conn.query(`
+   const rows = await db.connection(conn => conn.query(`
             SELECT * FROM friendships
             WHERE user1_id = ? AND user2_id = ?
             LIMIT 1`,
@@ -25,7 +25,7 @@ async function getFriendshipById(id1, id2) {
 }
 
 async function getFriendsByUserId(id) {
-    return connection(conn => conn.query(
+    return db.connection(conn => conn.query(
             `SELECT * FROM friendships 
             WHERE (user1_id = ? OR user2_id = ?)
             AND user1_accept = true 
@@ -35,7 +35,7 @@ async function getFriendsByUserId(id) {
 }
 
 async function getPendingFriendships(id) {
-    return connection(conn => conn.query(
+    return db.connection(conn => conn.query(
             `SELECT * FROM friendships 
             WHERE (user1_id = ? 
                 AND user1_accept = true 
@@ -48,7 +48,7 @@ async function getPendingFriendships(id) {
 }
 
 async function getReceivedFriendRequests(id) {
-    return connection(conn => conn.query(
+    return db.connection(conn => conn.query(
             `SELECT * FROM friendships 
             WHERE (user1_id = ? 
                 AND user1_accept = false 
@@ -61,7 +61,7 @@ async function getReceivedFriendRequests(id) {
 }
 
 async function createFriendship(id1, id2, revert) {
-    return connection(conn => conn.query(
+    return db.connection(conn => conn.query(
          `INSERT INTO friendships (
             user1_id, 
             user2_id, 
@@ -73,7 +73,7 @@ async function createFriendship(id1, id2, revert) {
 }
 
 async function acceptPendingFriendship(id1, id2, revert) {
-    return connection(conn => conn.query(`
+    return db.connection(conn => conn.query(`
       UPDATE friendships 
       SET ${revert ? "user2_accept" : "user1_accept"} = true 
       WHERE user1_id = ? AND user2_id = ?
@@ -83,7 +83,7 @@ async function acceptPendingFriendship(id1, id2, revert) {
 }
 
 async function checkIfAreFriends(id1, id2) {
-  const rows = await connection(conn => conn.query(`
+  const rows = await db.connection(conn => conn.query(`
       SELECT * FROM friendships
       WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
       LIMIT 1`,
@@ -94,7 +94,7 @@ async function checkIfAreFriends(id1, id2) {
 
 async function authorizeToPlay(id1, id2, revert) {
 
-    return connection(conn => conn.query(`
+    return db.connection(conn => conn.query(`
       UPDATE friendships 
       SET ${revert ? "user2_authorization" : "user1_authorization"} = true 
       WHERE user1_id = ? AND user2_id = ? AND user1_accept = true AND user2_accept = true
@@ -105,7 +105,7 @@ async function authorizeToPlay(id1, id2, revert) {
 
 async function cancelFriendship(id1, id2, revert) {
 
-    return connection(conn => conn.query(`
+    return db.connection(conn => conn.query(`
       UPDATE friendships 
       SET ${revert ? "user2_accept" : "user1_accept"} = false,
         user1_authorization = false,
@@ -118,7 +118,7 @@ async function cancelFriendship(id1, id2, revert) {
 
 async function cancelAuthorization(id1, id2, revert) {
 
-    return connection(conn => conn.query(`
+    return db.connection(conn => conn.query(`
       UPDATE friendships 
       SET ${revert ? "user2_authorization" : "user1_authorization"} = false 
       WHERE user1_id = ? 

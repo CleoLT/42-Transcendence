@@ -22,6 +22,7 @@ services:
       dockerfile: Dockerfile.prod
     env_file:
       - .user_env
+      - .jwt_env
     networks:
       - main
     restart: always
