@@ -1,15 +1,13 @@
 import query from '../queries/users.js'
 import fs from 'node:fs'
-import util from 'node:util'
-import { pipeline } from 'node:stream'
 import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 import jwt from 'jsonwebtoken';
+import { fileTypeFromBuffer } from 'file-type'
 
-const pump = util.promisify(pipeline)
 
-function noFileUploadedError() {
-    const err = new Error('No file uploaded')
+function noFileUploadedError(str) {
+    const err = new Error(str)
     err.statusCode = 400
     err.name = 'Bad Request'
     throw err
@@ -183,9 +181,15 @@ async function uploadAvatar(req, reply) {
         await deleteAvatarFile(userId)
         
         const data = await req.file()
+        if (!data) noFileUploadedError('No file uploaded')
 
-        if (!data) noFileUploadedError()
+        const allowedTypes = ['image/jpeg', 'image/png']
+        if (!allowedTypes.includes(data.mimetype)) noFileUploadedError('only .jpg and .png images are allowed')
 
+        const buffer = await data.toBuffer()
+        const type = await fileTypeFromBuffer(buffer)
+        if (!type || !['image/png','image/jpeg'].includes(type.mime)) noFileUploadedError('only .jpg and .png images are allowed')
+    
         const uploadDir = path.join('/app', 'uploads', 'avatars');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
@@ -193,7 +197,7 @@ async function uploadAvatar(req, reply) {
         const filename = `${userId}_${data.filename}`
         const filepath = path.join(uploadDir, filename)
 
-        await pump(data.file, fs.createWriteStream(filepath))
+        await fs.promises.writeFile(filepath, buffer)
 
         await query.uploadAvatar(userId, filepath)
 
