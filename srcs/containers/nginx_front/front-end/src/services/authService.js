@@ -4,7 +4,8 @@ export async function Login(username, password) {
   const res = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username, password }),
+    credentials: "include"
   })
 
   const respond = await res.json()
@@ -15,12 +16,12 @@ export async function Login(username, password) {
   return respond
 }
 
-
 export async function Register(username, password, email) {
-  const res = await fetch(`${baseUrl}/api/users`, {
+  const res = await fetch(`${baseUrl}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password, email })
+    body: JSON.stringify({ username, password, email }),
+    credentials: "include"
   })
   //DEBUG
   // console.log("BASE URL =", baseUrl)
@@ -40,7 +41,8 @@ export async function Logout(username) {
   const res = await fetch(`${baseUrl}/api/auth/logout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
+    body: JSON.stringify({ username }),
+    credentials: "include"
   })
 
   const respond = await res.json()
