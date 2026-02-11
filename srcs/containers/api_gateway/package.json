@@ -3,6 +3,7 @@
   "type": "module",
   "dependencies": {
     "fastify": "^4",
+    "jsonwebtoken": "^9.0.2",
     "@fastify/http-proxy": "^9",
     "@fastify/swagger": "^8.0.0",
     "@fastify/swagger-ui": "^2.0.0",

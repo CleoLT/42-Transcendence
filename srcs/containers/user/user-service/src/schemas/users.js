@@ -60,7 +60,13 @@ const getAllUsers = {
             200: {
                 description: 'Users list',
                 type: 'array',
-                items: userResponse
+                items: {
+                  type: 'object',
+                  properties: {
+                      id: { type: 'number' },
+                      username: { type: 'string' }
+                  }
+              }
             }
         }
 }
