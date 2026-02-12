@@ -68,7 +68,7 @@ export function GameConfig({ game }) {
               onClick={handlePlayClick}
               interactive={true}
               className={`
-                text-4xl md:text-6xl xl:text-7xl
+                text-5xl md:text-7xl xl:text-8xl
                 ${configVisible && !canPlay ? "opacity-40" : ""}
               `}
             />
@@ -217,62 +217,64 @@ export function SignIn({setScreen}){
           })
         }
       }}
-      className="relative flex justify-center items-center h-full w-full">
-      
-      <Circle>
-        <LogInInput
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="top-1/4"
+      className="
+        relative flex
+        justify-center
+        items-center
+        h-full w-full"
+    >
+    <Circle>
+      <LogInInput
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="top-1/4"
+      />
+      <LogInInput
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="bottom-1/4"
+      />
+      <CorbenRegular
+        onClick={() => setScreen("createAccount")}
+        className="
+          absolute bottom-[8%]
+          text-[10px] md:text-base
+          text-shell
+          hover:text-red-900
+          cursor-pointer"
+      >
+        Create an account
+      </CorbenRegular>
+      <button type="submit" className="flex items-center justify-center">
+        <CenterText
+            text ="CONNECT"
+            className="text-4xl md:text-6xl xl:text-7xl"
         />
-        <LogInInput
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="bottom-1/4"
-        />
-        <CorbenRegular
-          onClick={() => setScreen("createAccount")}
-          className="
-            absolute bottom-[8%]
-            text-[10px] md:text-base
-            text-shell
-            hover:text-red-900
-            cursor-pointer"
-        >
-            Create an account
-        </CorbenRegular>
-        <button type="submit" className="flex items-center justify-center">
-          <CenterText
-              text ="CONNECT"
-              className="text-4xl md:text-6xl xl:text-7xl"
-          />
-        </button>
-      </Circle>
-    </form>
+      </button>
+    </Circle>
+  </form>
   )
 }
-  // to fix the register log out display
-  // const {login} = useAuth()
-  // await login(username, password)
-  // setScreen("homePlay");
+
 
 export function CreateAccount({setScreen}){
   const[username, setUsername] = useState("")
   const[email, setEmail] = useState("")
   const[password, setPassword] = useState("")
   const[repeatPassword, setRepeatPassword] = useState("")
+  const {register} = useAuth()
 
-  const handleRegister = async () => {
+   const handleRegister = async () => {
     if (!username || !email || !password || !repeatPassword) {
       throw new Error("All fields are required")
     }
     if (password !== repeatPassword) {
       throw new Error("Passwords do not match")
     }
-    await Register(username, password, email)
+    await register(username, password, email)
     setScreen("homePlay");
   }
 
@@ -337,3 +339,6 @@ export function CreateAccount({setScreen}){
   </form>
   )
 }
+
+// i added     "start": "HOST=0.0.0.0 react-scripts start" on package json for hot reloaded with windows
+// and in Dockerfile.dev too

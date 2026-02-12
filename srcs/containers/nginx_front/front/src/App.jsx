@@ -17,7 +17,7 @@ export default function App() {
   // si es dev = http://localhost:5173
   // si es prod = https://localhost:8080
 
-  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const rl = import.meta.env.VITE_BASE_URL;
   
   const handleLogin = async (e) => {
     e.preventDefault();
