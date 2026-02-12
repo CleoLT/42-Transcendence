@@ -1,9 +1,7 @@
-import {Circle} from "./circleUtils.jsx"
-import StartScreen from "./startScreen"
-import GameContainer from "./gameContainer"
 import {IconsList} from "./icon.jsx"
-import { useState, useEffect } from "react"
-import {PlayConnected, PlayNotConnected, SignIn, CreateAccount} from "./circlePages.jsx"
+import { useState } from "react"
+import GameContainer from "./gameContainer"
+import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
 
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
@@ -16,19 +14,25 @@ export default function Content({screen, setScreen}){
     //   });
     // }, [game]);
     return (
-        <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black" >
+        <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
             <IconsList />
-            <div className="flex-1 flex justify-center items-center">
-                {screen === "homePlay" && (<PlayConnected setScreen={setScreen} /> )}
-                {screen === "playNC" && (<PlayNotConnected setScreen={setScreen} /> )}
-                {screen === "signIn" && (<SignIn setScreen={setScreen} /> )}
-                {screen === "createAccount" && (<CreateAccount setScreen={setScreen} /> )}
-                {screen === "game" && (<StartScreen setScreen={setScreen} game={game} /> )}
+            <div className="flex-1 flex justify-center items-center relative overflow-hidden">
+                {screen === "homePlay" && (
+                    <>
+                        <GameContainer onGameReady={setGame} />
+                        <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+                        <div className="pointer-events-auto w-full h-full flex justify-center items-center">
+                            <GameConfig game={game} />
+                        </div>
+                        </div>
+                    </>
+                )}
+                {screen === "playNC" && (<PlayNotConnected setScreen={setScreen} />)}
+                {screen === "signIn" && (<SignIn setScreen={setScreen} />)}
+                {screen === "createAccount" && (<CreateAccount setScreen={setScreen} />)}
+
+               
             </div>
-            {/* <div className="flex-1 relative overflow-hidden w-full h-auto" >
-                <GameContainer onGameReady={setGame} />
-                <StartScreen game={game} /> 
-            </div> */}
         </div>
     )
 }
