@@ -12,13 +12,136 @@ export function PlayConnected({setScreen}){
       <Circle>
         <CenterText
           text ="PLAY"
-          onClick={() =>setScreen("game")}
+          onClick={() =>setScreen("homePlay")}
           // interactive={true}
           className="
             text-5xl
             md:text-7xl
             xl:text-8xl"
         />
+      </Circle>
+    </div>
+  )
+}
+
+export function GameConfig({ game }) {
+  const [configVisible, setConfigVisible] = useState(false)
+  const [player1Name, setPlayer1Name] = useState("")
+  const [player2Name, setPlayer2Name] = useState("")
+  const [vsAI, setVsAI] = useState(true)
+  const [difficulty, setDifficulty] = useState("easy")
+  const [hasStarted, setHasStarted] = useState(false)
+
+  const _p1 = Boolean(player1Name.trim())
+  const _p2 = vsAI || Boolean(player2Name.trim())
+  const canPlay = _p1 && _p2 && !!game
+
+  const handlePlayClick = () => {
+    if (!configVisible) {
+      setConfigVisible(true)
+      return
+    }
+
+    if (!canPlay) return
+
+    const p1 = player1Name.trim()
+    const p2 = vsAI ? "AI" : player2Name.trim()
+
+    game.setAIMode(vsAI, difficulty)
+    game.startGame(p1, p2)
+    setHasStarted(true)
+  }
+
+  if (hasStarted) return null
+
+  return (
+    <div className="flex flex-col justify-center items-center h-full w-full">
+      <Circle>
+        {!game ? (
+          <Sixtyfour className="text-shell text-center text-xl md:text-3xl">
+            Loading...
+          </Sixtyfour>
+        ) : (
+          <>
+            <CenterText
+              text="PLAY"
+              onClick={handlePlayClick}
+              interactive={true}
+              className={`
+                text-4xl md:text-6xl xl:text-7xl
+                ${configVisible && !canPlay ? "opacity-40" : ""}
+              `}
+            />
+
+            {configVisible && (
+              <>
+                <LogInInput
+                  placeholder="Player 1 name"
+                  value={player1Name}
+                  onChange={(e) => setPlayer1Name(e.target.value.slice(0, 10))}
+                  className="top-1/4"
+                />
+
+                {vsAI ? (
+                  <div className="absolute bottom-[28%] flex items-center justify-center gap-2 text-[10px] md:text-xs">
+                    <span className="font-corben text-shell">
+                      Difficulty
+                    </span>
+                    <select
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value)}
+                      className="rounded-2xl bg-greyish text-red-900 px-2 py-1 border border-red-600/40"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="normal">Normal</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                ) : (
+                  <LogInInput
+                    placeholder="Player 2 name"
+                    value={player2Name}
+                    onChange={(e) => setPlayer2Name(e.target.value.slice(0, 10))}
+                    className="bottom-1/4"
+                  />
+                )}
+                <div className="absolute bottom-[10%] flex flex-col items-center gap-1 text-[10px] md:text-xs">
+                  <span className="font-corben text-shell mb-1">
+                    Mode
+                  </span>
+
+                  <div className="flex gap-2">
+                    <Sixtyfour
+                      onClick={() => {
+                        setVsAI(false)
+                        game?.setAIMode(false)
+                      }}
+                      className={`
+                        cursor-pointer
+                        ${!vsAI ? "text-red-600" : "text-shell hover:text-red-900"}
+                      `}
+                    >
+                      VS Human
+                    </Sixtyfour>
+
+                    <Sixtyfour
+                      onClick={() => {
+                        setVsAI(true)
+                        game?.setAIMode(true, difficulty)
+                      }}
+                      className={`
+                        cursor-pointer
+                        ${vsAI ? "text-red-600" : "text-shell hover:text-red-900"}
+                      `}
+                    >
+                      VS AI
+                    </Sixtyfour>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
       </Circle>
     </div>
   )

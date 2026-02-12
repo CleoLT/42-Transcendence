@@ -1,14 +1,12 @@
 import query from '../queries/users.js'
 import fs from 'node:fs'
-import util from 'node:util'
-import { pipeline } from 'node:stream'
 import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
+import { fileTypeFromBuffer } from 'file-type'
 
-const pump = util.promisify(pipeline)
 
-function noFileUploadedError() {
-    const err = new Error('No file uploaded')
+function noFileUploadedError(str) {
+    const err = new Error(str)
     err.statusCode = 400
     err.name = 'Bad Request'
     throw err
@@ -96,6 +94,7 @@ async function postUser(req, reply) {
         const user = await query.addUser(username, password, email)
         const result = await query.getUserById(user.insertId) 
     
+        await query.updateUserById(user.insertId, { online_status: 1 });
         reply.code(201).send(result);
     } catch (error) {
         reply.send(error)
@@ -141,6 +140,10 @@ async function logOut(req, reply) {
     }
 }
 
+async function validate(req, reply) {
+    return reply.code(200).send({ valid: true });
+}
+
 async function updateUserById(req, reply) {
     const modifiedData = req.body;
     const { username, email } = req.body
@@ -182,9 +185,15 @@ async function uploadAvatar(req, reply) {
         await deleteAvatarFile(userId)
         
         const data = await req.file()
+        if (!data) noFileUploadedError('No file uploaded')
 
-        if (!data) noFileUploadedError()
+        const allowedTypes = ['image/jpeg', 'image/png']
+        if (!allowedTypes.includes(data.mimetype)) noFileUploadedError('only .jpg and .png images are allowed')
 
+        const buffer = await data.toBuffer()
+        const type = await fileTypeFromBuffer(buffer)
+        if (!type || !['image/png','image/jpeg'].includes(type.mime)) noFileUploadedError('only .jpg and .png images are allowed')
+    
         const uploadDir = path.join('/app', 'uploads', 'avatars');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
@@ -192,13 +201,25 @@ async function uploadAvatar(req, reply) {
         const filename = `${userId}_${data.filename}`
         const filepath = path.join(uploadDir, filename)
 
-        await pump(data.file, fs.createWriteStream(filepath))
+        await fs.promises.writeFile(filepath, buffer)
 
         await query.uploadAvatar(userId, filepath)
 
         const result = await query.getUserById(userId)
         reply.code(200).send(result)
     } catch(error) {
+        reply.send(error)
+    }
+}
+
+async function getAvatarById(req, reply) {
+    try {
+        const { userId } = req.params
+
+        await checkIfUserExists(userId)
+        const result = await query.getAvatarByUserId(userId)
+        reply.code(201).send({ id: userId, ...result });
+    } catch (error) {
         reply.send(error)
     }
 }
@@ -227,8 +248,10 @@ export default {
     getUserByName,
     tryLogin,
     logOut,
+    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,
+    getAvatarById,
     deleteAvatar
 }

@@ -17,6 +17,7 @@
     "bcrypt": "^5.1.0",
     "@faker-js/faker": "^10.2.0",
     "@fastify/cookie": "^9.0.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "file-type": "^18.0.0"
   }
 }
