@@ -1,5 +1,0 @@
-DB_HOST=user-db
-DB_PORT=3306
-DB_USER=user
-DB_PASSWORD=userpassword
-DB_NAME=transcendance_db

@@ -4,7 +4,6 @@ MODE ?= dev
 
 #echo "Active mode: $(MODE)"
 
-
 # Compose command selector
 ifeq ($(MODE),prod)
 DC = docker compose -f srcs/docker-compose.yml -f srcs/docker-compose.prod.yml
@@ -54,6 +53,12 @@ dev-up:
 prod-up:
 	$(MAKE) MODE=prod up
 
+dev-down:
+	$(MAKE) MODE=dev down
+
+prod-down:
+	$(MAKE) MODE=prod down
+
 dev-clean:
 	$(MAKE) MODE=dev clean
 
@@ -81,6 +86,8 @@ help:
 	@echo "  make down           : stop + remove containers"
 	@echo "  make clean          : stop + remove containers & volumes"
 	@echo "  make deep-clean     : clean + remove images + prune"
+	@echo "  make dev-down       : stop + remove containers for DEV"
+	@echo "  make prod-down      : stop + remove containers for PROD"
 	@echo "  make dev-deep-clean : clean + remove images + prune for DEV mode"
 	@echo "  make prod-deep-clean: clean + remove images + prune for PROD mode"
 	@echo "  make restart        : remove + restart containers"

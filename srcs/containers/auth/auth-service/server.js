@@ -2,10 +2,15 @@ import Fastify from 'fastify';
 import auth from './auth.js';
 import jwt from 'jsonwebtoken';
 import cookie from '@fastify/cookie';
+import fs from 'fs';
 
 const fastify = Fastify({ logger: true });
 
 fastify.register(cookie);
+
+export function readSecret(path) {
+  return fs.readFileSync(path, 'utf8').trim()
+}
 
 fastify.get('/', async () => {
   return { service: 'auth', status: 'running' };
@@ -14,7 +19,6 @@ fastify.get('/', async () => {
 fastify.post('/login', async (req, reply) => {
   try {
     const { username, password } = req.body || {};
-
     if (auth.checkActiveSession(req))
       return reply.code(403).send({ error: 'Ya hay una sesion activa' });
 
@@ -31,7 +35,7 @@ fastify.post('/login', async (req, reply) => {
 
     if (coincidence.ok)
     {
-      const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: resValues.userId, username: username }, readSecret(process.env.JWT_SECRET_FILE), { expiresIn: '1h' });
       reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
     }
 
@@ -81,6 +85,6 @@ const start = async () => {
   }
 }
 
-start()
+export default {readSecret}
 
-//fastify.listen({ port: 3000, host: '0.0.0.0' });
+start()

@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS `transcendance_db`;
-USE `transcendance_db`;
+/*CREATE DATABASE IF NOT EXISTS `transcendance_db`;
+USE `transcendance_db`;*/
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT NOT NULL AUTO_INCREMENT,

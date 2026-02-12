@@ -17,8 +17,6 @@ const app = Fastify({
   //}
 //});
 
-
-
 // printf para ver la request en los logs de la api-gateway
 app.addHook('onRequest', async (req) => {
   console.log(`[GATEWAY] ${req.method} ${req.url}`);
@@ -51,8 +49,6 @@ app.register(cors, {
 //  credentials: true // if you plan to use cookies/auth
 //});
 
-
-
 app.register(proxy, {
   upstream: "http://user-service:3000",
   prefix: "/api/users",
@@ -71,7 +67,8 @@ app.register(proxy, {
   rewritePrefix: "/",
 });
 
-app.get("/health", async () => ({ ok: true }));
+app.get("/api/health", async () => {
+  return { ok: true };});
 
 app.listen({ port: 3000, host: "0.0.0.0" });
 

@@ -4,14 +4,11 @@ services:
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-    env_file:
-      - .jwt_env
     networks:
       - main
     depends_on:
       - user-service
       - auth-service
-  #    - game_history-service
     restart: always
 
 # USER MICROSERVICE
@@ -22,9 +19,19 @@ services:
       dockerfile: Dockerfile.prod
     volumes:
       - user_uploads_volume:/uploads/avatars
-    env_file:
-      - .user_env
-      - .jwt_env
+    secrets:
+      - db_host
+      - db_username
+      - db_user_password
+      - db_name
+      - jwt_secret
+    environment: 
+      DB_HOST_FILE: /run/secrets/db_host
+      DB_PORT: 3306
+      DB_USER_FILE: /run/secrets/db_username
+      DB_PASSWORD_FILE: /run/secrets/db_user_password
+      DB_NAME_FILE: /run/secrets/db_name
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
     networks:
       - main
     restart: always
@@ -35,29 +42,23 @@ services:
   user-db:
     container_name: user-db
     build: ./containers/user/user-db
-    
-    env_file:
-      - .userdb_env
-    # las variables en este archivo seran utilizadas por el contenedor user-db
-    
-    #environment:
-      #MARIADB_PASSWORD: "userpassword"
-    # las variables aqui son usadas tmb por el docker-compose, pero no te puedes fiar del rden si luego la quieres usar en un healthcheck
-    # docker solo añade los archivos estrictamente llamados ".env" para resolver variables del docker-compose
-
+    secrets:
+      - db_root_password
+      - db_username
+      - db_user_password
+      - db_name
+    environment: 
+     MYSQL_DATABASE_FILE: /run/secrets/db_name
+     MYSQL_USER_FILE: /run/secrets/db_username
+     MYSQL_PASSWORD_FILE: /run/secrets/db_user_password
+     MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
     volumes:
     - db_volume:/var/lib/mysql
-
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      #test:
-      # [
-      #   "CMD-SHELL",
-      #   "mariadb -u ${MARIADB_USER} -p${MARIADB_PASSWORD} -e 'SELECT 1'"
-      # ]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 8
       start_period: 15s
     networks:
       - main
@@ -69,21 +70,13 @@ services:
     build: 
       context: ./containers/auth/auth-service
       dockerfile: Dockerfile.prod
-    env_file:
-      - .jwt_env
+    environment:
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+    secrets:
+      - jwt_secret
     networks:
       - main
     restart: always
-
-# GAME HISTORY MICROSERVICE
-#  game_history-service:
-#    container_name: game_history-service
-#    build: 
-#      context: ./containers/game_history/game_history-service
-#      dockerfile: Dockerfile.prod
-#    networks:
-#      - main
-#    restart: always
 
 volumes:
   db_volume:
@@ -92,11 +85,27 @@ volumes:
 
   user_uploads_volume:
     driver: local
-  #  driver_opts:
-  #    type: none
-  #    o: bind
-  #    device: ./containers/user/user-service/user_uploads/avatars
+    #  driver_opts:
+    #    type: none
+    #    o: bind
+    #    device: ./containers/user/user-service/user_uploads/avatars
   # esto seria para hacer named volumes stored as bind mounts, como en inception
+
+secrets:
+  db_host:
+    file: ../secrets/db_host.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_username:
+    file: ../secrets/db_username.txt
+  db_user_password:
+    file: ../secrets/db_user_password.txt
+  db_name:
+    file: ../secrets/db_name.txt
+  db_port:
+    file: ../secrets/db_port.txt
+  jwt_secret:
+    file: ../secrets/jwt_secret.txt
 
 networks:
    main:

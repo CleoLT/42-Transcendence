@@ -27,17 +27,8 @@ services:
    auth-service:
     build:
       dockerfile: Dockerfile.dev
-    env_file:
-      - .jwt_env
     networks:
       - main 
     volumes:
       - ./containers/auth/auth-service:/app
       - /app/node_modules
-
-   #game_history-service:
-   # build:
-   #   dockerfile: Dockerfile.dev
-   # volumes:
-   #   - ./containers/game_history/game_history-service:/app
-   #   - /app/node_modules
