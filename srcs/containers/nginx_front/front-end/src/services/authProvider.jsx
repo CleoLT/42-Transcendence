@@ -14,13 +14,11 @@ export function AuthProvider({children}){
     // --> checking in the API if a cookie token is saved
     async function checkCookie(username, setLog) {
         try {
-            const res = await fetch(`${baseUrl}/api/users/user/validate`,{
+            const res = await fetch(`${baseUrl}/api/auth/validate`,{
                 method:"POST",
                 credentials: "include",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({username}),
             })
-            console.log('REQUEST DONE')
+            // console.log('REQUEST DONE')
             if (!res.ok)
                 throw new Error("Not authenticated")
 
@@ -28,21 +26,21 @@ export function AuthProvider({children}){
             setLog(true)
             // setUsername(data.username)
             setUsername(username)
-            console.log("LOG TRUE: ", log, "USername: ", username)
+            // console.log("LOG TRUE: ", log, "USername: ", username)
         }
         catch (error)
         {
             setLog(false)
             setUsername(null)
-            console.log("LOG FALSE: ", log)
-            throw error;
+            // console.log("LOG FALSE: ", log)
+            // throw error;
         }
     }
 
     //launch at startup cookie's check function
-    useEffect(() => {
-        checkCookie()
-    }, [])
+    // useEffect(() => {
+    //     checkCookie(username, setLog)
+    // }, [])
 
     // --> if login    
     const login = async (username, password) => {
