@@ -274,12 +274,29 @@ export function CreateAccount({setScreen}){
     if (password !== repeatPassword) {
       throw new Error("Passwords do not match")
     }
+
+    const regexName = /^[a-zA-Z][a-zA-Z0-9_-]*$/
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+    const regexPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]+$/
+    if (!regexName.test(username))
+      throw new Error("Invalid username. Only letters, numbers, and '_' are allowed, and the first character must be a letter")
+    if (!regexEmail.test(email))
+      throw new Error("Invalid email syntaxis")
+    if (!regexPw.test(repeatPassword))
+      throw new Error("Password must contain uppercase, lowercase, number, and at least one special character @$!%*#?&")
+    if (username.length < 2 || username.length > 20)
+      throw new Error("Username must contain between 2 and 20 characters")
+    if (email.length > 255)
+      throw new Error("Email too long")
+    if (password.length < 6 || password.length > 20)
+      throw new Error("Password must contain between 6 and 20 characters")
+
     await register(username, password, email)
     setScreen("homePlay");
   }
 
   return(
-    <form
+    <form noValidate
       onSubmit={async (e) => {
         e.preventDefault()
         try {
