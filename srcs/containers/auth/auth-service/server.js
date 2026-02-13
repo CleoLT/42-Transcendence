@@ -70,6 +70,59 @@ fastify.post('/logout', async (req, reply) => {
 
 });
 
+fastify.post('/register', async (req, reply) => {
+  try {
+    const { username, password, email } = req.body || {};
+
+    if (!username || !password || !email) {
+      return reply.code(400).send({ error: 'Credenciales invalidas' });
+    }
+
+    const coincidence = await fetch('http://user-service:3000/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, email })
+    });
+    const resValues = await coincidence.json();
+
+    if (!coincidence.ok) {
+      return reply.code(coincidence.status).send(resValues);
+    }
+    const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
+
+    return reply.code(201).send(resValues);
+
+  } catch (err) {
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
+fastify.post('/validate', async (req, reply) => {
+  try {
+    const { username, password } = req.body || {};
+
+    if (!username || !password) {
+      return reply.code(400).send({ error: 'Credenciales invalidas' });
+    }
+
+    const coincidence = await fetch('http://user-service:3000/user/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const resValues = await coincidence.json();
+
+    return reply.code(coincidence.status).send(resValues);
+
+  } catch (err) {
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
 // Health check
 fastify.get('/health', async () => {
   return { status: 'ok', service: 'auth-service' };

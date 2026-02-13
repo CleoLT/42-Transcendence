@@ -60,13 +60,13 @@ const getAllUsers = {
             200: {
                 description: 'Users list',
                 type: 'array',
-                items: {
+                items: /*{
                   type: 'object',
                   properties: {
                       id: { type: 'number' },
                       username: { type: 'string' }
                   }
-              }
+              }*/ userResponse
             }
         }
 }
@@ -109,6 +109,28 @@ const getUserById = {
             description: 'User info',
             ...userResponse
         },
+        401: errorResponse,
+        404: errorResponse
+    }
+};
+
+const getAvatarById = {
+    description: 'Get avatar by id',
+    tags: ['Users'],
+    summary: 'User avatar info',
+
+    params: paramId,
+
+    response: {
+        201: {
+            description: 'User Avatar',
+            type: 'object',
+            properties: {
+                id: { type: 'number' },
+                avatar: { type: 'string' }
+            }
+        },
+        401: errorResponse,
         404: errorResponse
     }
 };
@@ -186,6 +208,37 @@ const logOut = {
       }
     },
     404: errorResponse
+  }
+};
+
+export const validate = {
+  body: {
+    type: 'object',
+    required: ['username'],
+    properties: {
+      username: { type: 'string', minLength: 1 }
+    },
+    additionalProperties: false
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' }
+      }
+    },
+    401: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    },
+    403: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      }
+    }
   }
 };
 
@@ -281,9 +334,11 @@ export default {
     getAllUsers,
     postUser,
     getUserById,
+    getAvatarById,
     getUserByName,
     tryLogin,
     logOut,
+    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,

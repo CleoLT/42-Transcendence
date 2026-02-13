@@ -12,12 +12,14 @@ const routes = async function(fastify, options) {
     fastify.get('/:userId', { schema: userSchema.getUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.getUserById)
     fastify.post('/user/login', { schema: userSchema.tryLogin }, userHandler.tryLogin)
     fastify.post('/user/logout', { schema: userSchema.logOut }, userHandler.logOut)
+
+    fastify.post('/user/validate', { schema: userSchema.validate, preHandler: preHandler.verifySession }, userHandler.validate)
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
     fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)
-    fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath },  userHandler.uploadAvatar)
+    fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath }, userHandler.uploadAvatar)
+    fastify.get('/:userId/avatar', { schema: userSchema.getAvatarById, preHandler: userHandler.verifySessionFromPath }, userHandler.getAvatarById)
     //fastify.post('/:userId/avatar/select', { schema: userSchema.selectAvatar },  userHandler.selectAvatar)
     fastify.delete('/:userId/avatar', { schema: userSchema.deleteAvatar },  userHandler.deleteAvatar)
-
 
     fastify.get('/friendships', { schema: friendSchema.getAllFriendships, preHandler: preHandler.verifySession }, friendHandler.getAllFriendships) // borrar?
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId, preHandler: preHandler.verifySessionFromPath }, friendHandler.getAllFriendsByUserId)
