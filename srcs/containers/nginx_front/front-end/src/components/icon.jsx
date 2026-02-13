@@ -4,10 +4,11 @@ import friendsIcon from "../assets/icons_svg/icon_friends.svg"
 import statsIcon from "../assets/icons_svg/icon_stats.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import { CorbenBold } from "./typography"
+import { useAuth } from "../services/authProvider"
 
 export function Icon(props){
     return(
-        <div className="flex flex-col items-center m-0.5 md:m-1 group">
+        <div className="flex flex-col items-center m-0.5 md:m-1 group" onClick={props.onClick} >
             <img
                 className="w-10 sm:w-12 lg:w-14 h-auto cursor-pointer"
                 src={props.image}
@@ -28,14 +29,35 @@ export function Icon(props){
     )
 }
 
-export function IconsList(props){
+export function IconsList({setScreen}){
+    const {log} = useAuth()
     return(
         <div className= "flex flex-col h-full justify-evenly items-center sm:border-r-4 border-r-2 border-black">
-            <Icon image={homeIcon} text="Home" />
-            <Icon image={profileIcon} text="Profile" />
-            <Icon image={friendsIcon} text="Friends" />
-            <Icon image={statsIcon} text="Stats" />
-            <Icon image={rulesIcon} text="Rules" />
+            <Icon 
+                image={homeIcon} 
+                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                text="Home"
+            />
+            <Icon
+                image={profileIcon}
+                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                text="Profile"
+            />
+            <Icon
+                image={friendsIcon}
+                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                text="Friends"
+            />
+            <Icon
+                image={statsIcon}
+                onClick={() =>setScreen("homePlay")}
+                text="Stats"
+            />
+            <Icon
+                image={rulesIcon}
+                onClick={() =>setScreen("homePlay")}
+                text="Rules"
+            />
         </div>
     )
 }

@@ -97,16 +97,11 @@ fastify.post('/register', async (req, reply) => {
 
 fastify.post('/validate', async (req, reply) => {
   try {
-    const { username, password } = req.body || {};
-
-    if (!username || !password) {
-      return reply.code(400).send({ error: 'Credenciales invalidas' });
-    }
-
     const coincidence = await fetch('http://user-service:3000/user/validate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      headers: {
+        cookie: req.headers.cookie
+      }
     });
 
     const resValues = await coincidence.json();

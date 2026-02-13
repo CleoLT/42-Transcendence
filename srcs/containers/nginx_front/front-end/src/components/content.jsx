@@ -15,7 +15,7 @@ export default function Content({screen, setScreen}){
     // }, [game]);
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
-            <IconsList />
+            <IconsList setScreen={setScreen} />
             <div className="flex-1 flex justify-center items-center relative overflow-hidden">
                 {screen === "homePlay" && (
                     <>
