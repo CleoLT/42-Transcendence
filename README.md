@@ -185,6 +185,8 @@ We created a Whatsapp group to communicate with each other and we set up weekly 
 <br>
 
 ## 7. Database Schema
+![Database](assets/database.png)
+
 > Visual representation or description of the database structure
 
 > Tables/collections and their relationships
