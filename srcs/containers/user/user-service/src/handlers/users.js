@@ -26,8 +26,8 @@ function userNotFoundError() {
     throw err
 }
 
-function userConflictError() {
-    const err = new Error('User already exists')
+function userConflictError(string) {
+    const err = new Error(string)
     err.statusCode = 409
     err.name = 'Conflict'
     throw err
@@ -150,9 +150,11 @@ async function updateUserById(req, reply) {
     const { userId } = req.params;
 
     try {
-        const user = await checkIfUserExists(userId)
-        if (user.username === username) userConflictError()
-        if (user.email === email) userConflictError()
+        await checkIfUserExists(userId)
+        const userByName = await query.getUserByName(username)
+        if (userByName && userByName.id != userId) userConflictError('Choose an other username')
+        const userByEmail = await query.getUserByEmail(email)
+        if (userByEmail && userByEmail.id != userId) userConflictError('User already exists')
 
         await query.updateUserById(userId, modifiedData)
         const result = await query.getUserById(userId)
