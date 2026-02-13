@@ -175,8 +175,10 @@ We created a Whatsapp group to communicate with each other and we set up weekly 
 > Frontend technologies and frameworks used.
 
 > Backend technologies and frameworks used.
+Backend built with Fastify, with Swagger UI for API route documentation.
 
 > Database system and why it was chosen.
+We used MariaDB as our relational database.
 
 > Any other significant technologies or libraries.
 
@@ -324,6 +326,13 @@ choice"
 > Specific features, modules, or components implemented by each person
 
 > Any challenges faced and how they were overcome
+Cleo
+I started implementing the backend using Fastify, organizing the project with a clean and modular architecture by separating routes, schemas, handlers, and database queries into different files. I set up global error handling with custom responses and used schemas both for validation and as a security layer to control request and response formats.
+
+I seeded the database with realistic test data using Faker.js and implemented avatar uploads with Fastify Multipart. I also integrated Swagger UI to document and manually test all API routes.
+
+The main challenge was the integration with the frontend, which required constant adjustments to endpoints, handlers, and error management. Through iterative testing and debugging, I was able to stabilize the communication between both sides and ensure reliable API behavior.
+
 <br>
 
 ## 11. The game (EXTRA)
