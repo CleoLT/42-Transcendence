@@ -326,6 +326,8 @@ choice"
 > Specific features, modules, or components implemented by each person
 
 > Any challenges faced and how they were overcome
+
+<br>
 Cleo
 I started implementing the backend using Fastify, organizing the project with a clean and modular architecture by separating routes, schemas, handlers, and database queries into different files. I set up global error handling with custom responses and used schemas both for validation and as a security layer to control request and response formats.
 
