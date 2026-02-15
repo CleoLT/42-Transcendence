@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "start": "HOST=0.0.0.0 react-scripts start"
   },
   "dependencies": {
     "react": "^18.2.0",

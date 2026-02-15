@@ -10,6 +10,10 @@ WORKDIR /app
 COPY front-end/package*.json ./
 RUN npm install
 
+# EMILIE added for hot reloaded on windows
+ENV CHOKIDAR_USEPOLLING=true
+ENV CHOKIDAR_INTERVAL=100
+
 EXPOSE 5173
 
 # Source code comes from bind mount

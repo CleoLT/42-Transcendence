@@ -23,11 +23,13 @@ export async function Register(username, password, email) {
     body: JSON.stringify({ username, password, email }),
     credentials: "include"
   })
+
   //DEBUG
   // console.log("BASE URL =", baseUrl)
   // console.log("FETCH TYPE:", typeof fetch)
 
   const respond = await res.json()
+
   // console.log(respond)
 
   if (!res.ok) {
