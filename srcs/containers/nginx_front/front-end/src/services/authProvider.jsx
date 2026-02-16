@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react"
-import {Login, Register, Logout} from "./authService"
+import {Login, Register, Logout, Login2FA} from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -44,7 +44,21 @@ export function AuthProvider({children}){
 
     // --> if login    
     const login = async (username, password) => {
-        await Login(username, password)
+        const { email } = await Login(username, password)
+        const maskedEmail = email.replace(/^(.).+(@.+)$/, '$1***$2')
+        const { value: code } = await AlertMessage.fire({
+            title: `Introduce el código que hemos enviado a ${maskedEmail}:`,
+            input: "text",
+            inputPlaceholder: "Código 2FA",
+            showCancelButton: false,
+            confirmButtonText: "Verificar",
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            timer: null
+        })
+        if (!code) throw new Error("Código requerido")
+    
+        await Login2FA(username, code)
         await checkCookie(username, setLog)
     }
 

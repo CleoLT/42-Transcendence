@@ -117,7 +117,8 @@ async function tryLogin(req, reply) {
 
         return reply.code(200).send({
             valid: true,
-            userId: user.id
+            userId: user.id,
+            email: user.email
         });        
     } catch (error) {
         reply.send(error)

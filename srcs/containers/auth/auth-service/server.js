@@ -2,10 +2,25 @@ import Fastify from 'fastify';
 import auth from './auth.js';
 import jwt from 'jsonwebtoken';
 import cookie from '@fastify/cookie';
+import nodemailer from 'nodemailer';
 
 const fastify = Fastify({ logger: true });
 
 fastify.register(cookie);
+
+// 2FA en memoria
+const pending2FA = new Map();
+
+// Mail transporter
+const transporter = nodemailer.createTransport({
+  host: 'smtp.mailersend.net',
+  port: 587,            // o 2525
+  secure: false,        // TLS
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD
+  }
+});
 
 fastify.get('/', async () => {
   return { service: 'auth', status: 'running' };
@@ -31,14 +46,54 @@ fastify.post('/login', async (req, reply) => {
 
     if (coincidence.ok)
     {
-      const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
+
+      const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+      pending2FA.set(username, { code: code2FA, userId: resValues.userId, expires: Date.now() + 5*60*1000 });
+
+      await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: resValues.email,
+        subject: 'Código 2FA',
+        text: `Tu código de verificación es: ${code2FA}`
+      });
+
+      // ** Movido a 2FA ** //
+      //const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      //reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
     }
 
     return reply.code(coincidence.status).send(resValues); // 200 OK, o propaga error desde user-service
 
   } catch (err) {
     req.log.error(err, ''); // debug
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
+fastify.post('/login/2fa', async (req, reply) => {
+  try {
+    const { username, code } = req.body || {};
+    if (!username || !code) return reply.code(400).send({ error: 'Faltan datos' });
+
+    const entry = pending2FA.get(username);
+    if (!entry) return reply.code(400).send({ error: 'No hay 2FA pendiente' });
+
+    if (entry.expires < Date.now()) {
+      pending2FA.delete(username);
+      return reply.code(400).send({ error: 'Código expirado' });
+    }
+
+    if (entry.code !== code) return reply.code(401).send({ error: 'Código incorrecto' });
+
+    // Codigo correcto, generar JWT
+    const token = jwt.sign({ userId: entry.userId, username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
+
+    pending2FA.delete(username);
+    return reply.code(200).send({ message: 'Autenticación 2FA exitosa' });
+
+  } catch (err) {
+    req.log.error(err);
     return reply.code(500).send({ error: 'Internal auth error' });
   }
 });
