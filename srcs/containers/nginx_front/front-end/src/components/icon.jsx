@@ -3,8 +3,8 @@ import profileIcon from "../assets/icons_svg/icon_profile.svg"
 import friendsIcon from "../assets/icons_svg/icon_friends.svg"
 import statsIcon from "../assets/icons_svg/icon_stats.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
-import { CorbenBold } from "./typography"
-import { useAuth } from "../services/authProvider"
+import {CorbenBold} from "./typography"
+import {useAuth} from "../services/authProvider"
 
 export function Icon(props){
     return(
