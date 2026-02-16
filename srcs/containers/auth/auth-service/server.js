@@ -88,7 +88,7 @@ fastify.post('/register', async (req, reply) => {
     if (!coincidence.ok) {
       return reply.code(coincidence.status).send(resValues);
     }
-    const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: resValues.userId, username: username }, readSecret(process.env.JWT_SECRET_FILE), { expiresIn: '1h' });
     reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
 
     return reply.code(201).send(resValues);
