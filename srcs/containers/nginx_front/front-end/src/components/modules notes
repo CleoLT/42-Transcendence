@@ -18,14 +18,14 @@
 09.LogInInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
-10.IconGround({setScreen})
+10.IconsOverlayFrame()
 
 -->footer
 -->header
 -->content
 
 
--> Tailwind Colors <-
+--> Tailwind Colors <--
 
 shell "#FFFEF4" -> CREATED
 yellowish "#FDD28B" -> CREATED
@@ -38,12 +38,12 @@ black -> black
 
 
 
-// -> Tailwind Breakpoints <-
+--> Tailwind Breakpoints <--
 
-// --> mobile -> 320/375 -> Iphone SE
-// sm → 640px
-// --> md → 768px ->Ipad Mini
-// lg → 1024px -> nest Hub
-// --> xl → 1280px -> nest Hub max (our screen)
+--> mobile -> 320/375 -> Iphone SE
+sm → 640px
+--> md → 768px ->Ipad Mini
+lg → 1024px -> nest Hub
+--> xl → 1280px -> nest Hub max (our screen)
 
-// --> mobile, md & xl and check lg
+--> mobile, md & xl and check lg

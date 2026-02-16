@@ -6,11 +6,12 @@ import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {CorbenBold} from "./typography"
 import {useAuth} from "../services/authProvider"
 
+
 export function Icon(props){
     return(
-        <div className="flex flex-col items-center m-0.5 md:m-1 group" onClick={props.onClick} >
+        <div className="flex flex-col items-center mx-0.5 md:mx-1 group" onClick={props.onClick} >
             <img
-                className="w-10 sm:w-12 lg:w-14 h-auto cursor-pointer"
+                className="w-10 sm:w-12 lg:w-13 xl:w-14 h-auto cursor-pointer"
                 src={props.image}
                 alt={props.text + "icon"}
             />
@@ -29,10 +30,11 @@ export function Icon(props){
     )
 }
 
+
 export function IconsList({setScreen}){
     const {log} = useAuth()
     return(
-        <div className= "flex flex-col h-full justify-evenly items-center sm:border-r-4 border-r-2 border-black">
+        <div className= "flex flex-col h-full justify-between items-center py-1 sm:border-r-4 border-r-2 border-black">
             <Icon 
                 image={homeIcon} 
                 onClick={() =>setScreen(log ? "homePlay" : "playNC")}
@@ -40,22 +42,22 @@ export function IconsList({setScreen}){
             />
             <Icon
                 image={profileIcon}
-                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                onClick={() =>setScreen(log ? "profile" : "playNC")}
                 text="Profile"
             />
             <Icon
                 image={friendsIcon}
-                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                onClick={() =>setScreen(log ? "friends" : "playNC")}
                 text="Friends"
             />
             <Icon
                 image={rulesIcon}
-                onClick={() =>setScreen("homePlay")}
+                onClick={() =>setScreen("rules")}
                 text="Rules"
             />
             <Icon
                 image={projectIcon}
-                onClick={() =>setScreen("homePlay")}
+                onClick={() =>setScreen("project")}
                 text="Project"
             />
         </div>
