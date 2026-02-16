@@ -26,8 +26,8 @@ function userNotFoundError() {
     throw err
 }
 
-function userConflictError() {
-    const err = new Error('User already exists')
+function userConflictError(str) {
+    const err = new Error(str)
     err.statusCode = 409
     err.name = 'Conflict'
     throw err
@@ -88,9 +88,9 @@ async function postUser(req, reply) {
 
     try {
         const name = await query.getUserByName(username)
-        if (name !== null) userConflictError()
+        if (name !== null) userConflictError('User already exists')
         const mail = await query.getUserByEmail(email)
-        if (mail !== null) userConflictError()
+        if (mail !== null) userConflictError('User already exists')
         const user = await query.addUser(username, password, email)
         const result = await query.getUserById(user.insertId) 
     
@@ -111,7 +111,7 @@ async function tryLogin(req, reply) {
         const user = await query.getUserByName(username);
         if (!user || !user.id) userNotFoundError()
 
-        if (user.online_status === 1) userConflictError()
+        if (user.online_status === 1) userConflictError('You are already logged')
 
         await query.updateUserById(user.id, { online_status: 1 });
 
@@ -150,9 +150,11 @@ async function updateUserById(req, reply) {
     const { userId } = req.params;
 
     try {
-        const user = await checkIfUserExists(userId)
-        if (user.username === username) userConflictError()
-        if (user.email === email) userConflictError()
+        await checkIfUserExists(userId)
+        const userByName = await query.getUserByName(username)
+        if (userByName && userByName.id != userId) userConflictError('Choose an other username')
+        const userByEmail = await query.getUserByEmail(email)
+        if (userByEmail && userByEmail.id != userId) userConflictError('User already exists')
 
         await query.updateUserById(userId, modifiedData)
         const result = await query.getUserById(userId)
