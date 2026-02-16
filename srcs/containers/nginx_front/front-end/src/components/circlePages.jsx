@@ -12,8 +12,8 @@ export function PlayConnected({setScreen}){
       <Circle>
         <CenterText
           text ="PLAY"
-          onClick={() =>setScreen("homePlay")}
-          // interactive={true}
+          onClick={() =>setScreen("game")}
+          interactive={true}
           className="
             text-5xl
             md:text-7xl
@@ -37,10 +37,6 @@ export function GameConfig({ game }) {
   const canPlay = _p1 && _p2 && !!game
 
   const handlePlayClick = () => {
-    if (!configVisible) {
-      setConfigVisible(true)
-      return
-    }
 
     if (!canPlay) return
 
@@ -73,7 +69,7 @@ export function GameConfig({ game }) {
               `}
             />
 
-            {configVisible && (
+            {(
               <>
                 <LogInInput
                   placeholder="Player 1 name"
@@ -153,7 +149,7 @@ export function PlayNotConnected({setScreen}){
     <div className="flex flex-col justify-center items-center h-full w-full">
       <Circle>
         <Sixtyfour
-          onClick={() =>setScreen("homePlay")}
+          onClick={() =>setScreen("game")}
             className="
             absolute top-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl

@@ -5,19 +5,15 @@ import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from
 
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
-    // const [screen, setScreen] = useState("playNC")
-    // // Debug: log when game state changes
-    // useEffect(() => {
-    //   console.log('📦 Content: game state changed', {
-    //     game: game ? 'exists' : 'null',
-    //     gameState: game?.state
-    //   });
-    // }, [game]);
+
+    console.log("screen = ", screen)
+
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
             <IconsList setScreen={setScreen} />
             <div className="flex-1 flex justify-center items-center relative overflow-hidden">
-                {screen === "homePlay" && (
+                {screen === "homePlay" && (<PlayConnected setScreen={setScreen} />)}
+                {screen === "game" && (
                     <>
                         <GameContainer onGameReady={setGame} />
                         <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
@@ -29,13 +25,21 @@ export default function Content({screen, setScreen}){
                 )}
                 {screen === "playNC" && (<PlayNotConnected setScreen={setScreen} />)}
                 {screen === "signIn" && (<SignIn setScreen={setScreen} />)}
-                {screen === "createAccount" && (<CreateAccount setScreen={setScreen} />)}
-
-               
+                {screen === "createAccount" && (<CreateAccount setScreen={setScreen} />)}          
             </div>
         </div>
     )
 }
 
+{/* <GameContainer onGameReady={setGame} /> --> need to be call inside Game config at the end to not have the white screen */}
+
+    // const [screen, setScreen] = useState("playNC")
+    // // Debug: log when game state changes
+    // useEffect(() => {
+    //   console.log('📦 Content: game state changed', {
+    //     game: game ? 'exists' : 'null',
+    //     gameState: game?.state
+    //   });
+    // }, [game]);
 
 // backdrop-blur-xs

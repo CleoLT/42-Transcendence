@@ -1,5 +1,6 @@
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
+
 export function Circle({children}){
   return(
       <div className="
@@ -62,6 +63,3 @@ export function LogInInput({placeholder, className = "", value, onChange, type})
         ${className}`} />
   )
 }
-
-//faire les checks et pasing du create account et sign in
-//(pas de placeholder vide

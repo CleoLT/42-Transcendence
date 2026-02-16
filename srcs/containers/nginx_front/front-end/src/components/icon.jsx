@@ -1,7 +1,7 @@
 import homeIcon from "../assets/icons_svg/icon_home.svg"
 import profileIcon from "../assets/icons_svg/icon_profile.svg"
 import friendsIcon from "../assets/icons_svg/icon_friends.svg"
-import statsIcon from "../assets/icons_svg/icon_stats.svg"
+import projectIcon from "../assets/icons_svg/icon_project.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {CorbenBold} from "./typography"
 import {useAuth} from "../services/authProvider"
@@ -49,14 +49,14 @@ export function IconsList({setScreen}){
                 text="Friends"
             />
             <Icon
-                image={statsIcon}
-                onClick={() =>setScreen("homePlay")}
-                text="Stats"
-            />
-            <Icon
                 image={rulesIcon}
                 onClick={() =>setScreen("homePlay")}
                 text="Rules"
+            />
+            <Icon
+                image={projectIcon}
+                onClick={() =>setScreen("homePlay")}
+                text="Project"
             />
         </div>
     )

@@ -10,7 +10,8 @@ export default function App() {
   const flowerGround = "/images_png/flower_ground.png"
   const {log} = useAuth()
   const [screen, setScreen] = useState("playNC")
-  
+  // const [initialized, setInitialized] = useState(false)
+
   useEffect(() =>
   {
     if (log)
@@ -19,6 +20,13 @@ export default function App() {
       {setScreen("playNC")}
   }, [log])
 
+  // useEffect(() => {
+  //   if (!initialized) {
+  //     setScreen(log ? "homePlay" : "playNC")
+  //     setInitialized(true)
+  //   }
+  // }, [log, initialized])
+  
   return (
     <div
       className="relative flex flex-col h-screen items-center justify-center">

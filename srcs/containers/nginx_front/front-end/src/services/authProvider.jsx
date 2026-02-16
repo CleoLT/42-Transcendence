@@ -30,10 +30,10 @@ export function AuthProvider({children}){
         }
         catch (error)
         {
-            setLog(false)
-            setUsername(null)
-            // console.log("LOG FALSE: ", log)
-            // throw error;
+            if (log !== false) {
+                setLog(false)
+                setUsername(null)
+            }
         }
     }
 

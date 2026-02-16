@@ -12,19 +12,9 @@ export function IconsList({setScreen}){
     )
 }
 
-export function Profile({setScreen}){
-
-}
-
-
-export function Friends({steScreen}){
-
-}
-
-export function Rules(){
-
-}
-
-export function Project(){
-
+export function IconsOverlayFrame({setScreen}){
+    return(
+        <div className="h-full w-full background-shell">
+        </div>
+    )
 }
