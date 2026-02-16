@@ -48,7 +48,7 @@ fastify.post('/logout', async (req, reply) => {
   if (auth.isLogged(req))
   {
     const username = req.body?.username || req.user?.username;
-    if (!username) return reply.code(200).send({ message: 'Logout unnecessary' });
+    //if (!username) return reply.code(200).send({ message: 'Logout unnecessary' });
 
     const logoutRes = await fetch('http://user-service:3000/user/logout',
     {
