@@ -38,9 +38,9 @@ export function AuthProvider({children}){
     }
 
     //launch at startup cookie's check function
-    // useEffect(() => {
-    //     checkCookie(username, setLog)
-    // }, [])
+     useEffect(() => {
+         checkCookie(username, setLog)
+     }, [])
 
     // --> if login    
     const login = async (username, password) => {
