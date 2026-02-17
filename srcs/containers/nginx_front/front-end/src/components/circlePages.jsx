@@ -10,15 +10,17 @@ export function PlayConnected({setScreen}){
   return(
     <div className="flex justify-center items-center h-full w-full">
       <Circle>
-        <CenterText
-          text ="PLAY"
-          onClick={() =>setScreen("game")}
-          interactive={true}
-          className="
-            text-5xl
-            md:text-7xl
-            xl:text-8xl"
-        />
+        <button className="flex justify-center items-center">
+          <CenterText
+            text ="PLAY"
+            onClick={() =>setScreen("game")}
+            interactive={true}
+            className="
+              text-5xl
+              md:text-7xl
+              xl:text-8xl"
+          />
+        </button>
       </Circle>
     </div>
   )
@@ -59,16 +61,17 @@ export function GameConfig({ game }) {
           </Sixtyfour>
         ) : (
           <>
-            <CenterText
-              text="PLAY"
-              onClick={handlePlayClick}
-              interactive={true}
-              className={`
-                text-5xl md:text-7xl xl:text-8xl
-                ${configVisible && !canPlay ? "opacity-40" : ""}
-              `}
-            />
-
+            <button className="flex justify-center items-center">
+              <CenterText
+                text="PLAY"
+                onClick={handlePlayClick}
+                interactive={true}
+                className={`
+                  text-5xl md:text-7xl xl:text-8xl
+                  ${configVisible && !canPlay ? "opacity-40" : ""}
+                `}
+              />
+            </button>
             {(
               <>
                 <LogInInput
@@ -160,8 +163,8 @@ export function PlayNotConnected({setScreen}){
         </Sixtyfour>
         <CenterText
           text ="PLAY"
-          onClick={null}
-          interactive={false}
+          // onClick={null}
+          // interactive={false}
           className="
             text-5xl
             md:text-7xl
@@ -188,12 +191,14 @@ export function SignIn({setScreen}){
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const {login} = useAuth()
+  // const {userID} = useAuth()
 
   const handleLogin = async () => {
     if (!username || !password) {
       throw new Error("All fields are required")}
     await login(username, password)
     setScreen("homePlay");
+    // console.log("UserID: ", userID)
   }
 
   return(

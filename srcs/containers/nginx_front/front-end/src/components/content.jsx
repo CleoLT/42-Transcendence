@@ -8,7 +8,7 @@ import {Profile, Friends, Rules, Project} from "./iconPages.jsx"
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
 
-    console.log("screen = ", screen)
+    // console.log("screen = ", screen)
 
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
