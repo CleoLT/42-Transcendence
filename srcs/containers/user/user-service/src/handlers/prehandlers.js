@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import secretutils from '../db.js';
 
 async function verifySession(request, reply) {
     const token = request.cookies?.access_token;
@@ -9,7 +10,7 @@ async function verifySession(request, reply) {
     }
 
     try {
-        request.user = jwt.verify(token, process.env.JWT_SECRET);
+        request.user = jwt.verify(token, secretutils.readSecret(process.env.JWT_SECRET_FILE));
         request.headers['x-user-id'] = request.user.userId;
         request.headers['x-user-role'] = request.user.role;
     } catch (err) {
@@ -27,7 +28,7 @@ async function verifySessionFromPath(request, reply) {
     }
 
     try {
-        request.user = jwt.verify(token, process.env.JWT_SECRET);
+        request.user = jwt.verify(token, secretutils.readSecret(process.env.JWT_SECRET_FILE));
         request.headers['x-user-id'] = request.user.userId;
         request.headers['x-user-role'] = request.user.role;
 
@@ -57,7 +58,7 @@ async function verifySessionFromBody(request, reply) {
     }
 
     try {
-        request.user = jwt.verify(token, process.env.JWT_SECRET);
+        request.user = jwt.verify(token, secretutils.readSecret(process.env.JWT_SECRET_FILE));
         request.headers['x-user-id'] = request.user.userId;
         request.headers['x-user-role'] = request.user.role;
 
