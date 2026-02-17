@@ -70,34 +70,6 @@ fastify.post('/login', async (req, reply) => {
   }
 });
 
-/*fastify.post('/login/2fa', async (req, reply) => {
-  try {
-    const { username, code } = req.body || {};
-    if (!username || !code) return reply.code(400).send({ error: 'Faltan datos' });
-
-    const entry = pending2FA.get(username);
-    if (!entry) return reply.code(400).send({ error: 'No hay 2FA pendiente' });
-
-    if (entry.expires < Date.now()) {
-      pending2FA.delete(username);
-      return reply.code(400).send({ error: 'Código expirado' });
-    }
-
-    if (entry.code !== code) return reply.code(401).send({ error: 'Código incorrecto' });
-
-    resValues = coincidence.json
-    const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
-
-    pending2FA.delete(username);
-    return reply.code(200).send({ message: 'Autenticación 2FA exitosa' });
-
-  } catch (err) {
-    req.log.error(err);
-    return reply.code(500).send({ error: 'Internal auth error' });
-  }
-});*/
-
 fastify.post('/login/2fa', async (req, reply) => {
   try {
     const { username, code } = req.body || {};
@@ -164,13 +136,23 @@ fastify.post('/logout', async (req, reply) => {
 
 });
 
-fastify.post('/register', async (req, reply) => {
+/*fastify.post('/register', async (req, reply) => {
   try {
     const { username, password, email } = req.body || {};
 
     if (!username || !password || !email) {
       return reply.code(400).send({ error: 'Invalid credentials' });
     }
+
+    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+    pending2FA.set(username, { code: code2FA, userId: 0, expires: Date.now() + 5*60*1000 });
+
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: resValues.email,
+      subject: '2FA code',
+      text: `Your verification code is: ${code2FA}`
+    });
 
     const coincidence = await fetch('http://user-service:3000/', {
       method: 'POST',
@@ -179,11 +161,53 @@ fastify.post('/register', async (req, reply) => {
     });
     const resValues = await coincidence.json();
 
-    if (!coincidence.ok) {
+    if (!coincidence.ok)
       return reply.code(coincidence.status).send(resValues);
+    pending2FA.set();
+    return reply.code(201).send(resValues);
+
+  } catch (err) {
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});*/
+
+fastify.post('/register', async (req, reply) => {
+  try {
+    const { username, password, email } = req.body || {};
+
+    if (!username || !password || !email) {
+      return reply.code(400).send({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
+
+    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+    pending2FA.set(username, { code: code2FA, userId: 0, expires: Date.now() + 5*60*1000 }); // userId = 0 temporal
+
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: email,
+      subject: '2FA code',
+      text: `Your verification code is: ${code2FA}`
+    });
+
+    const coincidence = await fetch('http://user-service:3000/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, email })
+    });
+    const resValues = await coincidence.json();
+
+    if (!coincidence.ok)
+      return reply.code(coincidence.status).send(resValues);
+
+    const existing = pending2FA.get(username);
+    if (existing) {
+      pending2FA.set(username, {
+        code: existing.code,
+        userId: resValues.userId,
+        expires: existing.expires
+      });
+    }
 
     return reply.code(201).send(resValues);
 

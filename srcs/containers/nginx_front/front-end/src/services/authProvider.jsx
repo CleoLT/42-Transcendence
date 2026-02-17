@@ -47,16 +47,16 @@ export function AuthProvider({children}){
         const { email } = await Login(username, password)
         const maskedEmail = email.replace(/^(.).+(@.+)$/, '$1***$2')
         const { value: code } = await AlertMessage.fire({
-            title: `Introduce el código que hemos enviado a ${maskedEmail}:`,
+            title: `Introduce the code we sent to ${maskedEmail}:`,
             input: "text",
-            inputPlaceholder: "Código 2FA",
+            inputPlaceholder: "Your 2FA Code",
             showCancelButton: false,
-            confirmButtonText: "Verificar",
+            confirmButtonText: "Verify",
             allowOutsideClick: false,
             allowEscapeKey: true,
             timer: null
         })
-        if (!code) throw new Error("Código requerido")
+        if (!code) throw new Error("A code is required")
     
         await Login2FA(username, code)
         await checkCookie(username, setLog)
@@ -64,7 +64,21 @@ export function AuthProvider({children}){
 
     // --> if register    
     const register = async (username, password, email) => {
-        await Register(username, password, email)
+        const { email: returnedEmail } = await Register(username, password, email)
+        const maskedEmail = returnedEmail.replace(/^(.).+(@.+)$/, '$1***$2')
+        const { value: code } = await AlertMessage.fire({
+            title: `Introduce the code we sent to ${maskedEmail}:`,
+            input: "text",
+            inputPlaceholder: "Your 2FA Code",
+            showCancelButton: false,
+            confirmButtonText: "Verify",
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            timer: null
+        })
+        if (!code) throw new Error("A code is required")
+    
+        await Login2FA(username, code)
         await checkCookie(username,setLog)
     }
 
