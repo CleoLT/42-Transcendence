@@ -1,8 +1,13 @@
 {
   "name": "api-gateway",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
   "dependencies": {
     "fastify": "^4",
+    "nodemon": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
     "@fastify/http-proxy": "^9",
     "@fastify/swagger": "^8.0.0",

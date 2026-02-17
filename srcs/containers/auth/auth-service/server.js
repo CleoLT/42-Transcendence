@@ -12,8 +12,8 @@ export function readSecret(path) {
   return fs.readFileSync(path, 'utf8').trim()
 }
 
-fastify.get('/', async () => {
-  return { service: 'auth', status: 'running' };
+fastify.get('/health', async () => {
+  return { service: 'auth', status: 'running-ok' };
 });
 
 fastify.post('/login', async (req, reply) => {
@@ -119,7 +119,7 @@ fastify.post('/validate', async (req, reply) => {
 });
 
 // Health check
-fastify.get('/health', async () => {
+fastify.get('/api/health', async () => {
   return { status: 'ok', service: 'auth-service' };
 });
 

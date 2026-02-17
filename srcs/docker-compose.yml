@@ -3,7 +3,8 @@ name: transcendence
 services:
   api_gateway:
     container_name: api_gateway
-    build: ./containers/api_gateway
+    build: 
+      context: ./containers/api_gateway
     networks:
       - main
     depends_on:

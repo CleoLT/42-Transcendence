@@ -27,8 +27,13 @@ services:
    auth-service:
     build:
       dockerfile: Dockerfile.dev
-    networks:
-      - main 
     volumes:
       - ./containers/auth/auth-service:/app
+      - /app/node_modules
+
+   api_gateway:
+    build:
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./containers/api_gateway:/app
       - /app/node_modules

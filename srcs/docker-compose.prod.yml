@@ -13,3 +13,7 @@ services:
     networks:
       - main
     restart: always
+
+  api_gateway:
+    build:
+      dockerfile: Dockerfile.prod
