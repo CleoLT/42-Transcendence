@@ -11,7 +11,7 @@ services:
     depends_on:
       - api_gateway
     networks:
-      - main
+      - front
     restart: always
     volumes:
       - ./containers/nginx_front/front-end:/app # bind mount, no aparece  en "docker volume ls" a no ser que lo declaremos como en inception imagino

@@ -6,7 +6,8 @@ services:
     build: 
       context: ./containers/api_gateway
     networks:
-      - main
+      - front
+      - back
     depends_on:
       - user-service
       - auth-service
@@ -34,7 +35,7 @@ services:
       DB_NAME_FILE: /run/secrets/db_name
       JWT_SECRET_FILE: /run/secrets/jwt_secret
     networks:
-      - main
+      - back
     restart: always
     depends_on:
       user-db:
@@ -62,7 +63,7 @@ services:
       retries: 8
       start_period: 15s
     networks:
-      - main
+      - back
     restart: always
 
 # AUTH MICROSERVICE
@@ -76,7 +77,7 @@ services:
     secrets:
       - jwt_secret
     networks:
-      - main
+      - back
     restart: always
 
 volumes:
@@ -109,5 +110,13 @@ secrets:
     file: ../secrets/jwt_secret.txt
 
 networks:
-   main:
-     driver: bridge
+  front:
+    driver: bridge
+  back:
+    driver: bridge
+
+# EXTRA: para que los contenedores no tengan acceso a internet
+# back:
+#   internal: true
+# se checkearia con:
+# "curl google.com" dentro de user-service por ej, y deberia fallar

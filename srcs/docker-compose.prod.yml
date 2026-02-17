@@ -11,9 +11,12 @@ services:
     depends_on:
       - api_gateway
     networks:
-      - main
+      - front
     restart: always
 
   api_gateway:
     build:
       dockerfile: Dockerfile.prod
+    networks:
+      - front
+      - back

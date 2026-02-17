@@ -7,6 +7,7 @@ ENV VITE_BASE_URL=$VITE_BASE_URL
 WORKDIR /app
 
 # Only dependencies are baked into the image
+# the whole folder will be a bind mount so that we have hot reload -> ./containers/nginx_front/front-end:/app
 COPY front-end/package*.json ./
 RUN npm install
 
