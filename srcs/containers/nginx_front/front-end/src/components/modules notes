@@ -18,7 +18,8 @@
 09.LogInInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
-10.IconsOverlayFrame()
+10.IconText({text})
+11.IconsOverlayFrame()
 
 -->footer
 -->header

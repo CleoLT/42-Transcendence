@@ -5,6 +5,7 @@ import projectIcon from "../assets/icons_svg/icon_project.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {CorbenBold} from "./typography"
 import {useAuth} from "../services/authProvider"
+import {IconText} from "./iconUtils"
 
 
 export function Icon(props){
@@ -15,17 +16,7 @@ export function Icon(props){
                 src={props.image}
                 alt={props.text + "icon"}
             />
-            <span className="
-                bg-red-900 rounded-lg
-                my-1 px-2 py-0.5
-                cursor-default
-                opacity-0
-                group-hover:opacity-100
-                transition-opacity duration-500">
-                    <CorbenBold className="text-[8px] md:text-[10px] text-shell">
-                        {props.text}
-                    </CorbenBold>   
-            </span>
+            <IconText text={props.text}/>
         </div>
     )
 }

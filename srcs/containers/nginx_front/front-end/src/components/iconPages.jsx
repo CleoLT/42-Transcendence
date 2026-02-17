@@ -6,12 +6,13 @@ export function Profile({setScreen}){
     return(
         <>
             <IconsOverlayFrame />
+            
         </>
     )
 }
 
 
-export function Friends({steScreen}){
+export function Friends({setScreen}){
     return(
         <>
             <IconsOverlayFrame />
