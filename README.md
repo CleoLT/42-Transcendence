@@ -79,7 +79,8 @@ At the end of the section, you can find out more about how we approached the use
 ###### Youtube video: [Node beguinner guide](https://www.youtube.com/watch?v=ENrzD9HAZK4&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=69) | [Nodemon setup](https://www.youtube.com/watch?v=kV6MJ9W4whM&t=53s)
 
 #### Web
-###### Youtube videos: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0)
+- https://blog.nginx.org/blog/rate-limiting-nginx
+###### Youtube videos: [Web design fundamentals](https://www.youtube.com/watch?v=qyomWr_C_jA&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=54) |  [Request and response full cycle](https://www.youtube.com/watch?v=xv0Be4QfkH0) 
 
 #### SPAs
 ###### Youtube videos: [Dynamic Websites vs Static Pages vs Single Page Apps](https://www.youtube.com/watch?v=Kg0Q_YaQ3Gk&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=63) |  [Multi-page vs single page](https://www.youtube.com/watch?v=me5lS00Nj1k&list=PL-iwwQA26tlFecnT2HMip8gigYBWz9Q1X&index=61)
