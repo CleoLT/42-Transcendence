@@ -1,14 +1,12 @@
-import {IconsList} from "./icon.jsx"
+import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
-import {Profile, Friends, Rules, Project} from "./iconPages.jsx"
+import {Profile, Friends, Rules, Project} from "./iconPages"
 
 
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
-
-    // console.log("screen = ", screen)
 
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
@@ -36,6 +34,7 @@ export default function Content({screen, setScreen}){
         </div>
     )
 }
+
 
 {/* <GameContainer onGameReady={setGame} /> --> need to be call inside Game config at the end to not have the white screen */}
 

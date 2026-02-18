@@ -280,8 +280,8 @@ export function CreateAccount({setScreen}){
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
     const regexPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]+$/
     
-    if (username.length < 2 || username.length > 20)
-      throw new Error("Username must contain between 2 and 20 characters")
+    if (username.length < 2 || username.length > 10)
+      throw new Error("Username must contain between 2 and 10 characters")
     if (!regexName.test(username))
       throw new Error("Invalid username. Only letters, numbers, and '_' are allowed, and the first character must be a letter")
     if (email.length > 255)
