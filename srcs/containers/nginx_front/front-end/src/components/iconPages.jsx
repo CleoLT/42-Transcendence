@@ -17,6 +17,8 @@ export function Profile({setScreen}){
     )
 }
 
+//request for Avatar and not Hardcoded
+
 
 export function Friends({setScreen}){
     return(
