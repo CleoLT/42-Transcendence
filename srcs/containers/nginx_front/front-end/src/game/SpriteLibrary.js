@@ -9,7 +9,6 @@ export class SpriteLibrary {
 		this.BlossomSprite = null;
 		this.GoldenBlossomSprite = null;
 		this.BowlSprite = null;
-		this.TableSprite = null;
 
 		this.loaded = false;
 	}
@@ -28,7 +27,6 @@ export class SpriteLibrary {
 			GoldenBlossomSprite: '/images_png/sprites/golden.png',
 			FillSprite: '/images_png/sprites/bar.png',
 			BowlSprite: '/images_png/sprites/bowl.png',
-			TableSprite: '/images_png/sprites/table.png'
 		};
 
 		// Attempt to load any missing sprites from disk
@@ -103,13 +101,6 @@ export class SpriteLibrary {
 	 */
 	getBowlSprite() {
 		return this.BowlSprite;
-	}
-
-	/**
-	 * Retrieves the table sprite used under the bowls.
-	 */
-	getTableSprite() {
-		return this.TableSprite;
 	}
 
 	/**

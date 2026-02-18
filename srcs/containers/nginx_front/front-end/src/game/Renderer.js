@@ -52,30 +52,6 @@ import {
 	ABILITY_INDICATOR_STROKE_COLOR,
 	ABILITY_SPRITE_SIZE,
 	ABILITY_SPRITE_Y_OFFSET,
-	PAUSE_BUTTON_SIZE,
-	PAUSE_BUTTON_X_OFFSET,
-	PAUSE_BUTTON_Y_OFFSET,
-	PAUSE_BUTTON_COLOR,
-	PAUSE_BUTTON_TEXT_COLOR,
-	PAUSE_BUTTON_FONT,
-	ROUND_INDICATOR_BG_ALPHA,
-	ROUND_INDICATOR_TEXT_COLOR,
-	ROUND_INDICATOR_TITLE_FONT,
-	ROUND_INDICATOR_CONTROLS_FONT,
-	ROUND_INDICATOR_CONTROLS_SMALL_FONT,
-	ROUND_INDICATOR_SCORE_FONT,
-	ROUND_INDICATOR_SCORE_SUB_FONT,
-	ROUND_INDICATOR_TIMER_FONT,
-	ROUND_INDICATOR_TIMER_ALPHA,
-	ROUND_INDICATOR_Y_OFFSET,
-	ROUND_INDICATOR_CONTROLS_Y_OFFSET,
-	ROUND_INDICATOR_SCORE_Y_OFFSET,
-	PAUSE_OVERLAY_ALPHA,
-	PAUSE_TEXT_FONT,
-	PAUSE_TEXT_Y_OFFSET,
-	PAUSE_TIMER_FONT,
-	PAUSE_TIMER_COLOR,
-	PAUSE_TIMER_Y_OFFSET,
 	TABLE_WIDTH_FACTOR,
 	TABLE_HEIGHT_FACTOR,
 	TABLE_INSET_FACTOR,
@@ -448,16 +424,25 @@ export class Renderer {
 				? dotStartX - (index * ABILITY_INDICATOR_SPACING)
 				: dotStartX + (index * ABILITY_INDICATOR_SPACING);
 
-			// Ability is available if cooldown is 0 and player has enough perfect meter
-			const isAvailable = ability && 
-				ability.cooldown <= 0 && 
-				player.perfectMeter.value >= ability.cost;
+			const hasAbility = !!ability;
+			const onCooldown = hasAbility && ability.cooldown > 0;
+			const hasMeter = hasAbility && player.perfectMeter.value >= ability.cost;
+			// Ability is available only if not on cooldown and player has enough perfect meter
+			const isAvailable = hasAbility && !onCooldown && hasMeter && !player.frozen;
 
-			// Draw dot - lit if available, dim if on cooldown
+			// Draw dot - lit if available, red with timer if on cooldown,
+			// solid red when the player is frozen, dim otherwise.
 			ctx.beginPath();
 			ctx.arc(dotX, dotY, ABILITY_INDICATOR_RADIUS, 0, Math.PI * 2);
 			
-			if (isAvailable) {
+			if (player.frozen) {
+				// While frozen, all abilities are visually blocked in solid red
+				ctx.fillStyle = '#ff3333';
+				ctx.fill();
+				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
+				ctx.lineWidth = 1;
+				ctx.stroke();
+			} else if (isAvailable) {
 				// Lit: glowing/filled circle
 				ctx.fillStyle = ABILITY_INDICATOR_AVAILABLE_COLOR;
 				ctx.fill();
@@ -466,6 +451,23 @@ export class Renderer {
 				ctx.shadowColor = ABILITY_INDICATOR_AVAILABLE_COLOR;
 				ctx.fill();
 				ctx.shadowBlur = 0;
+			} else if (onCooldown) {
+				// Cooldown: red indicator with remaining seconds
+				ctx.fillStyle = '#ff3333';
+				ctx.fill();
+				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
+				ctx.lineWidth = 1;
+				ctx.stroke();
+
+				// Draw remaining cooldown seconds on top of the dot
+				const remaining = Math.ceil(ability.cooldown);
+				ctx.save();
+				ctx.fillStyle = '#ffffff';
+				ctx.font = '12px sans-serif';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(`${remaining}`, dotX, dotY + 2);
+				ctx.restore();
 			} else {
 				// Dim: outline only
 				ctx.fillStyle = ABILITY_INDICATOR_UNAVAILABLE_COLOR;
@@ -543,8 +545,8 @@ export class Renderer {
 			ctx.moveTo(0, -s);       // top center
 			ctx.lineTo(-s / 2, -s / 4); // middle left
 			ctx.lineTo(s / 4, 0);    // middle right
-			ctx.lineTo(-s / 4, s / 2); // bottom left
-			ctx.lineTo(s / 2, s / 4); // bottom right
+			ctx.lineTo(-s / 3, s / 1.5); // bottom left
+			// ctx.lineTo(s / 2, s / 4); // bottom right
 		
 			ctx.stroke();
 		}
@@ -702,18 +704,6 @@ export class Renderer {
 		this.tableWidth = tableWidth;
 		this.tableInset = _inset;
 
-		// Use sprite if available, scaling it to the configured width
-		const tableSprite = this.spriteLibrary && this.spriteLibrary.getTableSprite();
-		if (tableSprite) {
-			// Scale sprite to width while preserving aspect
-			const aspect = tableSprite.width && tableSprite.height ? tableSprite.width / tableSprite.height : tableWidth / tableHeight;
-			const drawW = tableWidth;
-			const drawH = Math.round(drawW / aspect);
-			const drawY = tableTop + (tableHeight - drawH) / 2;
-			ctx.drawImage(tableSprite, tableX, drawY, drawW, drawH);
-			return;
-		}
-
 		// Fallback: draw a stylised wooden/ink table with legs
 		ctx.save();
 
@@ -817,13 +807,7 @@ export class Renderer {
 		let bowlColor = BOWL_COLOR_DEFAULT_1;
 		let rimColor = BOWL_RIM_COLOR_DEFAULT;
 
-		if (player.frozen) {
-			bowlColor = BOWL_COLOR_FROZEN;
-			rimColor = BOWL_RIM_COLOR_FROZEN;
-		} else if (player.momentumActive) {
-			bowlColor = BOWL_COLOR_MOMENTUM;
-			rimColor = BOWL_RIM_COLOR_MOMENTUM;
-		} else if (player.dashing) {
+		if (player.dashing) {
 			bowlColor = BOWL_COLOR_DASHING;
 			rimColor = BOWL_RIM_COLOR_DASHING;
 		} else {
@@ -898,11 +882,6 @@ export class Renderer {
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		ctx.fillText(`P${playerId}`, 0, labelYOffset);
-
-		// Add ink bloom effect when the momentum ability is active
-		if (player.momentumActive) {
-			this.drawInkBloom(0, 0, inkBloomSize);
-		}
 
 		ctx.restore();
 	}
