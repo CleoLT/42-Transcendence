@@ -2,6 +2,7 @@ import {IconsList} from "./icon.jsx"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
+import { Friends } from "./Friends.jsx"
 
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
@@ -30,6 +31,7 @@ export default function Content({screen, setScreen}){
                 {screen === "playNC" && (<PlayNotConnected setScreen={setScreen} />)}
                 {screen === "signIn" && (<SignIn setScreen={setScreen} />)}
                 {screen === "createAccount" && (<CreateAccount setScreen={setScreen} />)}
+                {screen === "friends" && (<Friends setScreen={setScreen}/>)}
 
                
             </div>

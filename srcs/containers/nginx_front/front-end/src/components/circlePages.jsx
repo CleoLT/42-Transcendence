@@ -360,3 +360,4 @@ export function CreateAccount({setScreen}){
 
 // i added     "start": "HOST=0.0.0.0 react-scripts start" on package json for hot reloaded with windows
 // and in Dockerfile.dev too
+

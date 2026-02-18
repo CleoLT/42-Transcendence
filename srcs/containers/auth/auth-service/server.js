@@ -108,13 +108,35 @@ fastify.post('/validate', async (req, reply) => {
       }
     });
 
-    const resValues = await coincidence.json();
+    const resValues = await coincidence.json(); //esto no sirve ????
 
-    return reply.code(coincidence.status).send(resValues);
+
+  
+    const token = req.cookies.access_token;
+    console.log("token: ", token)
+
+    if (!token) {
+      return reply.code(401).send({ valid: false });
+    }
+
+    console.log("secret: ", readSecret(process.env.JWT_SECRET_FILE))
+
+    const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
+
+    
+
+    return reply.code(200).send({
+      valid: true,
+      userId: decoded.userId,
+      username: decoded.username
+    });
+
+    //return reply.code(coincidence.status).send(resValues);
 
   } catch (err) {
-    req.log.error(err);
-    return reply.code(500).send({ error: 'Internal auth error' });
+    //req.log.error(err);
+    console.error("JWTerror: ", err.message)
+    //return reply.code(err.code).send(err.message);
   }
 });
 

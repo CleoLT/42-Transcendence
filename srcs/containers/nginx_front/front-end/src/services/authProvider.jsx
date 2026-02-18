@@ -10,6 +10,7 @@ const AuthContext = createContext()
 export function AuthProvider({children}){
     const [log, setLog] = useState(false)
     const [username, setUsername] = useState(null)
+    const [userId, setUserId] = useState(null)
 
     // --> checking in the API if a cookie token is saved
     async function checkCookie(username, setLog) {
@@ -22,11 +23,13 @@ export function AuthProvider({children}){
             if (!res.ok)
                 throw new Error("Not authenticated")
 
-            // const data = await res.json()
-            setLog(true)
-            // setUsername(data.username)
-            setUsername(username)
-            // console.log("LOG TRUE: ", log, "USername: ", username)
+             const data = await res.json()
+            //setLog(true)
+            setLog(data.valid)
+            setUsername(data.username)
+            setUserId(data.userId)
+            //setUsername(username)
+            console.log("LOG TRUE: ", log, "USername: ", username, "userId: ", userId)
         }
         catch (error)
         {
@@ -70,6 +73,7 @@ export function AuthProvider({children}){
             value={{
                 log,
                 username,
+                userId,
                 login,
                 register,
                 logout

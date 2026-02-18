@@ -45,7 +45,7 @@ export function IconsList({setScreen}){
             />
             <Icon
                 image={friendsIcon}
-                onClick={() =>setScreen(log ? "homePlay" : "playNC")}
+                onClick={() =>setScreen(log ? "friends" : "playNC")}
                 text="Friends"
             />
             <Icon
