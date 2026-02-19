@@ -4,14 +4,11 @@ services:
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-    env_file:
-      - .jwt_env
     networks:
       - main
     depends_on:
       - user-service
       - auth-service
-      - game_history-service
     restart: always
 
 # USER MICROSERVICE
@@ -20,20 +17,49 @@ services:
     build: 
       context: ./containers/user/user-service
       dockerfile: Dockerfile.prod
-    env_file:
-      - .user_env
-      - .jwt_env
+    volumes:
+      - user_uploads_volume:/uploads/avatars
+    secrets:
+      - db_host
+      - db_username
+      - db_user_password
+      - db_name
+      - jwt_secret
+    environment: 
+      DB_HOST_FILE: /run/secrets/db_host
+      DB_PORT: 3306
+      DB_USER_FILE: /run/secrets/db_username
+      DB_PASSWORD_FILE: /run/secrets/db_user_password
+      DB_NAME_FILE: /run/secrets/db_name
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
     networks:
       - main
     restart: always
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
 
   user-db:
     container_name: user-db
     build: ./containers/user/user-db
-    env_file:
-      - .userdb_env
+    secrets:
+      - db_root_password
+      - db_username
+      - db_user_password
+      - db_name
+    environment: 
+     MYSQL_DATABASE_FILE: /run/secrets/db_name
+     MYSQL_USER_FILE: /run/secrets/db_username
+     MYSQL_PASSWORD_FILE: /run/secrets/db_user_password
+     MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    volumes:
+    - db_volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
     networks:
       - main
     restart: always
@@ -44,21 +70,42 @@ services:
     build: 
       context: ./containers/auth/auth-service
       dockerfile: Dockerfile.prod
-    env_file:
-      - .jwt_env
+    environment:
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+    secrets:
+      - jwt_secret
     networks:
       - main
     restart: always
 
-# GAME HISTORY MICROSERVICE
-  game_history-service:
-    container_name: game_history-service
-    build: 
-      context: ./containers/game_history/game_history-service
-      dockerfile: Dockerfile.prod
-    networks:
-      - main
-    restart: always
+volumes:
+  db_volume:
+    driver: local
+  # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
+
+  user_uploads_volume:
+    driver: local
+    #  driver_opts:
+    #    type: none
+    #    o: bind
+    #    device: ./containers/user/user-service/user_uploads/avatars
+  # esto seria para hacer named volumes stored as bind mounts, como en inception
+
+secrets:
+  db_host:
+    file: ../secrets/db_host.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_username:
+    file: ../secrets/db_username.txt
+  db_user_password:
+    file: ../secrets/db_user_password.txt
+  db_name:
+    file: ../secrets/db_name.txt
+  db_port:
+    file: ../secrets/db_port.txt
+  jwt_secret:
+    file: ../secrets/jwt_secret.txt
 
 networks:
    main:
