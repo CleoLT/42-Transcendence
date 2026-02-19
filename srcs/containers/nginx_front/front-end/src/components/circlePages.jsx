@@ -284,7 +284,7 @@ export function CreateAccount({setScreen}){
       throw new Error("Username must contain between 2 and 10 characters")
     if (!regexName.test(username))
       throw new Error("Invalid username. Only letters, numbers, and '_' are allowed, and the first character must be a letter")
-    if (email.length > 255)
+    if (email.length > 30)
       throw new Error("Email too long")
     if (!regexEmail.test(email))
       throw new Error("Invalid email syntaxis")

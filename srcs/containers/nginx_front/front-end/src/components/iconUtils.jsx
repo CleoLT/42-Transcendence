@@ -10,12 +10,14 @@ import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
 export function IconText({text}){
     return(
         <span className="
+            flex
             bg-red-900 rounded-lg
             my-1 px-2 py-0.5
             cursor-default
             opacity-0
             group-hover:opacity-100
-            transition-opacity duration-500">
+            transition-opacity duration-500
+            whitespace-nowrap ">
                 <CorbenBold className="text-[8px] md:text-[10px] text-shell">
                     {text}
                 </CorbenBold>   
@@ -88,5 +90,17 @@ export function ProfilePicture({src, className=""}){
                 alt="avatar image"
                 className = "h-full w-full object-cover" />
         </div>
+    )
+}
+
+
+export function ChopstickButton({text}){
+    return(
+        <button className="group">
+            <img src="/validation_icons/chopsticks.svg" alt="chopstick button icon" className="w-4 h-auto" />
+            <div className="absolute">
+                <IconText text={text} />
+            </div>
+        </button>
     )
 }
