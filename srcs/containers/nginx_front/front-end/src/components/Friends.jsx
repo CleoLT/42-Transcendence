@@ -30,7 +30,6 @@ function Card({ title, friends, children }) {
   );
 }
 
-
 export function Friends({setScreen}) {
   const { userId } = useAuth()
   console.log("userId ", userId)
@@ -41,48 +40,22 @@ export function Friends({setScreen}) {
   useEffect(() => {
     if (!userId) return;
 
-    async function fetchFriends() {
+    async function fetchFriendships(fetchFct, setState) {
       try {
-        const data = await getFriends(userId)
+        const data = await fetchFct(userId)
         const friendsInfo = await Promise.all(data.map(async (friendship) => {
           const friendId = (friendship.user1_id === userId) ?  friendship.user2_id : friendship.user1_id
           return await getUserInfo(friendId)
         }))
-        setFriends(friendsInfo)
+        setState(friendsInfo)
       } catch (error) {
         console.error(error);
       }
     }
 
-    async function fetchPending() {
-      try {
-        const data = await getFriendsPending(userId)
-        const friendsInfo = await Promise.all(data.map(async (friendship) => {
-          const friendId = (friendship.user1_id === userId) ?  friendship.user2_id : friendship.user1_id
-          return await getUserInfo(friendId)
-        }))
-        setPending(friendsInfo)
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async function fetchRequests() {
-      try {
-        const data = await getFriendsToRespond(userId)
-        const friendsInfo = await Promise.all(data.map(async (friendship) => {
-          const friendId = (friendship.user1_id === userId) ?  friendship.user2_id : friendship.user1_id
-          return await getUserInfo(friendId)
-        }))
-        setRequests(friendsInfo)
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchFriends()
-    fetchPending()
-    fetchRequests()
+    fetchFriendships(getFriends, setFriends)
+    fetchFriendships(getFriendsPending, setPending)
+    fetchFriendships(getFriendsToRespond, setRequests)
   }, [userId]);
 
   return (
