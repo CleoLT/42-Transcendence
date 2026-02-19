@@ -25,7 +25,7 @@ const routes = async function(fastify, options) {
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId, preHandler: preHandler.verifySessionFromPath }, friendHandler.getAllFriendsByUserId)
     fastify.get('/:userId/friendships/pending', { schema: friendSchema.getPendingFriendships, preHandler: preHandler.verifySessionFromPath }, friendHandler.getPendingFriendships)
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests, preHandler: preHandler.verifySessionFromPath }, friendHandler.getReceivedFriendRequests)
-    fastify.post('/friendships', { schema: friendSchema.newFriendship, preHandler: preHandler.verifySessionFromBody }, friendHandler.newFriendship)
+    fastify.post('/friendships', { schema: friendSchema.newFriendship, /*preHandler: preHandler.verifySessionFromBody*/ }, friendHandler.newFriendship)
     fastify.patch('/friendships/accept', { schema: friendSchema.acceptFriendship, /*preHandler: preHandler.verifySessionFromBody*/ }, friendHandler.acceptFriendship)
     fastify.patch('/friendships/cancel', { schema: friendSchema.cancelFriendship, /*preHandler: preHandler.verifySessionFromBody*/ }, friendHandler.cancelFriendship)
     fastify.patch('/friendships/authorization', { schema: friendSchema.addAuthorizationToPlay, preHandler: preHandler.verifySessionFromBody }, friendHandler.addAuthorizationToPlay)
