@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "nodemon": "^3.0.0",
-    "fastify": "^4.0.0",
-    "mariadb": "^3.3.3",
+    "fastify": "4.0.0",
+    "mariadb": "3.3.0",
     "@fastify/swagger": "^8.0.0",
     "@fastify/swagger-ui": "^2.0.0",
     "@fastify/multipart": "^8.1.0",
