@@ -18,7 +18,7 @@ export function IconText({text}){
             group-hover:opacity-100
             transition-opacity duration-500
             whitespace-nowrap ">
-                <CorbenBold className="text-[8px] md:text-[10px] text-shell">
+                <CorbenBold className="text-[7px] md:text-[9px] text-shell">
                     {text}
                 </CorbenBold>   
         </span>
@@ -96,9 +96,9 @@ export function ProfilePicture({src, className=""}){
 
 export function ChopstickButton({text}){
     return(
-        <button className="group">
+        <button className="group relative flex items-center">
             <img src="/validation_icons/chopsticks.svg" alt="chopstick button icon" className="w-4 h-auto" />
-            <div className="absolute">
+            <div className="absolute z-20 left-2/3 top-1/2 transform -translate-y-1/2 ml-2">
                 <IconText text={text} />
             </div>
         </button>
