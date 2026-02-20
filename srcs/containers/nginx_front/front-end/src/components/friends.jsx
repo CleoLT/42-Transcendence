@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useAuth } from "../services/authProvider"
+import { useAuth } from "../services/authProvider.jsx"
 import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond } from "../services/authService.js"
 
 function Card({ title, friends, children }) {

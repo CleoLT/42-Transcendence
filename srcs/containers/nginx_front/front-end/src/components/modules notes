@@ -12,16 +12,18 @@
 05.FooterButton({text, onClick})
 
 #circleUtils.jsx
-06.Circle({children})
+06.Circle({children, className=""})
 07.SmallCircle()
 08.CenterText({text, onClick, className = "", interactive = true})
 09.LogInInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
 10.IconText({text})
-11.IconsOverlayFrame()
-12.ProfilePicture({src, className=""})
-13.ChopstickButton()
+11.Icon(props)
+12.IconsOverlayFrame()
+13.ProfilePicture({src, className=""})
+14.ChopstickButton({text, onClick})
+15.OverlayPage({children, onClose})
 
 -->footer
 -->header
