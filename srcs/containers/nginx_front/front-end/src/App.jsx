@@ -1,15 +1,32 @@
 import Content from "./components/content.jsx"
 import Header from "./components/header.jsx"
 import {Footer} from "./components/footer.jsx"
-
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./components/typography.jsx"
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import {useAuth} from "./services/authProvider"
 
 export default function App() {
   const background = "/images_png/ground_00.png"
   const flowerGround = "/images_png/flower_ground.png"
+  const {log} = useAuth()
   const [screen, setScreen] = useState("playNC")
+  // const [initialized, setInitialized] = useState(false)
 
+  useEffect(() =>
+  {
+    if (log)
+      {setScreen("homePlay")}
+    else 
+      {setScreen("playNC")}
+  }, [log])
+
+  // useEffect(() => {
+  //   if (!initialized) {
+  //     setScreen(log ? "homePlay" : "playNC")
+  //     setInitialized(true)
+  //   }
+  // }, [log, initialized])
+  
   return (
     <div
       className="relative flex flex-col h-screen items-center justify-center">

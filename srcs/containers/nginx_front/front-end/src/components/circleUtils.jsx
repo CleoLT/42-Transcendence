@@ -1,5 +1,6 @@
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
+
 export function Circle({children}){
   return(
       <div className="
@@ -28,13 +29,13 @@ export function SmallCircle(){
 
 export function CenterText({text, onClick, className = "", interactive = true}){
   return(
-      <button 
+      <div
         onClick={() => onClick?.()} //call onClick only if onClick exist (no null)
         className={"absolute flex items-center justify-center " + (interactive ? "cursor-pointer" : "cursor-default")}>
         <Sixtyfour className={"text-center text-shell " + (interactive ? "hover:text-red-900 " : "") + className}>
           {text}
         </Sixtyfour>
-      </button>
+      </div>
   )
 }
 
@@ -62,6 +63,3 @@ export function LogInInput({placeholder, className = "", value, onChange, type})
         ${className}`} />
   )
 }
-
-//faire les checks et pasing du create account et sign in
-//(pas de placeholder vide
