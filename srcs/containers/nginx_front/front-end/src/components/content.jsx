@@ -2,8 +2,9 @@ import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
-import {Friends, Rules, Project} from "./iconPages"
+import {Rules, Project} from "./iconPages"
 import {Profile} from "./profilePages"
+import {Friends} from "./friends.jsx"
 
 
 export default function Content({screen, setScreen}){
