@@ -1,0 +1,52 @@
+--> Components (10 minimum) <--
+
+#typography.jsx
+01.SixtyFour({children, className = "", onClick})
+02.CorbenBold({children, className = ""})
+03.CorbenRegular({children, className = "", onClick})
+
+#icon.jsx
+04.Icon(props)
+
+#footer.jsx
+05.FooterButton({text, onClick})
+
+#circleUtils.jsx
+06.Circle({children})
+07.SmallCircle()
+08.CenterText({text, onClick, className = "", interactive = true})
+09.LogInInput({placeholder, className = "", value, onChange, type})
+
+#iconUtils.jsx
+10.IconText({text})
+11.IconsOverlayFrame()
+12.ProfilePicture({src, className=""})
+13.ChopstickButton()
+
+-->footer
+-->header
+-->content
+
+
+--> Tailwind Colors <--
+
+shell "#FFFEF4" -> CREATED
+yellowish "#FDD28B" -> CREATED
+palePink "#E8B0A3" -> CREATED
+bright red -> red-600
+dark red -> red-900
+greyish "#C8C6B8" -> CREATED
+black -> black
+
+
+
+
+--> Tailwind Breakpoints <--
+
+--> mobile -> 320/375 -> Iphone SE
+sm → 640px
+--> md → 768px ->Ipad Mini
+lg → 1024px -> nest Hub
+--> xl → 1280px -> nest Hub max (our screen)
+
+--> mobile, md & xl and check lg

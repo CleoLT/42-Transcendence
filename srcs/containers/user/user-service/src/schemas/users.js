@@ -4,7 +4,7 @@ const userResponse = {
         id: { type: 'number' },
         username: { type: 'string' },
         email: { type: 'string' },
-        alias: { type: 'string' },
+        //alias: { type: 'string' }, Borrar de la base de datos
         bio: { type: 'string' },
         avatar: { type: 'string' },
         online_status: { type: 'boolean' },
