@@ -5,7 +5,7 @@ import projectIcon from "../assets/icons_svg/icon_project.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {useAuth} from "../services/authProvider"
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
-
+import {Circle} from "./circleUtils"
 
 export function IconText({text}){
     return(
@@ -94,9 +94,9 @@ export function ProfilePicture({src, className=""}){
 }
 
 
-export function ChopstickButton({text}){
+export function ChopstickButton({text, onClick}){
     return(
-        <button className="group relative flex items-center">
+        <button className="group relative flex items-center" onClick={onClick}>
             <img src="/validation_icons/chopsticks.svg" alt="chopstick button icon" className="w-4 h-auto" />
             <div className="absolute z-20 left-2/3 top-1/2 transform -translate-y-1/2 ml-2">
                 <IconText text={text} />
@@ -104,3 +104,21 @@ export function ChopstickButton({text}){
         </button>
     )
 }
+
+
+export function OverlayPage({children, onClose}){
+    return(
+        <div className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm">
+            <div className="relative">
+                {children}
+            </div>
+            < div
+                className="absolute inset-0 -z-10"
+                onClick={onClose}
+            />
+        </div>
+    )
+}
+
+
+//backdrop-blur-sm

@@ -2,7 +2,8 @@ import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
-import {Profile, Friends, Rules, Project} from "./iconPages"
+import {Friends, Rules, Project} from "./iconPages"
+import {Profile} from "./profilePages"
 
 
 export default function Content({screen, setScreen}){
@@ -29,7 +30,7 @@ export default function Content({screen, setScreen}){
                 {screen === "profile" && (<Profile setScreen={setScreen} />)}
                 {screen === "friends" && (<Friends setScreen={setScreen} />)}
                 {screen === "rules" && (<Rules setScreen={setScreen} />)}
-                {screen === "project" && (<Project setScreen={setScreen} />)}
+                {screen === "project" && (<Project />)}
             </div>
         </div>
     )
