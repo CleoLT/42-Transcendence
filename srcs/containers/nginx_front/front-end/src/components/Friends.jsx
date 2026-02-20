@@ -1,18 +1,10 @@
 import { useState, useEffect } from "react"
-//import {Circle, CenterText, LogInInput} from "./circleUtils.jsx"
-//import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
-//import { Login, Register, Logout } from "../services/authService"
-//import {AlertMessage} from "../services/alertMessage"
 import { useAuth } from "../services/authProvider"
-
 import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond } from "../services/authService.js"
-
-
 
 function Card({ title, friends, children }) {
   const { userId } = useAuth()
-  console.log("Friends in Card: ", friends)
-
+  //console.log("Friends in Card: ", friends)
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">
