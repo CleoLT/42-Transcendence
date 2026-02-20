@@ -5,7 +5,7 @@ import projectIcon from "../assets/icons_svg/icon_project.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {useAuth} from "../services/authProvider"
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
-import {Circle} from "./circleUtils"
+
 
 export function IconText({text}){
     return(
