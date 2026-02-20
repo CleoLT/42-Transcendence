@@ -50,6 +50,7 @@ fastify.post('/login', async (req, reply) => {
       const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
       pending2FA.set(username, { code: code2FA, userId: resValues.userId, expires: Date.now() + 5*60*1000 });
 
+      req.log.info({ email }, '2FA email destination'); // debug
       await transporter.sendMail({
         from: process.env.MAIL_FROM,
         to: resValues.email,
@@ -136,42 +137,6 @@ fastify.post('/logout', async (req, reply) => {
 
 });
 
-/*fastify.post('/register', async (req, reply) => {
-  try {
-    const { username, password, email } = req.body || {};
-
-    if (!username || !password || !email) {
-      return reply.code(400).send({ error: 'Invalid credentials' });
-    }
-
-    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
-    pending2FA.set(username, { code: code2FA, userId: 0, expires: Date.now() + 5*60*1000 });
-
-    await transporter.sendMail({
-      from: process.env.MAIL_FROM,
-      to: resValues.email,
-      subject: '2FA code',
-      text: `Your verification code is: ${code2FA}`
-    });
-
-    const coincidence = await fetch('http://user-service:3000/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, email })
-    });
-    const resValues = await coincidence.json();
-
-    if (!coincidence.ok)
-      return reply.code(coincidence.status).send(resValues);
-    pending2FA.set();
-    return reply.code(201).send(resValues);
-
-  } catch (err) {
-    req.log.error(err);
-    return reply.code(500).send({ error: 'Internal auth error' });
-  }
-});*/
-
 fastify.post('/register', async (req, reply) => {
   try {
     const { username, password, email } = req.body || {};
@@ -183,6 +148,7 @@ fastify.post('/register', async (req, reply) => {
     const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
     pending2FA.set(username, { code: code2FA, userId: 0, expires: Date.now() + 5*60*1000 }); // userId = 0 temporal
 
+    req.log.info({ email }, '2FA email destination'); // debug
     await transporter.sendMail({
       from: process.env.MAIL_FROM,
       to: email,
