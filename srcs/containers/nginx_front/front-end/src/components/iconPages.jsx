@@ -9,20 +9,20 @@ export function UserData({data}){
             px-5 py-3 sm:px-10 justify-between items-center
             gap-x-2 text-[0.5rem] sm:text-[0.6rem]" >
             <div className="flex gap-x-2 items-center pb-3">
-                <Sixtyfour children="Emilie" onClick="null" />
+                <Sixtyfour children="Emilie" onClick={null} />
                 {/* <Sixtyfour children={data.username} onClick="null" className="text-base" /> */}
                 <ChopstickButton text="Change name"/>
             </div>
             <div className="flex gap-x-2 items-center">
-                <Sixtyfour children="Email: emilie@gmail.com" onClick="null" />
+                <Sixtyfour children="Email: emilie@gmail.com" onClick={null} />
                 {/* <Sixtyfour children={data.email} onClick="null" className="text-base" /> */}
                 <ChopstickButton text="Change email"/>
             </div>
-            <Sixtyfour children="Player since 01/01/2025" onClick="null" />
+            <Sixtyfour children="Player since 01/01/2025" onClick={null} />
             {/* <Sixtyfour children={data.date} onClick="null" className="text-base" /> */}
             <button className="pt-3" >
-                <Sixtyfour children="Change password" onClick="null" className="hover:text-red-900" />
-                <Sixtyfour children="Delete account" onClick="null" className="hover:text-red-900" />
+                <Sixtyfour children="Change password" onClick={null} className="hover:text-red-900" />
+                <Sixtyfour children="Delete account" onClick={null} className="hover:text-red-900" />
             </button>
         </div>
     )
@@ -59,7 +59,7 @@ export function Profile({setScreen}){
                                 ...<br />
                                 ...
                             </> }
-                        onClick="null"
+                        onClick={null}
                         className="flex-1 text-[0.5rem] sm:text-[0.6rem]" />
                     {/* <Sixtyfour children={data.info} onClick="null" className="text-base" /> */}
                     <ChopstickButton text="Change infos"/>
