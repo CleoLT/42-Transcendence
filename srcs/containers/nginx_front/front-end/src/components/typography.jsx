@@ -23,6 +23,6 @@ export function CorbenRegular({children, className = "", onClick}){
         onClick={onClick}
         style={{ letterSpacing: "-0.05em" }}>
         {children}
-      </h1>
+      </h1>                          
   )
 }

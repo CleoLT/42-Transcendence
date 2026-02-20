@@ -10,15 +10,17 @@ export function PlayConnected({setScreen}){
   return(
     <div className="flex justify-center items-center h-full w-full">
       <Circle>
-        <CenterText
-          text ="PLAY"
-          onClick={() =>setScreen("homePlay")}
-          // interactive={true}
-          className="
-            text-5xl
-            md:text-7xl
-            xl:text-8xl"
-        />
+        <button className="flex justify-center items-center">
+          <CenterText
+            text ="PLAY"
+            onClick={() =>setScreen("game")}
+            interactive={true}
+            className="
+              text-5xl
+              md:text-7xl
+              xl:text-8xl"
+          />
+        </button>
       </Circle>
     </div>
   )
@@ -37,10 +39,6 @@ export function GameConfig({ game }) {
   const canPlay = _p1 && _p2 && !!game
 
   const handlePlayClick = () => {
-    if (!configVisible) {
-      setConfigVisible(true)
-      return
-    }
 
     if (!canPlay) return
 
@@ -63,17 +61,18 @@ export function GameConfig({ game }) {
           </Sixtyfour>
         ) : (
           <>
-            <CenterText
-              text="PLAY"
-              onClick={handlePlayClick}
-              interactive={true}
-              className={`
-                text-5xl md:text-7xl xl:text-8xl
-                ${configVisible && !canPlay ? "opacity-40" : ""}
-              `}
-            />
-
-            {configVisible && (
+            <button className="flex justify-center items-center">
+              <CenterText
+                text="PLAY"
+                onClick={handlePlayClick}
+                interactive={true}
+                className={`
+                  text-5xl md:text-7xl xl:text-8xl
+                  ${configVisible && !canPlay ? "opacity-40" : ""}
+                `}
+              />
+            </button>
+            {(
               <>
                 <LogInInput
                   placeholder="Player 1 name"
@@ -153,7 +152,7 @@ export function PlayNotConnected({setScreen}){
     <div className="flex flex-col justify-center items-center h-full w-full">
       <Circle>
         <Sixtyfour
-          onClick={() =>setScreen("homePlay")}
+          onClick={() =>setScreen("game")}
             className="
             absolute top-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
@@ -164,8 +163,8 @@ export function PlayNotConnected({setScreen}){
         </Sixtyfour>
         <CenterText
           text ="PLAY"
-          onClick={null}
-          interactive={false}
+          // onClick={null}
+          // interactive={false}
           className="
             text-5xl
             md:text-7xl
@@ -192,12 +191,14 @@ export function SignIn({setScreen}){
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const {login} = useAuth()
+  // const {userID} = useAuth()
 
   const handleLogin = async () => {
     if (!username || !password) {
       throw new Error("All fields are required")}
     await login(username, password)
     setScreen("homePlay");
+    // console.log("UserID: ", userID)
   }
 
   return(
@@ -279,11 +280,11 @@ export function CreateAccount({setScreen}){
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
     const regexPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]+$/
     
-    if (username.length < 2 || username.length > 20)
-      throw new Error("Username must contain between 2 and 20 characters")
+    if (username.length < 2 || username.length > 10)
+      throw new Error("Username must contain between 2 and 10 characters")
     if (!regexName.test(username))
       throw new Error("Invalid username. Only letters, numbers, and '_' are allowed, and the first character must be a letter")
-    if (email.length > 255)
+    if (email.length > 30)
       throw new Error("Email too long")
     if (!regexEmail.test(email))
       throw new Error("Invalid email syntaxis")
