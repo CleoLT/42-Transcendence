@@ -40,8 +40,11 @@ import {
 	LOADING_TEXT_COLOR,
 	LOADING_TEXT_FONT,
 	ROUND_INDICATOR_BG_ALPHA,
+	ROUND_INDICATOR_CIRCLE_COLOR,
+	ROUND_INDICATOR_CIRCLE_RADIUS,
 	ROUND_INDICATOR_TEXT_COLOR,
 	ROUND_INDICATOR_TITLE_FONT,
+	ROUND_INDICATOR_SUBTITLE_FONT,
 	ROUND_INDICATOR_CONTROLS_FONT,
 	ROUND_INDICATOR_CONTROLS_SMALL_FONT,
 	ROUND_INDICATOR_SCORE_FONT,
@@ -49,7 +52,8 @@ import {
 	ROUND_INDICATOR_TIMER_FONT,
 	ROUND_INDICATOR_TIMER_ALPHA,
 	ROUND_INDICATOR_Y_OFFSET,
-	ROUND_INDICATOR_CONTROLS_Y_OFFSET,
+	ROUND_INDICATOR_COLUMN_OFFSET,
+	ROUND_INDICATOR_RESET_SUB_FONT,
 	ROUND_INDICATOR_SCORE_Y_OFFSET,
 	PAUSE_OVERLAY_ALPHA,
 	PAUSE_TEXT_FONT,
@@ -58,7 +62,9 @@ import {
 	PAUSE_TIMER_COLOR,
 	PAUSE_TIMER_Y_OFFSET,
 	MAX_ROUNDS,
-	BLOSSOM_DESPAWN_Y_OFFSET
+	BLOSSOM_DESPAWN_Y_OFFSET,
+	RESET_BUTTON_RADIUS,
+	RESET_BUTTON_FONT
 } from './Constants.js';
 
 export class Game {
@@ -93,6 +99,32 @@ export class Game {
 		this.pauseButtonBounds = null;
 		this.roundIndicatorTimer = 0;
 		this.showRoundIndicator = false;
+		this.roundBlurOverlay = null;
+		this.roundIndicatorCanvas = null;
+		this.roundIndicatorCtx = null;
+		this.resetButtonBounds = null;
+		this.onBackToMenu = null;
+	}
+
+	/**
+	 * Sets the DOM layer used for blur overlay and round indicator canvas (optional).
+	 * When set, the round indicator is drawn on the indicator canvas over a blurred background.
+	 *
+	 * @param {HTMLElement} overlay - Element with backdrop-filter: blur (shown when indicator is on).
+	 * @param {HTMLCanvasElement} indicatorCanvas - Canvas for drawing the round indicator (same resolution as game canvas).
+	 */
+	setRoundIndicatorLayer(overlay, indicatorCanvas) {
+		this.roundBlurOverlay = overlay;
+		this.roundIndicatorCanvas = indicatorCanvas;
+		this.roundIndicatorCtx = indicatorCanvas ? indicatorCanvas.getContext('2d') : null;
+	}
+
+	/**
+	 * Sets callback to run when user chooses "Reset" at game end (return to play button screen).
+	 * @param {Function} callback - Called after resetGame() when Reset is clicked.
+	 */
+	setOnBackToMenu(callback) {
+		this.onBackToMenu = callback;
 	}
 
 	/**
@@ -169,16 +201,26 @@ export class Game {
 		// which validates player names before calling startGame()
 		this.spaceKeyHandler = null;
 
-		// Handle pause button clicks
+		// Handle pause button and game-end Reset button clicks
 		this.canvasClickHandler = (e) => {
-			if (this.pauseButtonBounds && (this.state === 'playing' || this.state === 'paused')) {
-				const rect = this.canvas.getBoundingClientRect();
-				const scaleX = this.canvas.width / rect.width;
-				const scaleY = this.canvas.height / rect.height;
-				const x = (e.clientX - rect.left) * scaleX;
-				const y = (e.clientY - rect.top) * scaleY;
+			const rect = this.canvas.getBoundingClientRect();
+			const scaleX = this.canvas.width / rect.width;
+			const scaleY = this.canvas.height / rect.height;
+			const x = (e.clientX - rect.left) * scaleX;
+			const y = (e.clientY - rect.top) * scaleY;
 
-				// Check if click is within pause button bounds
+			if (this.state === 'gameEnd' && this.resetButtonBounds) {
+				const b = this.resetButtonBounds;
+				const dx = x - b.x;
+				const dy = y - b.y;
+				if (dx * dx + dy * dy <= b.radius * b.radius) {
+					this.resetGame();
+					this.onBackToMenu?.();
+				}
+				return;
+			}
+
+			if (this.pauseButtonBounds && (this.state === 'playing' || this.state === 'paused')) {
 				if (x >= this.pauseButtonBounds.x &&
 					x <= this.pauseButtonBounds.x + this.pauseButtonBounds.width &&
 					y >= this.pauseButtonBounds.y &&
@@ -237,7 +279,7 @@ export class Game {
 		this.roundSystem.startRound();
 		// Show round indicator
 		this.showRoundIndicator = true;
-		this.roundIndicatorTimer = ROUND_INDICATOR_DURATION;
+		this.roundIndicatorTimer = this.roundSystem.getCurrentRound() == 1 ? ROUND_INDICATOR_DURATION * 1.75 : ROUND_INDICATOR_DURATION;
 	}
 
 	/**
@@ -281,10 +323,25 @@ export class Game {
 
 		// Only run gameplay logic when state is 'playing' and round indicator is not showing
 		if (this.state === 'playing' && !this.showRoundIndicator) {
-			// Update player logic
+			// Update player logic and apply ability effects that target other players
 			this.players.forEach((player, index) => {
 				const otherPlayer = this.players[1 - index];
-				player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
+				const abilityUsed = player.update(dt, this.inputManager, this.laneSystem, otherPlayer);
+
+				if (!otherPlayer) return;
+
+				// Ability 1: invert horizontal controls of the *other* player
+				if (abilityUsed === 'invertControls') {
+					otherPlayer.invertControlsActive = true;
+					otherPlayer.invertControlsTimer = otherPlayer.invertControlsDuration;
+				}
+
+				// Ability 2: freeze the *other* player so they cannot move or
+				// use abilities for a short duration.
+				if (abilityUsed === 'freeze') {
+					otherPlayer.frozen = true;
+					otherPlayer.freezeTimer = otherPlayer.freezeDuration;
+				}
 			});
 			
 			this.resolvePlayerCollision();
@@ -375,7 +432,7 @@ export class Game {
 		const left = p1.x <= p2.x ? p1 : p2;
 		const right = left === p1 ? p2 : p1;
 	
-		const minDistance = left.radius + right.radius;
+		const minDistance = left.radius + right.radius - 10;
 		const targetDistance = minDistance * PLAYER_COLLISION_TARGET_DISTANCE;
 
 		const distance = right.x - left.x;
@@ -610,21 +667,14 @@ export class Game {
 	 * Switches to the game-end state and reveals final UI.
 	 */
 	handleGameEnd() {
-		// Record game-end state and figure out the winner
 		this.state = 'gameEnd';
-		const winner = this.roundSystem.getWinner();
-
-		// Reveal reset button so players can start over
-		const resetBtn = document.getElementById('reset-button');
-		if (resetBtn) {
-			resetBtn.classList.remove('hidden');
-		}
 	}
 
 	/**
 	 * Performs a full game restart, returning to the main menu.
 	 */
 	resetGame() {
+		this.resetButtonBounds = null;
 		// Restore baseline game state values
 		this.state = 'menu';
 		this.blossomSystem.reset();
@@ -712,12 +762,7 @@ export class Game {
 			// Set Y position to table center for proper collision detection
 			player.y = tableCenterY;
 
-			// Clear temporary status effects and ability state
-			player.frozen = false;
-			player.freezeTimer = 0;
-			player.momentumActive = false;
-			player.momentumTimer = 0;
-			player.momentumPushCount = 0;
+			// Clear ability state
 			Object.values(player.abilities).forEach(ability => {
 				ability.active = false;
 				ability.cooldown = 0;
@@ -745,8 +790,10 @@ export class Game {
 			return;
 		}
 
+		// Clear to transparent so semi-transparent background reveals what's behind the canvas
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
 		// Always draw the background first regardless of game state
-		// This ensures the canvas is visible even when menu is showing
 		this.renderer.renderBackground(ctx, this.canvas.width, this.canvas.height);
 
 		if (this.state === 'playing' || this.state === 'paused') {
@@ -808,9 +855,19 @@ export class Game {
 			// Overlay catch FX sprites and meter highlights
 			this.renderer.renderPerfectCatchEffects(this.perfectCatchEffects);
 
-			// Show round indicator when starting a new round
+			// Show round indicator when starting a new round (blur overlay + indicator canvas or main ctx)
 			if (this.showRoundIndicator && this.roundSystem) {
-				this.renderRoundIndicator(ctx);
+				if (this.roundBlurOverlay && this.roundIndicatorCanvas && this.roundIndicatorCtx) {
+					this.roundBlurOverlay.style.display = 'block';
+					this.roundIndicatorCanvas.style.display = 'block';
+					this.roundIndicatorCtx.clearRect(0, 0, this.roundIndicatorCanvas.width, this.roundIndicatorCanvas.height);
+					this.renderRoundIndicator(this.roundIndicatorCtx, true);
+				} else {
+					this.renderRoundIndicator(ctx, false);
+				}
+			} else if (this.roundBlurOverlay && this.roundIndicatorCanvas) {
+				this.roundBlurOverlay.style.display = 'none';
+				this.roundIndicatorCanvas.style.display = 'none';
 			}
 
 			// Show pause indicator when paused
@@ -818,6 +875,8 @@ export class Game {
 				this.renderPauseOverlay(ctx);
 			}
 
+		} else if (this.state === 'gameEnd') {
+			this.renderGameEndOverlay(ctx);
 		} else if (this.state === 'menu') {
 			// When in menu, background is sufficient; rest is HTML-driven
 		}
@@ -826,38 +885,56 @@ export class Game {
 	/**
 	 * Renders the round indicator overlay with round number and controls/scores.
 	 *
-	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context (main canvas or indicator canvas).
+	 * @param {boolean} [useBlurLayer=false] - If true, background is blurred via DOM (no opaque fill).
 	 */
-	renderRoundIndicator(ctx) {
+	renderRoundIndicator(ctx, useBlurLayer = false) {
 		ctx.save();
-		const centerX = this.canvas.width / 2;
-		const centerY = this.canvas.height / 2;
-		
-		// Semi-transparent background overlay
-		ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
-		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		
-		// Display round number
-		const currentRound = this.roundSystem.getCurrentRound();
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.font = ROUND_INDICATOR_TITLE_FONT;
+		const w = this.canvas.width;
+		const h = this.canvas.height;
+		const centerX = w / 2;
+		const centerY = h / 2;
+		const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
+
+		if (!useBlurLayer) {
+			ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
+			ctx.fillRect(0, 0, w, h);
+		}
+
+		// Red circle (indicator style)
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+		ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
+		ctx.fill();
+
+		// All content inside the circle, centered
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-		ctx.fillText(`Round ${currentRound} / ${MAX_ROUNDS}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
-		
-		// Display time remaining in background
+		const currentRound = this.roundSystem.getCurrentRound();
 		const timeRemaining = Math.ceil(this.roundIndicatorTimer);
+
+		// Title: "Round 1" / "Round 2"
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_TITLE_FONT;
+		ctx.fillText(`ROUND ${currentRound}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
+
+		// Subtitle: "1 / 2"
+		ctx.font = ROUND_INDICATOR_SUBTITLE_FONT;
+		ctx.fillText(`${currentRound} / ${MAX_ROUNDS}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET + 42);
+
+		// Countdown (large, subtle)
 		ctx.fillStyle = `rgba(255, 255, 255, ${ROUND_INDICATOR_TIMER_ALPHA})`;
 		ctx.font = ROUND_INDICATOR_TIMER_FONT;
-		ctx.fillText(`${timeRemaining}   ${timeRemaining}`, centerX, centerY);
-		
-		// Display round-specific content
+		ctx.fillText(String(timeRemaining), centerX, centerY + 200);
+
+		// Round-specific content inside circle
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 		if (currentRound === 1) {
 			this.renderRound1Controls(ctx, centerX, centerY);
 		} else if (currentRound === 2) {
 			this.renderRound2Scores(ctx, centerX, centerY);
 		}
-		
+
 		ctx.restore();
 	}
 
@@ -869,23 +946,32 @@ export class Game {
 	 * @param {number} centerY - Center Y coordinate.
 	 */
 	renderRound1Controls(ctx, centerX, centerY) {
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		const startY = centerY - 30;
+		const lineH = 30;
+		const leftX = centerX - ROUND_INDICATOR_COLUMN_OFFSET;
+		const rightX = centerX + ROUND_INDICATOR_COLUMN_OFFSET;
+
+		// Column headers
 		ctx.font = ROUND_INDICATOR_CONTROLS_FONT;
-		ctx.fillText('Player 1 Controls:', centerX, centerY + ROUND_INDICATOR_CONTROLS_Y_OFFSET);
+		ctx.textAlign = 'center';
+		ctx.fillText('Player 1', leftX, startY);
+		ctx.fillText('Player 2', rightX, startY);
+
+		// Separator "|" in the center
+		// ctx.fillText('|', centerX, startY);
+
+		// Controls: left column
 		ctx.font = ROUND_INDICATOR_CONTROLS_SMALL_FONT;
-		ctx.fillText('Move: A / D', centerX, centerY);
-		ctx.fillText('Push: Left Shift', centerX, centerY + 30);
-		ctx.fillText('Dash: Space', centerX, centerY + 60);
-		ctx.fillText('Abilities: 1 / 2 / 3', centerX, centerY + 90);
-		
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.font = ROUND_INDICATOR_CONTROLS_FONT;
-		ctx.fillText('Player 2 Controls:', centerX, centerY + 150);
-		ctx.font = ROUND_INDICATOR_CONTROLS_SMALL_FONT;
-		ctx.fillText('Move: ← / →', centerX, centerY + 200);
-		ctx.fillText('Push: Right Ctrl', centerX, centerY + 230);
-		ctx.fillText('Dash: Right Shift', centerX, centerY + 260);
-		ctx.fillText('Abilities: Numpad 1 / 2 / 3', centerX, centerY + 290);
+		ctx.fillText('Move: A/D', leftX, startY + lineH);
+		ctx.fillText('Push: Left Shift', leftX, startY + lineH * 2);
+		ctx.fillText('Dash: Space', leftX, startY + lineH * 3);
+		ctx.fillText('Abilities: 1 / 2 / 3', leftX, startY + lineH * 4);
+
+		// Controls: right column
+		ctx.fillText('Move: ←/→', rightX, startY + lineH);
+		ctx.fillText('Push: Right Ctrl', rightX, startY + lineH * 2);
+		ctx.fillText('Dash: Right Shift', rightX, startY + lineH * 3);
+		ctx.fillText('Abilities: Numpad 1 / 2 / 3', rightX, startY + lineH * 4);
 	}
 
 	/**
@@ -896,12 +982,113 @@ export class Game {
 	 * @param {number} centerY - Center Y coordinate.
 	 */
 	renderRound2Scores(ctx, centerX, centerY) {
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		const startY = centerY;
+		const leftX = centerX - ROUND_INDICATOR_COLUMN_OFFSET;
+		const rightX = centerX + ROUND_INDICATOR_COLUMN_OFFSET;
+		const lineH = 30;
+
+		// Column headers
 		ctx.font = ROUND_INDICATOR_SCORE_FONT;
-		ctx.fillText('Current Scores:', centerX, centerY + ROUND_INDICATOR_SCORE_Y_OFFSET);
-		ctx.font = ROUND_INDICATOR_SCORE_SUB_FONT;
-		ctx.fillText(`${this.players[0].name}: ${this.players[0].score} points`, centerX, centerY + 30);
-		ctx.fillText(`${this.players[1].name}: ${this.players[1].score} points`, centerX, centerY + 80);
+		ctx.textAlign = 'center';
+		ctx.fillText(`${this.players[0].name}`, leftX, startY);
+		ctx.fillText(`${this.players[1].name}`, rightX, startY);
+		// ctx.fillText('|', centerX, startY);
+
+		// Points: left and right column
+		ctx.font = ROUND_INDICATOR_CONTROLS_SMALL_FONT;
+		ctx.fillText(`${this.players[0].score}`, leftX, startY + lineH);
+		ctx.fillText(`${this.players[1].score}`, rightX, startY + lineH);
+	}
+
+	/**
+	 * Renders the game-end overlay with winner and Reset button (round-indicator style).
+	 *
+	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
+	 */
+	renderGameEndOverlay(ctx) {
+		ctx.save();
+		const w = this.canvas.width;
+		const h = this.canvas.height;
+		const centerX = w / 2;
+		const centerY = h / 2;
+		const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
+
+		// Red circle (indicator style)
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+		ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
+		ctx.fill();
+
+		// All content inside the circle, centered
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = ROUND_INDICATOR_TITLE_FONT;
+		ctx.fillText("The end", centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
+
+		// Round-specific content inside circle
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		
+		// Column headers
+		ctx.font = ROUND_INDICATOR_SCORE_FONT;
+		ctx.textAlign = 'center';
+		// ctx.fillText('Player 1', leftX, startY);
+		// ctx.fillText('Player 2', rightX, startY);
+		// ctx.fillText('|', centerX, startY);
+
+		// Points: left and right column
+		const winner = this.roundSystem.getWinner();
+		ctx.font = ROUND_INDICATOR_RESET_SUB_FONT;
+		if (winner === 0) {
+			ctx.fillText('It-s a draw!', centerX, centerY - 100);
+		} else {
+			ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 100);
+		}
+		ctx.beginPath();
+		ctx.roundRect(centerX - 100, centerY, 200, 100, 100);
+		ctx.fillStyle = "#820000";
+		ctx.fill();
+
+		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.font = RESET_BUTTON_FONT;
+		ctx.fillText('Reset', centerX, centerY + 50);
+
+		this.resetButtonBounds = { x: centerX, y: centerY, radius: RESET_BUTTON_RADIUS };
+
+		ctx.restore();
+
+
+		// ctx.save();
+		// const centerX = this.canvas.width / 2;
+		// const centerY = this.canvas.height / 2;
+
+		// ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
+		// ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+		// const winner = this.roundSystem.getWinner();
+		// ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		// ctx.font = ROUND_INDICATOR_TITLE_FONT;
+		// ctx.textAlign = 'center';
+		// ctx.textBaseline = 'middle';
+		// if (winner === 0) {
+		// 	ctx.fillText('Draw!', centerX, centerY - 120);
+		// } else {
+		// 	ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 120);
+		// }
+
+		// // Reset button: red circle, same style as round indicator
+		// ctx.beginPath();
+		// ctx.arc(centerX, centerY, RESET_BUTTON_RADIUS, 0, Math.PI * 2);
+		// ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
+		// ctx.fill();
+
+		// ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		// ctx.font = RESET_BUTTON_FONT;
+		// ctx.fillText('Reset', centerX, centerY);
+
+		// this.resetButtonBounds = { x: centerX, y: centerY, radius: RESET_BUTTON_RADIUS };
+		// ctx.restore();
 	}
 
 	/**
@@ -916,6 +1103,7 @@ export class Game {
 		
 		// Display "PAUSED" text
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
+		ctx.fillStyle = PAUSE_TIMER_COLOR;
 		ctx.font = PAUSE_TEXT_FONT;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
@@ -924,7 +1112,7 @@ export class Game {
 		// Display remaining time
 		if (this.roundSystem && this.roundSystem.roundActive) {
 			const timeRemaining = this.roundSystem.getTimeRemaining();
-			ctx.fillStyle = PAUSE_TIMER_COLOR;
+			ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 			ctx.font = PAUSE_TIMER_FONT;
 			ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + PAUSE_TIMER_Y_OFFSET);
 		}

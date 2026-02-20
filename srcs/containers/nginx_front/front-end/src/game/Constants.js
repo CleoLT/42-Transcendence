@@ -1,3 +1,6 @@
+// colors
+export const red = "#DC2626";
+
 // Game constants
 export const PLAYER_RADIUS = 54; // Player/bowl radius in pixels
 
@@ -33,7 +36,7 @@ export const ABILITY_COSTS = {
 
 export const ABILITY_COOLDOWNS = {
 	reversePush: 5,
-	inkFreeze: 8,
+	inkFreeze: 5,
 	momentumSurge: 10
 };
 
@@ -72,7 +75,7 @@ export const WIND_DIRECTION_LEFT = -1;
 export const WIND_DIRECTION_RIGHT = 1;
 
 // Round system
-export const ROUND_TIME = 20; // seconds per round
+export const ROUND_TIME = 30; // seconds per round
 export const MAX_ROUNDS = 2;
 export const ROUND_INDICATOR_DURATION = 5.0; // seconds
 export const ROUND_RESET_DELAY = 2000; // milliseconds
@@ -146,30 +149,39 @@ export const ABILITY_SPRITE_Y_OFFSET = 12;
 export const PAUSE_BUTTON_SIZE = 80;
 export const PAUSE_BUTTON_X_OFFSET = 40;
 export const PAUSE_BUTTON_Y_OFFSET = 40;
-export const PAUSE_BUTTON_COLOR = '#FF0000';
+export const PAUSE_BUTTON_COLOR = red;
 export const PAUSE_BUTTON_TEXT_COLOR = '#000000';
 export const PAUSE_BUTTON_FONT = 'bold 30px corben';
 
-// Round indicator rendering
-export const ROUND_INDICATOR_BG_ALPHA = 0.8;
+// Round indicator rendering (circle style, Corben font)
+export const ROUND_INDICATOR_BG_ALPHA = 0.2;
+export const ROUND_INDICATOR_CIRCLE_COLOR = red;
+export const ROUND_INDICATOR_CIRCLE_RADIUS = 300;
 export const ROUND_INDICATOR_TEXT_COLOR = '#FFFFFF';
-export const ROUND_INDICATOR_TITLE_FONT = 'bold 72px Arial';
-export const ROUND_INDICATOR_CONTROLS_FONT = 'bold 32px Arial';
-export const ROUND_INDICATOR_CONTROLS_SMALL_FONT = '24px Arial';
-export const ROUND_INDICATOR_SCORE_FONT = 'bold 48px Arial';
-export const ROUND_INDICATOR_SCORE_SUB_FONT = 'bold 36px Arial';
-export const ROUND_INDICATOR_TIMER_FONT = 'bold 700px Arial';
-export const ROUND_INDICATOR_TIMER_ALPHA = 0.28;
+export const ROUND_INDICATOR_TITLE_FONT = '400 50px Sixtyfour, sans-serif';
+export const ROUND_INDICATOR_SUBTITLE_FONT = '400 28px Corben, sans-serif';
+export const ROUND_INDICATOR_CONTROLS_FONT = '700 26px Corben, sans-serif';
+export const ROUND_INDICATOR_CONTROLS_SMALL_FONT = '400 20px Corben, sans-serif';
+export const ROUND_INDICATOR_SCORE_FONT = '700 28px Corben, sans-serif';
+export const ROUND_INDICATOR_SCORE_SUB_FONT = '700 22px Corben, sans-serif';
+export const ROUND_INDICATOR_RESET_SUB_FONT = '700 30px Corben, sans-serif';
+export const ROUND_INDICATOR_TIMER_FONT = '400 100px Sixtyfour, sans-serif';
+export const ROUND_INDICATOR_TIMER_ALPHA = 0.35;
 export const ROUND_INDICATOR_Y_OFFSET = -150;
-export const ROUND_INDICATOR_CONTROLS_Y_OFFSET = -50;
-export const ROUND_INDICATOR_SCORE_Y_OFFSET = -30;
+export const ROUND_INDICATOR_COLUMN_OFFSET = 150; // horizontal distance from center to each column
+export const ROUND_INDICATOR_CONTROLS_Y_OFFSET = 100;
+export const ROUND_INDICATOR_SCORE_Y_OFFSET = 0;
+
+// Game end / Reset button (same style as round indicator)
+export const RESET_BUTTON_RADIUS = 100;
+export const RESET_BUTTON_FONT = '400 50px Sixtyfour, sans-serif';
 
 // Pause overlay
 export const PAUSE_OVERLAY_ALPHA = 0.7;
-export const PAUSE_TEXT_FONT = 'bold 64px Arial';
+export const PAUSE_TEXT_FONT = '400 70px Sixtyfour, sans-serif';
 export const PAUSE_TEXT_Y_OFFSET = -60;
-export const PAUSE_TIMER_FONT = 'bold 48px Arial';
-export const PAUSE_TIMER_COLOR = '#FFD700';
+export const PAUSE_TIMER_FONT = '700 48px Corben, sans-serif';
+export const PAUSE_TIMER_COLOR = red;
 export const PAUSE_TIMER_Y_OFFSET = 40;
 
 // Bowl rendering
@@ -230,7 +242,7 @@ export const PAPER_TEXTURE_POINTS = 200;
 export const PAPER_TEXTURE_SIZE_MIN = 1;
 export const PAPER_TEXTURE_SIZE_MAX = 3;
 export const PAPER_TEXTURE_COLOR = 'rgba(139, 115, 85, 0.02)';
-export const PAPER_BACKGROUND_COLOR = '#fffef0';
+export const PAPER_BACKGROUND_COLOR = 'rgba(255, 254, 240, 0.48)';
 
 // Table rendering (fallback)
 export const TABLE_LEG_COUNT = 3;
