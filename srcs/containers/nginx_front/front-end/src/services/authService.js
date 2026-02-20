@@ -54,3 +54,55 @@ export async function Logout(username) {
   }
   return respond
 }
+
+export async function getFriends(id) {
+  const res = await fetch(`${baseUrl}/api/users/${id}/friendships`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function getFriendsPending(id) {
+  const res = await fetch(`${baseUrl}/api/users/${id}/friendships/pending`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function getFriendsToRespond(id) {
+  const res = await fetch(`${baseUrl}/api/users/${id}/friendships/requests`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function getUserInfo(id) {
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}

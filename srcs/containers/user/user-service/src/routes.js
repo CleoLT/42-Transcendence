@@ -9,11 +9,11 @@ const routes = async function(fastify, options) {
 
     fastify.get('/', { schema: userSchema.getAllUsers }, userHandler.getAllUsers)
     fastify.post('/', { schema: userSchema.postUser }, userHandler.postUser)
-    fastify.get('/:userId', { schema: userSchema.getUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.getUserById)
+    fastify.get('/:userId', { schema: userSchema.getUserById }, userHandler.getUserById)
     fastify.post('/user/login', { schema: userSchema.tryLogin }, userHandler.tryLogin)
     fastify.post('/user/logout', { schema: userSchema.logOut }, userHandler.logOut)
 
-    fastify.post('/user/validate', { preHandler: preHandler.verifySession }, userHandler.validate)
+    //fastify.post('/user/validate', { preHandler: preHandler.verifySession }, userHandler.validate)
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
     fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)
     fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath }, userHandler.uploadAvatar)
@@ -21,7 +21,7 @@ const routes = async function(fastify, options) {
     //fastify.post('/:userId/avatar/select', { schema: userSchema.selectAvatar },  userHandler.selectAvatar)
     fastify.delete('/:userId/avatar', { schema: userSchema.deleteAvatar },  userHandler.deleteAvatar)
 
-    fastify.get('/friendships', { schema: friendSchema.getAllFriendships, preHandler: preHandler.verifySession }, friendHandler.getAllFriendships) // borrar?
+    fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships) // borrar? solo para test
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId, preHandler: preHandler.verifySessionFromPath }, friendHandler.getAllFriendsByUserId)
     fastify.get('/:userId/friendships/pending', { schema: friendSchema.getPendingFriendships, preHandler: preHandler.verifySessionFromPath }, friendHandler.getPendingFriendships)
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests, preHandler: preHandler.verifySessionFromPath }, friendHandler.getReceivedFriendRequests)
