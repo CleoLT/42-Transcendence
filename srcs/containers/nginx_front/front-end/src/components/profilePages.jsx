@@ -1,12 +1,15 @@
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
 import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPage} from "./iconUtils"
 import {useState} from "react"
+import { Circle } from "./circleUtils"
 
 
 export function ChangeAvatar({setScreenProfile}){
     return(
         <div className="flex flex-col relative w-full h-full justify-center items-center">
-            {/* <ChangePages /> */}
+            <Circle className="bg-shell border-2 border-greyish">
+
+            </Circle>
         </div>
     )
 }
@@ -26,7 +29,7 @@ export function UserData({data, setScreenProfile}){
             <div className="flex gap-x-2 items-center">
                 <Sixtyfour children="Email: emilie@gmail.com" onClick={null} />
                 {/* <Sixtyfour children={data.email} onClick="null" className="text-base" /> */}
-                <ChopstickButton text="Change email" onClick={() =>setScreenProfile("email")}/>
+                {/* <ChopstickButton text="Change email" onClick={() =>setScreenProfile("email")}/> */}
             </div>
             <Sixtyfour children="Player since 01/01/2025" onClick={null} />
             {/* <Sixtyfour children={data.date} onClick="null" className="text-base" /> */}

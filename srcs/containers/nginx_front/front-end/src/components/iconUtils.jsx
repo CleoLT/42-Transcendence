@@ -108,8 +108,8 @@ export function ChopstickButton({text, onClick}){
 
 export function OverlayPage({children, onClose}){
     return(
-        <div className="flex fixed inset-0 z-50 justify-center items-center bg-black/60 backdrop-blur-sm">
-            <div className="relative">
+        <div className="flex fixed inset-0 z-50 justify-center items-center bg-black/40 backdrop-blur-sm">
+            <div className="relative flex justify-center items-center">
                 {children}
             </div>
             < div
@@ -119,6 +119,3 @@ export function OverlayPage({children, onClose}){
         </div>
     )
 }
-
-
-//backdrop-blur-sm

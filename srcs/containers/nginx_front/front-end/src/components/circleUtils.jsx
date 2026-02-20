@@ -1,14 +1,15 @@
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 
 
-export function Circle({children}){
+export function Circle({children, className=""}){
   return(
-      <div className="
+      <div className={`
         flex items-center justify-center relative
         w-[60vmin] max-w-[270px] md:max-w-[400px]
         lg:min-w-[350px] xl:max-w-[80vmin]
         aspect-square rounded-full
-        bg-red-600">
+        bg-red-600
+        ${className}`}>
         {children}
       </div>
   )
