@@ -1,7 +1,7 @@
 import { Game } from './game/Game.js';
 import { InputManager } from './game/InputManager.js';
 
-const baseWidth = 1800;
+const baseWidth = 1950;
 const baseHeight = 800;
 const aspectRatio = baseWidth / baseHeight;
 /**

@@ -348,7 +348,7 @@ export class Renderer {
 		ctx.save();
 
 		// Draw solid bar background	
-		ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+		ctx.fillStyle = '#dc262679';
 		ctx.beginPath();
 		ctx.roundRect(x, yTop, totalWidth, height, 100);
 		ctx.fill();
