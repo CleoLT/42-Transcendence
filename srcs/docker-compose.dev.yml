@@ -27,6 +27,9 @@ services:
    auth-service:
     build:
       dockerfile: Dockerfile.dev
+    env_file:
+      - .jwt_env
+      - .user_env
     networks:
       - main 
     volumes:

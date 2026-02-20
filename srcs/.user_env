@@ -1,0 +1,9 @@
+DB_HOST=user-db
+DB_PORT=3306
+DB_USER=user
+DB_PASSWORD=userpassword
+DB_NAME=transcendance_db
+
+MAIL_USER: MS_Gp4trF@test-3m5jgroeojogdpyo.mlsender.net
+MAIL_PASSWORD: mssp.YespiOf.pr9084z2k9e4w63d.jARECNG
+MAIL_FROM: "Blossom Clash <MS_Gp4trF@test-3m5jgroeojogdpyo.mlsender.net>"

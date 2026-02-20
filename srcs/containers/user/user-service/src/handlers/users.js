@@ -95,7 +95,11 @@ async function postUser(req, reply) {
         const result = await query.getUserById(user.insertId) 
     
         await query.updateUserById(user.insertId, { online_status: 1 });
-        reply.code(201).send(result);
+        reply.code(201).send({
+            id: result.id,
+            username: result.username,
+            email: result.email
+        });
     } catch (error) {
         reply.send(error)
     }
@@ -117,7 +121,8 @@ async function tryLogin(req, reply) {
 
         return reply.code(200).send({
             valid: true,
-            userId: user.id
+            userId: user.id,
+            email: user.email
         });        
     } catch (error) {
         reply.send(error)

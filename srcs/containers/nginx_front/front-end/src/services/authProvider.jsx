@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react"
-import {Login, Register, Logout} from "./authService"
+import {Login, Register, Logout, Login2FA} from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -47,16 +47,41 @@ export function AuthProvider({children}){
 
     // --> if login    
     const login = async (username, password) => {
-        await Login(username, password)
+        const { email } = await Login(username, password)
+        const maskedEmail = email.replace(/^(.).+(@.+)$/, '$1***$2')
+        const { value: code } = await AlertMessage.fire({
+            title: `Introduce the code we sent to ${maskedEmail}:`,
+            input: "text",
+            inputPlaceholder: "Your 2FA Code",
+            showCancelButton: false,
+            confirmButtonText: "Verify",
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            timer: null
+        })
+        if (!code) throw new Error("A code is required")
+    
+        await Login2FA(username, code)
         await checkCookie(username, setLog)
     }
 
     // --> if register    
     const register = async (username, password, email) => {
-        await Register(username, password, email)
-        // const user = await Register(username, password, email)
-        // console.log(Register)
-        // setUserID(user.id)
+        const { email: returnedEmail } = await Register(username, password, email)
+        const maskedEmail = returnedEmail.replace(/^(.).+(@.+)$/, '$1***$2')
+        const { value: code } = await AlertMessage.fire({
+            title: `Introduce the code we sent to ${maskedEmail}:`,
+            input: "text",
+            inputPlaceholder: "Your 2FA Code",
+            showCancelButton: false,
+            confirmButtonText: "Verify",
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            timer: null
+        })
+        if (!code) throw new Error("A code is required")
+    
+        await Login2FA(username, code)
         await checkCookie(username,setLog)
     }
 
