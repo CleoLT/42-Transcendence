@@ -8,6 +8,10 @@ const fastify = Fastify({ logger: true });
 
 fastify.register(cookie);
 
+export function readSecret(path) {
+  return fs.readFileSync(path, 'utf8').trim()
+}
+
 // 2FA en memoria
 const pending2FA = new Map();
 
