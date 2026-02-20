@@ -894,7 +894,7 @@ export class Game {
 		const h = this.canvas.height;
 		const centerX = w / 2;
 		const centerY = h / 2;
-		const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
+		const radius = 287;
 
 		if (!useBlurLayer) {
 			ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
@@ -1011,7 +1011,8 @@ export class Game {
 		const h = this.canvas.height;
 		const centerX = w / 2;
 		const centerY = h / 2;
-		const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
+		const radius = 287;
+		// const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
 
 		// Red circle (indicator style)
 		ctx.beginPath();
@@ -1024,8 +1025,8 @@ export class Game {
 		ctx.textBaseline = 'middle';
 
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.font = ROUND_INDICATOR_TITLE_FONT;
-		ctx.fillText("The end", centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
+		ctx.font = '400 70px Sixtyfour, sans-serif';
+		ctx.fillText("THE END", centerX, centerY);
 
 		// Round-specific content inside circle
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
@@ -1033,62 +1034,28 @@ export class Game {
 		// Column headers
 		ctx.font = ROUND_INDICATOR_SCORE_FONT;
 		ctx.textAlign = 'center';
-		// ctx.fillText('Player 1', leftX, startY);
-		// ctx.fillText('Player 2', rightX, startY);
-		// ctx.fillText('|', centerX, startY);
 
 		// Points: left and right column
 		const winner = this.roundSystem.getWinner();
-		ctx.font = ROUND_INDICATOR_RESET_SUB_FONT;
+		ctx.font = '500 40px Corben, sans-serif';
 		if (winner === 0) {
-			ctx.fillText('It-s a draw!', centerX, centerY - 100);
+			ctx.fillText('It\'s a draw!', centerX, centerY - 150);
 		} else {
-			ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 100);
+			ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 150);
 		}
 		ctx.beginPath();
-		ctx.roundRect(centerX - 100, centerY, 200, 100, 100);
+		ctx.roundRect(centerX - 150, centerY + 100, 300, 100, 100);
 		ctx.fillStyle = "#820000";
 		ctx.fill();
 
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 		ctx.font = RESET_BUTTON_FONT;
-		ctx.fillText('Reset', centerX, centerY + 50);
+		ctx.fillText('Reset', centerX, centerY + 150);
 
-		this.resetButtonBounds = { x: centerX, y: centerY, radius: RESET_BUTTON_RADIUS };
+		this.resetButtonBounds = { x: centerX, y: centerY + 100, radius: 150 };
+		// this.resetButtonBounds = { x: centerX - 150, y: centerY + 100, radius: 200 };
 
 		ctx.restore();
-
-
-		// ctx.save();
-		// const centerX = this.canvas.width / 2;
-		// const centerY = this.canvas.height / 2;
-
-		// ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
-		// ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-		// const winner = this.roundSystem.getWinner();
-		// ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		// ctx.font = ROUND_INDICATOR_TITLE_FONT;
-		// ctx.textAlign = 'center';
-		// ctx.textBaseline = 'middle';
-		// if (winner === 0) {
-		// 	ctx.fillText('Draw!', centerX, centerY - 120);
-		// } else {
-		// 	ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 120);
-		// }
-
-		// // Reset button: red circle, same style as round indicator
-		// ctx.beginPath();
-		// ctx.arc(centerX, centerY, RESET_BUTTON_RADIUS, 0, Math.PI * 2);
-		// ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
-		// ctx.fill();
-
-		// ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		// ctx.font = RESET_BUTTON_FONT;
-		// ctx.fillText('Reset', centerX, centerY);
-
-		// this.resetButtonBounds = { x: centerX, y: centerY, radius: RESET_BUTTON_RADIUS };
-		// ctx.restore();
 	}
 
 	/**
