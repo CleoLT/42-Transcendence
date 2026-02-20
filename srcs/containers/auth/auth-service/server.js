@@ -101,14 +101,14 @@ fastify.post('/register', async (req, reply) => {
 
 fastify.post('/validate', async (req, reply) => {
   try {
-    const coincidence = await fetch('http://user-service:3000/user/validate', {
-      method: 'POST',
-      headers: {
-        cookie: req.headers.cookie
-      }
-    });
+    // const coincidence = await fetch('http://user-service:3000/user/validate', {
+    //   method: 'POST',
+    //   headers: {
+    //     cookie: req.headers.cookie
+    //   }
+    // });
 
-    const resValues = await coincidence.json(); //esto no sirve ????
+    // const resValues = await coincidence.json(); //esto no sirve ????
 
 
   

@@ -33,17 +33,17 @@ export function AuthProvider({children}){
         }
         catch (error)
         {
-            setLog(false)
-            setUsername(null)
-            // console.log("LOG FALSE: ", log)
-            // throw error;
+            if (log !== false) {
+                setLog(false)
+                setUsername(null)
+            }
         }
     }
 
     //launch at startup cookie's check function
-     useEffect(() => {
-         checkCookie(username, setLog)
-     }, [])
+    useEffect(() => {
+        checkCookie(username, setLog)
+    }, [])
 
     // --> if login    
     const login = async (username, password) => {
@@ -54,6 +54,9 @@ export function AuthProvider({children}){
     // --> if register    
     const register = async (username, password, email) => {
         await Register(username, password, email)
+        // const user = await Register(username, password, email)
+        // console.log(Register)
+        // setUserID(user.id)
         await checkCookie(username,setLog)
     }
 
