@@ -11,7 +11,7 @@ export default function Content({screen, setScreen}){
     return (
         <div className="flex flex-row h-[85%] w-[95%] sm:border-4 border-2 border-black">
             <IconsList setScreen={setScreen} />
-            <div className="flex-1 flex justify-center items-center relative overflow-hidden">
+            <div className="flex-1 flex justify-center items-center relative overflow-validate">
                 {screen === "homePlay" && (<PlayConnected setScreen={setScreen} />)}
                 {screen === "game" && (
                     <>

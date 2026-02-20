@@ -31,7 +31,7 @@ export function UserData({data}){
 
 export function Profile({setScreen}){
     return(
-        <div className="flex flex-col relative w-full min-h-screen justify-center items-center">
+        <div className="flex flex-col relative w-full h-full justify-center items-center">
             <div className="absolute inset-0">
                 <IconsOverlayFrame />
             </div>
