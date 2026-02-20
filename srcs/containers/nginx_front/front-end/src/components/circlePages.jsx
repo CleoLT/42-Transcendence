@@ -26,13 +26,12 @@ export function PlayConnected({setScreen}){
   )
 }
 
-export function GameConfig({ game }) {
+export function GameConfig({ game, hasStarted, setHasStarted }) {
   const [configVisible, setConfigVisible] = useState(false)
   const [player1Name, setPlayer1Name] = useState("")
   const [player2Name, setPlayer2Name] = useState("")
   const [vsAI, setVsAI] = useState(true)
   const [difficulty, setDifficulty] = useState("easy")
-  const [hasStarted, setHasStarted] = useState(false)
 
   const _p1 = Boolean(player1Name.trim())
   const _p2 = vsAI || Boolean(player2Name.trim())
@@ -47,13 +46,13 @@ export function GameConfig({ game }) {
 
     game.setAIMode(vsAI, difficulty)
     game.startGame(p1, p2)
-    setHasStarted(true)
+    setHasStarted?.(true)
   }
 
   if (hasStarted) return null
 
   return (
-    <div className="flex flex-col justify-center items-center h-full w-full">
+    <div className="pointer-events-auto flex flex-col justify-center items-center h-full w-full">
       <Circle>
         {!game ? (
           <Sixtyfour className="text-shell text-center text-xl md:text-3xl">

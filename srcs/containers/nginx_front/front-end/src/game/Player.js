@@ -9,7 +9,6 @@ import {
 	DASH_COOLDOWN,
 	DASH_SPEED_MULTIPLIER,
 	PUSH_COOLDOWN_NORMAL,
-	PUSH_COOLDOWN_ABILITY,
 	PUSH_IMPULSE,
 	PUSH_MAX_SPEED,
 	PUSH_DAMPING,
@@ -17,9 +16,6 @@ import {
 	ABILITY_COSTS,
 	ABILITY_COOLDOWNS,
 	PERFECT_METER_MAX,
-	FREEZE_DURATION,
-	MOMENTUM_DURATION,
-	MOMENTUM_PUSH_COUNT,
 	MOMENTUM_SPEED_MULTIPLIER
 } from './Constants.js';
 
@@ -70,11 +66,22 @@ export class Player {
 			inkFreeze: { cost: ABILITY_COSTS.inkFreeze, cooldown: 0, active: false },
 			momentumSurge: { cost: ABILITY_COSTS.momentumSurge, cooldown: 0, active: false }
 		};
+
+		// Inverted horizontal controls state
+		this.invertControlsActive = false;
+		this.invertControlsTimer = 0;
+		this.invertControlsDuration = 5; // seconds
+
+		// Freeze state (second functional ability)
 		this.frozen = false;
 		this.freezeTimer = 0;
+		this.freezeDuration = 5; // seconds
+
+		// Momentum buff state (third functional ability)
 		this.momentumActive = false;
 		this.momentumTimer = 0;
-		this.momentumPushCount = 0;
+		this.momentumDuration = 5; // seconds
+		this.momentumPushMultiplier = 2; // Stronger pushes while active
 
 		// Collision side flags used to restrict movement
 		this.blockedLeft = false;
@@ -97,33 +104,40 @@ export class Player {
 		// Track the most recently activated ability result
 		let abilityUsed = null;
 
-		// Step cooldown timers and deactivate abilities when finished
+		// Step cooldown timers for all abilities (UI / availability only)
 		Object.values(this.abilities).forEach(ability => {
 			if (ability.cooldown > 0) {
 				ability.cooldown -= deltaTime;
-			}
-			if (ability.active) {
-				ability.cooldown -= deltaTime;
-				if (ability.cooldown <= 0) {
-					ability.active = false;
+				if (ability.cooldown < 0) {
+					ability.cooldown = 0;
 				}
 			}
 		});
 
-		// Count down freeze duration and unfreeze when it expires
+		// Countdown for inverted controls ability (reversePush)
+		// Countdown for freeze effect
 		if (this.frozen) {
 			this.freezeTimer -= deltaTime;
 			if (this.freezeTimer <= 0) {
 				this.frozen = false;
+				this.freezeTimer = 0;
 			}
 		}
 
-		// Maintain momentum buff and clear it when the timer runs out
+		// Countdown for momentum buff
 		if (this.momentumActive) {
 			this.momentumTimer -= deltaTime;
 			if (this.momentumTimer <= 0) {
 				this.momentumActive = false;
-				this.momentumPushCount = 0;
+				this.momentumTimer = 0;
+			}
+		}
+
+		if (this.invertControlsActive) {
+			this.invertControlsTimer -= deltaTime;
+			if (this.invertControlsTimer <= 0) {
+				this.invertControlsActive = false;
+				this.invertControlsTimer = 0;
 			}
 		}
 
@@ -140,19 +154,20 @@ export class Player {
 				this.pushInvulnerable = false;
 				this.dashCooldown = this.dashCooldownTime;
 			}
-		} else {
-			if (this.dashCooldown > 0) {
-				this.dashCooldown -= deltaTime;
-			}
+		} else if (this.dashCooldown > 0) {
+			this.dashCooldown -= deltaTime;
 		}
-
-		// A frozen player only updates timers and does not accept input
-		if (this.frozen) return abilityUsed;
 
 		// Resolve which key bindings apply to this player
 		const keys = this.id === 1
 			? { left: 'KeyA', right: 'KeyD', push: 'ShiftLeft', dash: 'Space' }
 			: { left: 'ArrowLeft', right: 'ArrowRight', push: 'ControlRight', dash: 'ShiftRight' };
+
+		// A frozen player cannot move, dash, push or use abilities.
+		if (this.frozen) {
+			this.pushActive = false;
+			return abilityUsed;
+		}
 
 		// Cache whether the push key is currently held
 		this.pushActive = inputManager.isKeyPressed(keys.push);
@@ -187,16 +202,27 @@ export class Player {
 			moveSpeed *= DASH_SPEED_MULTIPLIER;
 			this.x += this.dashDirection.x * moveSpeed * deltaTime;
 		} else {
+			// Momentum buff slightly increases base movement speed
 			if (this.momentumActive) {
 				moveSpeed *= MOMENTUM_SPEED_MULTIPLIER;
 			}
 
-			// Apply left / right input for horizontal-only motion
-			if (inputManager.isKeyPressed(keys.left)) {
-				this.x -= moveSpeed * deltaTime;
+			// Horizontal movement only. The "reversePush" ability inverts the
+			// horizontal input mapping for a short duration without affecting
+			// other controls such as dash or push.
+			const leftPressed = inputManager.isKeyPressed(keys.left);
+			const rightPressed = inputManager.isKeyPressed(keys.right);
+
+			let moveDir = 0;
+			if (leftPressed) moveDir -= 1;
+			if (rightPressed) moveDir += 1;
+
+			if (this.invertControlsActive) {
+				moveDir *= -1;
 			}
-			if (inputManager.isKeyPressed(keys.right)) {
-				this.x += moveSpeed * deltaTime;
+
+			if (moveDir !== 0) {
+				this.x += moveDir * moveSpeed * deltaTime;
 			}
 		}
 
@@ -217,8 +243,8 @@ export class Player {
 
 
 		// Map keyboard inputs to abilities for this player index. Abilities are
-		// also edge-triggered: a press that happens while the ability is on
-		// cooldown or unaffordable is discarded instead of being buffered.
+		// edge-triggered; currently only "reversePush" (slot 1) has a functional
+		// gameplay effect, inverting horizontal movement controls for 5 seconds.
 		const abilityKeys = this.id === 1
 			? ['Digit1', 'Digit2', 'Digit3']
 			: ['Numpad1', 'Numpad2', 'Numpad3'];
@@ -243,31 +269,41 @@ export class Player {
 	 * @returns {string|null} A logical effect token or null if not used.
 	 */
 	useAbility(abilityName) {
-		// Find the requested ability and validate cooldown
+		// Only "reversePush", "inkFreeze" and "momentumSurge" are functionally implemented.
+		if (abilityName !== 'reversePush' && abilityName !== 'inkFreeze' && abilityName !== 'momentumSurge') {
+			return null;
+		}
+
 		const ability = this.abilities[abilityName];
-		if (!ability || ability.cooldown > 0) return null;
+		if (!ability) return null;
+
+		// Respect cooldown: cannot re-trigger while still cooling down
+		if (ability.cooldown > 0) {
+			return null;
+		}
 
 		// Spend perfect-meter points; fail if not enough resource
 		if (!this.perfectMeter.consume(ability.cost)) {
 			return null;
 		}
 
-		// Seed cooldown and mark the ability as active
+		// Seed cooldown so the UI and logic know when it can be used again.
 		ability.cooldown = this.getAbilityCooldown(abilityName);
 		ability.active = true;
 
-		// Map abilities to high-level effect tokens
+		// Let the Game apply effects that target the opposing player; self-buffs
+		// are handled locally here in the Player.
+		if (abilityName === 'reversePush') {
+			return 'invertControls';
+		}
 		if (abilityName === 'inkFreeze') {
 			return 'freeze';
-		} else if (abilityName === 'reversePush') {
-			return 'reversePush';
-		} else if (abilityName === 'momentumSurge') {
+		}
+		if (abilityName === 'momentumSurge') {
 			this.momentumActive = true;
-			this.momentumTimer = MOMENTUM_DURATION;
-			this.momentumPushCount = 0;
+			this.momentumTimer = this.momentumDuration;
 			return 'momentum';
 		}
-
 		return null;
 	}
 
@@ -359,25 +395,10 @@ export class Player {
 		if (this.pushCooldown > 0) return false;
 		if (!this.pushActive) return false;
 
-		// Reverse push inverts direction and immediately ends the buff
-		if (this.abilities.reversePush.active) {
-			this.applyPush(otherPlayer, true);
-			this.abilities.reversePush.active = false;
-			this.pushCooldown = PUSH_COOLDOWN_ABILITY;
-			return true;
-		} else {
-			// Momentum surge allows two rapid pushes within the buff window
-			if (this.momentumActive && this.momentumPushCount < MOMENTUM_PUSH_COUNT) {
-				this.applyPush(otherPlayer, false);
-				this.momentumPushCount++;
-				this.pushCooldown = PUSH_COOLDOWN_ABILITY;
-				return true;
-			} else {
-				this.applyPush(otherPlayer, false);
-				this.pushCooldown = PUSH_COOLDOWN_NORMAL;
-				return true;
-			}
-		}
+		// Abilities no longer modify push behaviour; apply a standard push.
+		this.applyPush(otherPlayer, false);
+		this.pushCooldown = PUSH_COOLDOWN_NORMAL;
+		return true;
 	}
 
 	/**
@@ -406,23 +427,15 @@ export class Player {
 			directionX *= -1;
 		}
 
-		// Apply the impulse as an additive velocity on the target
-		const impulseX = directionX * PUSH_IMPULSE;
+		// Apply the impulse as an additive velocity on the target. While the
+		// momentum ability is active, pushes are stronger.
+		const baseImpulse = PUSH_IMPULSE * (this.momentumActive ? this.momentumPushMultiplier : 1);
+		const impulseX = directionX * baseImpulse;
 
 		otherPlayer.pushVelocityX += impulseX;
 		// Clamp to a sensible maximum speed so repeated pushes don't explode
 		if (otherPlayer.pushVelocityX > PUSH_MAX_SPEED) otherPlayer.pushVelocityX = PUSH_MAX_SPEED;
 		if (otherPlayer.pushVelocityX < -PUSH_MAX_SPEED) otherPlayer.pushVelocityX = -PUSH_MAX_SPEED;
-	}
-
-	/**
-	 * Freezes this player in place for a short duration.
-	 *
-	 * @param {number} [duration=0.4] - How long the freeze should last.
-	 */
-	freeze(duration = FREEZE_DURATION) {
-		this.frozen = true;
-		this.freezeTimer = duration;
 	}
 
 	/**
@@ -434,10 +447,14 @@ export class Player {
 		// Y position will be set to table center by Game class
 		// Keep old value as fallback, but it should be overridden
 		this.y = this.canvasHeight - PLAYER_INITIAL_Y_OFFSET;
+
+		// Clear ability-related transient state
+		this.invertControlsActive = false;
+		this.invertControlsTimer = 0;
 		this.frozen = false;
+		this.freezeTimer = 0;
 		this.momentumActive = false;
 		this.momentumTimer = 0;
-		this.momentumPushCount = 0;
 		this.pushCooldown = 0;
 		this.dashing = false;
 		this.dashTimer = 0;
@@ -455,11 +472,6 @@ export class Player {
 		this.score = 0;
 		this.perfectMeter.reset();
 		this.resetPosition();
-		this.frozen = false;
-		this.freezeTimer = 0;
-		this.momentumActive = false;
-		this.momentumTimer = 0;
-		this.momentumPushCount = 0;
 		Object.values(this.abilities).forEach(ability => {
 			ability.active = false;
 			ability.cooldown = 0;

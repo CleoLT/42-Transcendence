@@ -302,39 +302,9 @@ export class AI {
 
 	}
 
-	/**
-	 * Decides when to trigger AI-controlled abilities based on opponent
-	 * behaviour, golden blossoms and lane ownership.
-	 *
-	 * @param {Player} otherPlayer - Opponent reference.
-	 * @param {LaneSystem} laneSystem - Lane system used for ownership checks.
-	 * @param {Array<Object>} blossoms - Current blossoms in play.
-	 */
-	useAbilities(otherPlayer, laneSystem, blossoms) {
-		// Reverse Push: counter an aggressively pushing opponent once enough meter is built
-		if (otherPlayer.pushActive && this.player.perfectMeter.value >= ABILITY_COSTS.reversePush &&
-			this.player.abilities.reversePush.cooldown <= 0) {
-			this.player.useAbility('reversePush');
-		}
-
-		// Ink Freeze: disrupt the opponent when they are near a golden blossom
-		const nearbyGolden = blossoms.find(b => {
-			if (!b.golden || !b.active) return false;
-			const dx = Math.abs(b.x - otherPlayer.x);
-			return dx < AI_GOLDEN_NEARBY_DISTANCE;
-		});
-		if (nearbyGolden && this.player.perfectMeter.value >= ABILITY_COSTS.inkFreeze &&
-			this.player.abilities.inkFreeze.cooldown <= 0) {
-			this.player.useAbility('inkFreeze');
-		}
-
-		// Momentum Surge: grab or contest lane control when behind on lane ownership
-		const ownedLanes = laneSystem.lanes.filter(l => l.owner === this.player.id);
-		if (ownedLanes.length < 2 && this.player.perfectMeter.value >= ABILITY_COSTS.momentumSurge &&
-			this.player.abilities.momentumSurge.cooldown <= 0) {
-			this.player.useAbility('momentumSurge');
-		}
-	}
+	// Ability usage for AI is intentionally disabled for now; all abilities other
+	// than the input inversion are placeholders, and inversion is handled by the
+	// same cooldown/resource rules as human players.
 
 	/**
 	 * Converts AI targeting decisions into horizontal input via InputManager.

@@ -1,7 +1,7 @@
 import { Game } from './game/Game.js';
 import { InputManager } from './game/InputManager.js';
 
-const baseWidth = 1800;
+const baseWidth = 1950;
 const baseHeight = 800;
 const aspectRatio = baseWidth / baseHeight;
 /**
@@ -15,18 +15,37 @@ const aspectRatio = baseWidth / baseHeight;
 
 export function initGame(container, onGameReady) {
 
+  const wrapper = document.createElement('div');
+  wrapper.className = 'game-canvas-wrapper';
+  wrapper.style.display = 'block';
+  wrapper.style.margin = '0 auto';
+  wrapper.style.position = 'relative';
+  wrapper.style.zIndex = '0';
+
   const canvas = document.createElement('canvas');
   canvas.id = 'game-canvas';
   canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
-  canvas.style.backgroundColor = '#1a0f2e'; // Fallback background color
-  canvas.style.position = 'relative';
-  canvas.style.zIndex = '0'; // Behind menu overlay
-  container.appendChild(canvas);
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.backgroundColor = 'transparent';
+  wrapper.appendChild(canvas);
+
+  const blurOverlay = document.createElement('div');
+  blurOverlay.className = 'game-round-indicator-blur';
+  blurOverlay.style.cssText = 'position:absolute;inset:0;pointer-events:none;display:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(0,0,0,0.12);';
+  wrapper.appendChild(blurOverlay);
+
+  const indicatorCanvas = document.createElement('canvas');
+  indicatorCanvas.className = 'game-round-indicator-canvas';
+  indicatorCanvas.width = baseWidth;
+  indicatorCanvas.height = baseHeight;
+  indicatorCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none;';
+  wrapper.appendChild(indicatorCanvas);
+
+  container.appendChild(wrapper);
 
   const ctx = canvas.getContext('2d');
-  
-  // Set initial canvas size to ensure it's visible
+
   canvas.width = baseWidth;
   canvas.height = baseHeight;
   
@@ -79,9 +98,15 @@ export function initGame(container, onGameReady) {
     canvas.style.maxWidth = '100%';
     canvas.style.maxHeight = '100%';
 
-    // Internal resolution stays constant
+    wrapper.style.width = canvas.style.width;
+    wrapper.style.height = canvas.style.height;
+    wrapper.style.maxWidth = canvas.style.maxWidth;
+    wrapper.style.maxHeight = canvas.style.maxHeight;
+
     canvas.width = baseWidth;
     canvas.height = baseHeight;
+    indicatorCanvas.width = baseWidth;
+    indicatorCanvas.height = baseHeight;
   }
 
   // Initial resize - use requestAnimationFrame to ensure container is laid out
@@ -102,6 +127,7 @@ export function initGame(container, onGameReady) {
 
 
   const game = new Game(canvas, ctx);
+  game.setRoundIndicatorLayer(blurOverlay, indicatorCanvas);
   const inputManager = new InputManager();
 
   let initialized = false;
@@ -189,8 +215,8 @@ export function initGame(container, onGameReady) {
     inputManager.cleanup?.();
     game.cleanup?.();
 
-    if (canvas && canvas.parentNode === container) {
-      container.removeChild(canvas);
+    if (wrapper && wrapper.parentNode === container) {
+      container.removeChild(wrapper);
     }
   }
 
