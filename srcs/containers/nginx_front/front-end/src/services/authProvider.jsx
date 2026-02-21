@@ -29,7 +29,8 @@ export function AuthProvider({children}){
             setUsername(data.username)
             setUserId(data.userId)
             //setUsername(username)
-            console.log("LOG TRUE: ", log, "USername: ", username, "userId: ", userId)
+            //console.log("LOG TRUE: ", log, "USername: ", username, "userId: ", userId)
+            console.log("/validate:", data)
         }
         catch (error)
         {

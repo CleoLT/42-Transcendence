@@ -3,6 +3,7 @@ import auth from './auth.js';
 import jwt from 'jsonwebtoken';
 import cookie from '@fastify/cookie';
 import nodemailer from 'nodemailer';
+import fs from 'fs';
 
 const fastify = Fastify({ logger: true });
 
@@ -17,12 +18,12 @@ const pending2FA = new Map();
 
 // Mail transporter
 const transporter = nodemailer.createTransport({
-  host: 'smtp.mailersend.net',
-  port: 587,            // o 2525
-  secure: false,        // TLS
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASSWORD
+    user: 'apikey',
+    pass: process.env.SENDGRID_API_KEY
   }
 });
 
@@ -53,7 +54,6 @@ fastify.post('/login', async (req, reply) => {
       const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
       pending2FA.set(username, { code: code2FA, userId: resValues.userId, expires: Date.now() + 5*60*1000 });
 
-      req.log.info({ email }, '2FA email destination'); // debug
       await transporter.sendMail({
         from: process.env.MAIL_FROM,
         to: resValues.email,
@@ -91,10 +91,10 @@ fastify.post('/login/2fa', async (req, reply) => {
 
     if (entry.code !== code) return reply.code(401).send({ error: 'Incorrect code' });
 
-    const resValues = entry.user || { userId: entry.userId };
+    //const resValues = entry.user || { userId: entry.userId };
     const token = jwt.sign(
-      { userId: resValues.userId, username: username },
-      process.env.JWT_SECRET,
+      { userId: entry.userId, username: username },
+      readSecret(process.env.JWT_SECRET_FILE),
       { expiresIn: '1h' }
     );
 
@@ -200,7 +200,7 @@ fastify.post('/validate', async (req, reply) => {
 
   
     const token = req.cookies.access_token;
-    console.log("token: ", token)
+    //console.log("token: ", token)
 
     if (!token) {
       return reply.code(401).send({ valid: false });
