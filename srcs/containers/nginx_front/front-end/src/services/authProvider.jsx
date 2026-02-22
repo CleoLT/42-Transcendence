@@ -32,11 +32,14 @@ export function AuthProvider({children}){
               setUsername(data.username ?? null);
               setUserId(data.userId ?? null);
           
-              console.log("/validate:", data);
+              //console.log("/validate:", data);
+              if (!data.valid)
+                localStorage.removeItem("lastUserId");
             } catch {
               setLog(false);
               setUsername(null);
               setUserId(null);
+              localStorage.removeItem("lastUserId");
             }
     }
 
@@ -46,9 +49,14 @@ export function AuthProvider({children}){
         }
     }, [userId])
 
-    //launch at startup cookie's check function
     useEffect(() => {
-        checkCookie(username, setLog)
+        checkCookie();
+
+        const interval = setInterval(() => {
+            checkCookie();
+        }, 1500);
+
+        return () => clearInterval(interval);
     }, [])
 
     // --> if login    

@@ -243,6 +243,14 @@ fastify.post('/validate', async (req, reply) => {
     }
 
     const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
+    await fetch('http://user-service:3000/user/connect', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': readSecret(process.env.API_KEY)
+      },
+      body: JSON.stringify({ userId: decoded.userId })
+    });
 
     return reply.code(200).send({
       valid: true,

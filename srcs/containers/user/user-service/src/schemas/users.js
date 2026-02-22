@@ -310,6 +310,16 @@ const disconnect = {
   },
 };
 
+const connect = {
+  body: {
+    type: "object",
+    required: ["userId"],
+    properties: {
+      userId: { type: 'number' }
+    }
+  },
+};
+
 export default {
     getAllUsers,
     postUser,
@@ -322,5 +332,6 @@ export default {
     deleteUserById,
     uploadAvatar,
     deleteAvatar,
-    disconnect
+    disconnect,
+    connect
 }
