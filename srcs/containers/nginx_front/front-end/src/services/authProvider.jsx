@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react"
-import {Login, Register, Logout, Login2FA} from "./authService"
+import {Login, Login2FA, Logout, Register, Register2FA } from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -82,7 +82,7 @@ export function AuthProvider({children}){
         })
         if (!code) throw new Error("A code is required")
     
-        await Login2FA(username, code)
+        await Register2FA(username, code)
         await checkCookie(username,setLog)
     }
 

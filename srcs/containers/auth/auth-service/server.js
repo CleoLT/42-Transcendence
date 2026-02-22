@@ -18,12 +18,12 @@ const pending2FA = new Map();
 
 // Mail transporter
 const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
+  host: 'smtp.gmail.com',
   port: 587,
-  secure: false,
+  secure: false, // STARTTLS
   auth: {
-    user: 'apikey',
-    pass: readSecret(process.env.MAILERAPIKEY_FILE) // readSecret(process.env.JWT_SECRET_FILE)
+    user: readSecret(process.env.MAILER_EMAIL),
+    pass: readSecret(process.env.MAILER_PASSWORD)
   }
 });
 
@@ -61,9 +61,6 @@ fastify.post('/login', async (req, reply) => {
         text: `Your verification code is: ${code2FA}`
       });
 
-      // ** Movido a 2FA ** //
-      //const token = jwt.sign({ userId: resValues.userId, username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      //reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
     }
 
     return reply.code(coincidence.status).send(resValues); // 200 OK, o propaga error desde user-service
@@ -140,24 +137,23 @@ fastify.post('/logout', async (req, reply) => {
 
 });
 
-fastify.post('/register', async (req, reply) => {
+fastify.post('/register/2fa', async (req, reply) => {
   try {
-    const { username, password, email } = req.body || {};
+    const { username, code } = req.body || {};
 
-    if (!username || !password || !email) {
-      return reply.code(400).send({ error: 'Invalid credentials' });
+    if (!username || !code) return reply.code(400).send({ error: 'Missing data' });
+
+    const entry = pending2FA.get(username);
+    const { email, password } = entry;
+
+    if (!entry) return reply.code(400).send({ error: 'No pending 2FA' });
+
+    if (entry.expires < Date.now()) {
+      pending2FA.delete(username);
+      return reply.code(400).send({ error: 'Expired code' });
     }
 
-    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
-    pending2FA.set(username, { code: code2FA, userId: 0, expires: Date.now() + 5*60*1000 }); // userId = 0 temporal
-
-    req.log.info({ email }, '2FA email destination'); // debug
-    await transporter.sendMail({
-      from: readSecret(process.env.MAILFROM_FILE),
-      to: email,
-      subject: '2FA code',
-      text: `Your verification code is: ${code2FA}`
-    });
+    if (entry.code !== code) return reply.code(401).send({ error: 'Incorrect code' });
 
     const coincidence = await fetch('http://user-service:3000/', {
       method: 'POST',
@@ -169,16 +165,56 @@ fastify.post('/register', async (req, reply) => {
     if (!coincidence.ok)
       return reply.code(coincidence.status).send(resValues);
 
-    const existing = pending2FA.get(username);
-    if (existing) {
-      pending2FA.set(username, {
-        code: existing.code,
-        userId: resValues.userId,
-        expires: existing.expires
-      });
+    //const resValues = entry.user || { userId: entry.userId };
+    const token = jwt.sign(
+      { userId: resValues.id, username: username },
+      readSecret(process.env.JWT_SECRET_FILE),
+      { expiresIn: '1h' }
+    );
+
+    reply.setCookie('access_token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+
+    pending2FA.delete(username);
+    return reply.code(200).send({ message: 'Successful 2FA' });
+
+  } catch (err) {
+    console.error('[2FA] CATCH ERROR:', err);
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
+fastify.post('/register', async (req, reply) => {
+  try {
+    const { username, password, email } = req.body || {};
+
+    if (!username || !password || !email) {
+      return reply.code(400).send({ error: 'Invalid credentials' });
     }
 
-    return reply.code(201).send(resValues);
+    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+    pending2FA.set(username, { 
+      code: code2FA,
+      userId: 0, // userId = 0 temporal
+      email,
+      password,
+      expires: Date.now() + 5*60*1000
+    });
+
+    req.log.info({ email }, '2FA email destination'); // debug
+    await transporter.sendMail({
+      from: readSecret(process.env.MAILFROM_FILE),
+      to: email,
+      subject: '2FA code',
+      text: `Your verification code is: ${code2FA}`
+    });
+
+    return reply.code(201).send({ email });
 
   } catch (err) {
     req.log.error(err);

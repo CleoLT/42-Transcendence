@@ -73,11 +73,13 @@ services:
     environment:
       JWT_SECRET_FILE: /run/secrets/jwt_secret
       MAILFROM_FILE: /run/secrets/mailfrom
-      MAILERAPIKEY_FILE: /run/secrets/mailerapikey
+      MAILER_EMAIL: /run/secrets/mailer_email
+      MAILER_PASSWORD: /run/secrets/mailer_password
     secrets:
       - jwt_secret
       - mailfrom
-      - mailerapikey
+      - mailer_email
+      - mailer_password
     networks:
       - main
     restart: always
@@ -110,8 +112,10 @@ secrets:
     file: ../secrets/db_port.txt
   jwt_secret:
     file: ../secrets/jwt_secret.txt
-  mailerapikey:
-    file: ../secrets/mailerapikey.txt
+  mailer_email:
+    file: ../secrets/mailer_email.txt
+  mailer_password:
+    file: ../secrets/mailer_password.txt
   mailfrom:
     file: ../secrets/mailfrom.txt
 
