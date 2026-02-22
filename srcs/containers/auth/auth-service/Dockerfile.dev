@@ -3,6 +3,10 @@ FROM node:20.18.1-alpine
 WORKDIR /app
 
 COPY package*.json ./
+
+# Needed for bcrypt
+RUN apk add --no-cache python3 make g++
+
 RUN npm install
 
 # Nodemon needs file system events
