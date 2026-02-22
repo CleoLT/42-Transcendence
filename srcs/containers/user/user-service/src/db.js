@@ -1,5 +1,6 @@
-import mariadb from 'mariadb'
+//import mariadb from 'mariadb'
 import fs from 'fs'
+import * as mariadb from 'mariadb'
 
 /*const pool = mariadb.createPool({
   host: process.env.DB_HOST || 'localhost',
