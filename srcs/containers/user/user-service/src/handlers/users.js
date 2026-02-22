@@ -5,6 +5,10 @@ import path from 'node:path'
 import { fileTypeFromBuffer } from 'file-type'
 
 
+export function readSecret(path) {
+    return fs.readFileSync(path, 'utf8').trim()
+}
+
 function noFileUploadedError(str) {
     const err = new Error(str)
     err.statusCode = 400
@@ -245,6 +249,26 @@ async function deleteAvatar(req, reply) {
         reply.send(error)
     }
 }
+
+async function disconnect(req, reply) {
+    try {
+      const apiKey = req.headers['api-key'];
+  
+      if (apiKey !== readSecret(process.env.API_KEY)) {
+        return reply.code(401).send({ error: "Invalid API key" });
+      }
+  
+      const { userId } = req.body;
+  
+      await query.updateUserById(userId, { online_status: 0 });
+  
+      return reply.code(200).send({ message: `User ${userId} disconnected` });
+    } catch (err) {
+      console.error("Disconnect Error:", err);
+      return reply.code(500).send({ error: "Internal server error" });
+    }
+}
+
   
 
 export default { 
@@ -260,5 +284,6 @@ export default {
     deleteUserById,
     uploadAvatar,
     getAvatarById,
-    deleteAvatar
+    deleteAvatar,
+    disconnect
 }

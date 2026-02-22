@@ -13,33 +13,38 @@ export function AuthProvider({children}){
     const [userId, setUserId] = useState(null)
 
     // --> checking in the API if a cookie token is saved
-    async function checkCookie(username, setLog) {
-        try {
-            const res = await fetch(`${baseUrl}/api/auth/validate`,{
-                method:"POST",
+    async function checkCookie() {
+            try {
+              const lastUserId = localStorage.getItem("lastUserId");
+          
+              const res = await fetch(`${baseUrl}/api/auth/validate`, {
+                method: "POST",
                 credentials: "include",
-            })
-            // console.log('REQUEST DONE')
-            if (!res.ok)
-                throw new Error("Not authenticated")
-
-             const data = await res.json()
-            //setLog(true)
-            setLog(data.valid)
-            setUsername(data.username)
-            setUserId(data.userId)
-            //setUsername(username)
-            //console.log("LOG TRUE: ", log, "USername: ", username, "userId: ", userId)
-            console.log("/validate:", data)
-        }
-        catch (error)
-        {
-            if (log !== false) {
-                setLog(false)
-                setUsername(null)
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ lastUserId })
+              });
+          
+              const data = await res.json();
+          
+              setLog(data.valid);
+              setUsername(data.username ?? null);
+              setUserId(data.userId ?? null);
+          
+              console.log("/validate:", data);
+            } catch {
+              setLog(false);
+              setUsername(null);
+              setUserId(null);
             }
-        }
     }
+
+    useEffect(() => {
+        if (userId) {
+            localStorage.setItem("lastUserId", userId)
+        }
+    }, [userId])
 
     //launch at startup cookie's check function
     useEffect(() => {

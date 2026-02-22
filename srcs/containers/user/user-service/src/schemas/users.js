@@ -300,6 +300,16 @@ const deleteAvatar = {
     }
 };
 
+const disconnect = {
+  body: {
+    type: "object",
+    required: ["userId"],
+    properties: {
+      userId: { type: 'number' }
+    }
+  },
+};
+
 export default {
     getAllUsers,
     postUser,
@@ -311,5 +321,6 @@ export default {
     updateUserById,
     deleteUserById,
     uploadAvatar,
-    deleteAvatar
+    deleteAvatar,
+    disconnect
 }

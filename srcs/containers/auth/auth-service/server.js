@@ -224,29 +224,25 @@ fastify.post('/register', async (req, reply) => {
 
 fastify.post('/validate', async (req, reply) => {
   try {
-    // const coincidence = await fetch('http://user-service:3000/user/validate', {
-    //   method: 'POST',
-    //   headers: {
-    //     cookie: req.headers.cookie
-    //   }
-    // });
 
-    // const resValues = await coincidence.json(); //esto no sirve ????
-
-
-  
     const token = req.cookies.access_token;
-    //console.log("token: ", token)
+    const { lastUserId } = req.body || {};
 
     if (!token) {
-      return reply.code(401).send({ valid: false });
+      if (lastUserId) {
+        await fetch('http://user-service:3000/user/disconnect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': readSecret(process.env.API_KEY)
+          },
+          body: JSON.stringify({ userId: lastUserId })
+        });
+      }
+      return reply.code(200).send({ valid: false });
     }
 
-    console.log("secret: ", readSecret(process.env.JWT_SECRET_FILE))
-
     const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
-
-    
 
     return reply.code(200).send({
       valid: true,
@@ -254,12 +250,9 @@ fastify.post('/validate', async (req, reply) => {
       username: decoded.username
     });
 
-    //return reply.code(coincidence.status).send(resValues);
-
   } catch (err) {
-    //req.log.error(err);
-    console.error("JWTerror: ", err.message)
-    //return reply.code(err.code).send(err.message);
+    console.error("JWT Error: ", err.message);
+    return reply.code(401).send({ valid: false, message: "Not authenticated" });
   }
 });
 
