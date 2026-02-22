@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: 'apikey',
-    pass: process.env.SENDGRID_API_KEY
+    pass: readSecret(process.env.MAILERAPIKEY_FILE) // readSecret(process.env.JWT_SECRET_FILE)
   }
 });
 
@@ -55,7 +55,7 @@ fastify.post('/login', async (req, reply) => {
       pending2FA.set(username, { code: code2FA, userId: resValues.userId, expires: Date.now() + 5*60*1000 });
 
       await transporter.sendMail({
-        from: process.env.MAIL_FROM,
+        from: readSecret(process.env.MAILFROM_FILE),
         to: resValues.email,
         subject: '2FA code',
         text: `Your verification code is: ${code2FA}`
@@ -153,7 +153,7 @@ fastify.post('/register', async (req, reply) => {
 
     req.log.info({ email }, '2FA email destination'); // debug
     await transporter.sendMail({
-      from: process.env.MAIL_FROM,
+      from: readSecret(process.env.MAILFROM_FILE),
       to: email,
       subject: '2FA code',
       text: `Your verification code is: ${code2FA}`

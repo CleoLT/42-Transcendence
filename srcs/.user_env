@@ -1,8 +1,0 @@
-DB_HOST=user-db
-DB_PORT=3306
-DB_USER=user
-DB_PASSWORD=userpassword
-DB_NAME=transcendance_db
-
-SENDGRID_API_KEY=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
-MAIL_FROM="Auth Service <blossom_clash@outlook.com>"

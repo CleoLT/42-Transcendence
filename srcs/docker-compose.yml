@@ -72,8 +72,12 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       JWT_SECRET_FILE: /run/secrets/jwt_secret
+      MAILFROM_FILE: /run/secrets/mailfrom
+      MAILERAPIKEY_FILE: /run/secrets/mailerapikey
     secrets:
       - jwt_secret
+      - mailfrom
+      - mailerapikey
     networks:
       - main
     restart: always
@@ -106,6 +110,10 @@ secrets:
     file: ../secrets/db_port.txt
   jwt_secret:
     file: ../secrets/jwt_secret.txt
+  mailerapikey:
+    file: ../secrets/mailerapikey.txt
+  mailfrom:
+    file: ../secrets/mailfrom.txt
 
 networks:
    main:
