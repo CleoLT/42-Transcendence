@@ -89,6 +89,8 @@ export class Player {
 
 		// Horizontal knockback velocity applied by push interactions
 		this.pushVelocityX = 0;
+
+		this.abilitiesEnabled = true;
 	}
 
 	/**
@@ -242,19 +244,21 @@ export class Player {
 		}
 
 
-		// Map keyboard inputs to abilities for this player index. Abilities are
-		// edge-triggered; currently only "reversePush" (slot 1) has a functional
-		// gameplay effect, inverting horizontal movement controls for 5 seconds.
-		const abilityKeys = this.id === 1
-			? ['Digit1', 'Digit2', 'Digit3']
-			: ['Numpad1', 'Numpad2', 'Numpad3'];
-		const abilityNames = ['reversePush', 'inkFreeze', 'momentumSurge'];
+		if (this.abilitiesEnabled) {
+			// Map keyboard inputs to abilities for this player index. Abilities are
+			// edge-triggered; currently only "reversePush" (slot 1) has a functional
+			// gameplay effect, inverting horizontal movement controls for 5 seconds.
+			const abilityKeys = this.id === 1
+				? ['Digit1', 'Digit2', 'Digit3']
+				: ['Numpad1', 'Numpad2', 'Numpad3'];
+			const abilityNames = ['reversePush', 'inkFreeze', 'momentumSurge'];
 
-		for (let i = 0; i < abilityKeys.length; i++) {
-			if (inputManager.wasKeyJustPressed(abilityKeys[i])) {
-				inputManager.consumeKey(abilityKeys[i]);
-				abilityUsed = this.useAbility(abilityNames[i]);
-				break; // Only one ability per frame
+			for (let i = 0; i < abilityKeys.length; i++) {
+				if (inputManager.wasKeyJustPressed(abilityKeys[i])) {
+					inputManager.consumeKey(abilityKeys[i]);
+					abilityUsed = this.useAbility(abilityNames[i]);
+					break; // Only one ability per frame
+				}
 			}
 		}
 

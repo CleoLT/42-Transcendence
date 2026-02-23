@@ -1,7 +1,7 @@
 export class SpriteLibrary {
 	/**
 	 * Provides lazily-loaded sprite references for various game elements.
-	 * This class does not scan folders; sprites are loaded from explicit paths.
+	 * Sprites are loaded from theme-based paths (e.g. classic vs sakura/dark/neon).
 	 */
 	constructor() {
 		// Sprite references (may be assigned before or after calling loadSprites)
@@ -9,43 +9,104 @@ export class SpriteLibrary {
 		this.BlossomSprite = null;
 		this.GoldenBlossomSprite = null;
 		this.BowlSprite = null;
+		this.FillSprite = null;
 
 		this.loaded = false;
+		this.theme = 'classic';
+		this._loadedTheme = null;
 	}
 
 	/**
-	 * Loads sprite images from predefined paths if they are not already set.
-	 * Safe to call multiple times; subsequent calls no-op once loaded.
+	 * Returns the base path for sprite assets for the current theme.
+	 * Classic uses root sprites folder; other themes use a subfolder.
+	 */
+	getSpriteBasePath() {
+		if (this.theme === 'classic' || !this.theme) {
+			return '/images_png/sprites/';
+		}
+		return `/images_png/sprites/${this.theme}/`;
+	}
+
+	/**
+	 * Loads sprite images from theme-based paths. Re-runs when theme changes.
+	 * Safe to call multiple times; skips only when already loaded for current theme.
 	 */
 	async loadSprites() {
-		if (this.loaded) return;
+		console.log(this.theme);
+		if (this.loaded && this._loadedTheme === this.theme) {
+			return this;
+		}
 
-		// Preferred paths for each sprite; can be overridden by pre-set fields
+		// Theme changed or first load: clear existing refs so we load fresh
+		this.loaded = false;
+		this.BambooSprite = null;
+		this.BlossomSprite = null;
+		this.GoldenBlossomSprite = null;
+		this.FillSprite = null;
+		this.BowlSprite = null;
+
+		const base = this.getSpriteBasePath();
 		const spritePaths = {
-			BambooSprite: '/images_png/sprites/bamboo.png',
-			BlossomSprite: '/images_png/sprites/blossom.png',
-			GoldenBlossomSprite: '/images_png/sprites/golden.png',
-			FillSprite: '/images_png/sprites/bar.png',
-			BowlSprite: '/images_png/sprites/bowl.png',
+			BambooSprite: `${base}bamboo.png`,
+			BlossomSprite: `${base}blossom.png`,
+			GoldenBlossomSprite: `${base}golden.png`,
+			FillSprite: `${base}bar.png`,
+			BowlSprite: `${base}bowl.png`,
 		};
 
-		// Attempt to load any missing sprites from disk
+		const classicBase = '/images_png/sprites/';
+		const fallbackPaths = {
+			BambooSprite: `${classicBase}bamboo.png`,
+			BlossomSprite: `${classicBase}blossom.png`,
+			GoldenBlossomSprite: `${classicBase}golden.png`,
+			FillSprite: `${classicBase}bar.png`,
+			BowlSprite: `${classicBase}bowl.png`,
+		};
+
 		for (const [key, path] of Object.entries(spritePaths)) {
-			if (!this[key]) {
+			try {
+				const img = await this.loadImage(path);
+				if (img) {
+					this[key] = img;
+				}
+			} catch (e) {
+				const fallback = fallbackPaths[key];
 				try {
-					const img = await this.loadImage(path);
+					const img = await this.loadImage(fallback);
 					if (img) {
 						this[key] = img;
 					}
-				} catch (e) {
-					// Missing sprites remain null and will be handled by fallbacks
-					console.warn(`Sprite not found: ${path}`);
+				} catch (e2) {
+					console.warn(`Sprite not found: ${path} (fallback ${fallback} also failed)`);
 				}
 			}
 		}
 
+		this._loadedTheme = this.theme;
 		this.loaded = true;
 		return this;
+	}
+
+	/**
+	 * Sets the current theme and reloads sprites for that theme.
+	 * Call this before or when starting a game so the correct assets are loaded.
+	 *
+	 * @param {string} theme - One of: 'classic', 'sakura', 'dark', 'neon'
+	 * @returns {Promise<void>}
+	 */
+	async setTheme(theme) {
+		if (!theme || typeof theme !== 'string') {
+			return;
+		}
+		this.theme = theme;
+		this.loaded = false;
+		this._loadedTheme = null;
+		this.BambooSprite = null;
+		this.BlossomSprite = null;
+		this.GoldenBlossomSprite = null;
+		this.FillSprite = null;
+		this.BowlSprite = null;
+		await this.loadSprites();
 	}
 
 	/**
