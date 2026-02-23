@@ -77,11 +77,10 @@ export function Friends({setScreen}) {
 
  async function deleteFriendship(friendId) { 
     try {
-      //console.log("friend id: ", friendId)
       const data = await cancelFriendship(userId, friendId)
-      setFriends(prev =>
-      prev.filter(friend => friend.id !== friendId)
-    )
+      setFriends(prev => prev.filter(friend => friend.id !== friendId))
+      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      setRequests(prev => prev.filter(friend => friend.id !== friendId)) //////revisar el endpoint o crear un nuevo endpoint !!!!!
     } catch (error) {
       console.error(error);
     }

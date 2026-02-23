@@ -104,10 +104,11 @@ async function authorizeToPlay(id1, id2, revert) {
 }
 
 async function cancelFriendship(id1, id2, revert) {
-
+// SET ${revert ? "user2_accept" : "user1_accept"} = false,
     return db.connection(conn => conn.query(`
       UPDATE friendships 
-      SET ${revert ? "user2_accept" : "user1_accept"} = false,
+      SET user1_accept = false,
+        user2_accept = false,
         user1_authorization = false,
         user2_authorization = false
       WHERE user1_id = ? AND user2_id = ?

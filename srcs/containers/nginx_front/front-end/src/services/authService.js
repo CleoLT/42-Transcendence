@@ -122,3 +122,4 @@ export async function cancelFriendship(id1, id2) {
   }
   return respond
 }
+
