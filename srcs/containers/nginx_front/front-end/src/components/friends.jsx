@@ -29,8 +29,8 @@ export function Friends({setScreen}) {
    const [pending, setPending] = useState([])
    const [requests, setRequests] = useState([])
 
-  useEffect(() => {
-    if (!userId) return;
+  //useEffect(() => {
+  //  if (!userId) return;
 
     async function fetchFriendships(fetchFct, setState) {
       try {
@@ -48,7 +48,7 @@ export function Friends({setScreen}) {
     fetchFriendships(getFriends, setFriends)
     fetchFriendships(getFriendsPending, setPending)
     fetchFriendships(getFriendsToRespond, setRequests)
-  }, [userId]);
+ // }, [userId]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">

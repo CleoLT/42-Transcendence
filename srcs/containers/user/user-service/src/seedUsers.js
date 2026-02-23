@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import db from './db.js'
 import usersQueries from './queries/users.js'
+import friendshipsQueries from './queries/friendships.js'
 
 export default async function seedUsers() {
     await db.connection(async (conn) => {
@@ -12,9 +13,27 @@ export default async function seedUsers() {
             return
         }
 
-        for (let i = 0; i < 10; i++)
+        const nb = 20
+
+        for (let i = 0; i < nb; i++)
             await usersQueries.addUser(faker.internet.username(), "Pass1!", faker.internet.email())
 
-        console.log('Seeded 10 users')
+        console.log('Seeded 20 users')
+
+        await usersQueries.addUser("Cleo", "Pass1!", "cleo.letron@gmail.com")
+
+
+        for (let i = 1; i <= nb; i += 2)
+            await friendshipsQueries.createFriendship(i, nb + 1, true)
+
+        for (let i = 1; i <= nb / 2; i += 2)
+            await friendshipsQueries.acceptPendingFriendship(i, nb + 1, false)
+        
+        for (let i = 2; i <= nb; i += 2)
+            await friendshipsQueries.createFriendship(i, nb + 1, false)
+
+        for (let i = nb / 2; i <= nb; i += 2)
+            await friendshipsQueries.acceptPendingFriendship(i, nb + 1, true)
+
     })
 }
