@@ -15,7 +15,7 @@ const routes = async function(fastify, options) {
 
     //fastify.post('/user/validate', { preHandler: preHandler.verifySession }, userHandler.validate)
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
-    fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)
+    fastify.delete('/:userId', { schema: userSchema.deleteUserById/*, preHandler: preHandler.verifySessionFromPath */}, userHandler.deleteUserById)
     fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath }, userHandler.uploadAvatar)
     fastify.get('/:userId/avatar', { schema: userSchema.getAvatarById, preHandler: userHandler.verifySessionFromPath }, userHandler.getAvatarById)
     //fastify.post('/:userId/avatar/select', { schema: userSchema.selectAvatar },  userHandler.selectAvatar)

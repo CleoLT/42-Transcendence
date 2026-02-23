@@ -123,3 +123,18 @@ export async function cancelFriendship(id1, id2) {
   return respond
 }
 
+export async function acceptFriendship(id1, id2) {
+  const res = await fetch(`${baseUrl}/api/users/friendships/accept`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id1, id2 }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}

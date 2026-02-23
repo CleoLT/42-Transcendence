@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../services/authProvider.jsx"
-import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship } from "../services/authService.js"
+import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship, acceptFriendship } from "../services/authService.js"
 import { ProfilePicture, IconText } from "./iconUtils.jsx"
 
 
 
- function Button({text, onClick}){
+ function Button({text, onClick, src}){
     return(
         <button className="group relative flex items-center" onClick={onClick}>
-            <img src="/validation_icons/X_bold_cut.svg" alt="chopstick button icon" className="w-4 h-auto" />
+            <img src={src} alt="chopstick button icon" className="w-4 h-auto" />
             <div className="absolute z-20 left-2/3 top-1/2 transform -translate-y-1/2 ml-2">
                 <IconText text={text} />
             </div>
@@ -16,10 +16,7 @@ import { ProfilePicture, IconText } from "./iconUtils.jsx"
     )
 }
 
-function Card({ friends, buttonText, onDelete, children }) {
-  //const { userId } = useAuth()
-
- 
+function Card({ friends, buttonText, onDelete, onAccept, children }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">
@@ -35,9 +32,16 @@ function Card({ friends, buttonText, onDelete, children }) {
               />
               <p>{friendship.username}</p>
             </div>
+           {(children === "Request confirmation") ? <Button
+              text="Accept invitation"
+              onClick={() => onAccept(friendship.id)}
+              src="/validation_icons/V_bold_cut.svg"
+            /> : <div/>}
+            
             <Button
               text={buttonText}
               onClick={() => onDelete(friendship.id)}
+              src="/validation_icons/X_bold_cut.svg"
             />
         </div>
         )
@@ -69,7 +73,6 @@ export function Friends({setScreen}) {
       }
     }
 
-
     fetchFriendships(getFriends, setFriends)
     fetchFriendships(getFriendsPending, setPending)
     fetchFriendships(getFriendsToRespond, setRequests)
@@ -80,7 +83,18 @@ export function Friends({setScreen}) {
       const data = await cancelFriendship(userId, friendId)
       setFriends(prev => prev.filter(friend => friend.id !== friendId))
       setPending(prev => prev.filter(friend => friend.id !== friendId))
-      setRequests(prev => prev.filter(friend => friend.id !== friendId)) //////revisar el endpoint o crear un nuevo endpoint !!!!!
+      setRequests(prev => prev.filter(friend => friend.id !== friendId)) 
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function acceptFriend(friendId) { 
+    try {
+      const data = await acceptFriendship(userId, friendId)
+      setFriends(prev => prev.filter(friend => friend.id !== friendId))
+      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))
     } catch (error) {
       console.error(error);
     }
@@ -91,7 +105,7 @@ export function Friends({setScreen}) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
         <Card friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship}>Friends list</Card>
         <Card friends={ pending } buttonText="Cancel invitation" onDelete={deleteFriendship}>Pending</Card>
-        <Card friends={ requests } buttonText="Decline invitation" onDelete={deleteFriendship}>Request confirmation</Card>
+        <Card friends={ requests } buttonText="Decline invitation" onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</Card>
       </div>
     </div>
   )
