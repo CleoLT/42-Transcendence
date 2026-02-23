@@ -82,9 +82,12 @@ export function IconsOverlayFrame(){
 }
 
 
-export function ProfilePicture({src, className=""}){
+export function ProfilePicture({src, className="", onClick}){
     return(
-        <div className={`rounded-full border border-greyish overflow-hidden ${className}`}>
+        <div
+            className={`rounded-full border border-greyish overflow-hidden ${className}`}
+            onClick={onClick}
+            >
             <img
                 src={src}
                 alt="avatar image"
@@ -119,3 +122,44 @@ export function OverlayPage({children, onClose}){
         </div>
     )
 }
+
+
+export function DisplayDate(string){
+    if (!string)
+        return null
+
+    const newString = string.slice(0,10)
+
+    return(newString)
+}
+
+
+export function DisplayIcon({children, avatar, setAvatar}){
+    return(
+        <ProfilePicture
+        src={children}
+        className={`w-8 h-8 sm:w-12 sm:h-12 cursor-pointer
+        ${avatar === children? "brightness-50" : "brightness-100"} filter`}
+        onClick={() => setAvatar(children)} />
+    )
+}
+
+
+export function LargeButton({children}){
+    return(
+        <button
+            className="
+                text-center
+                bg-greyish
+                rounded-3xl 
+                w-[150px] h-[17px]
+                md:w-[250px] md:h-[35px]
+                xl:w-[300px] xl:h-[40px]"
+        >
+            <CorbenRegular className="text-shell text-[10px] md:text-base">
+                {children}
+            </CorbenRegular>
+        </button>
+    )
+}
+

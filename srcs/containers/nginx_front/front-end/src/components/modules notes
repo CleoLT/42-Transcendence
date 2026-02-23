@@ -24,6 +24,9 @@
 13.ProfilePicture({src, className=""})
 14.ChopstickButton({text, onClick})
 15.OverlayPage({children, onClose})
+16.DisplayDate(string)
+17.DisplayIcon({children, avatar, setAvatar})
+18.LargeButton({children})
 
 -->footer
 -->header

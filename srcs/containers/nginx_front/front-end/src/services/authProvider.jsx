@@ -3,9 +3,8 @@ import {Login, Register, Logout} from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
-
-
 const AuthContext = createContext()
+
 
 export function AuthProvider({children}){
     const [log, setLog] = useState(false)
@@ -19,17 +18,15 @@ export function AuthProvider({children}){
                 method:"POST",
                 credentials: "include",
             })
-            // console.log('REQUEST DONE')
+            // console.log("RES = ", res)
             if (!res.ok)
                 throw new Error("Not authenticated")
 
-             const data = await res.json()
-            //setLog(true)
+            const data = await res.json()
             setLog(data.valid)
             setUsername(data.username)
             setUserId(data.userId)
-            //setUsername(username)
-            console.log("LOG TRUE: ", log, "USername: ", username, "userId: ", userId)
+            console.log("Data = ", data) //to borrow
         }
         catch (error)
         {
@@ -57,7 +54,7 @@ export function AuthProvider({children}){
         // const user = await Register(username, password, email)
         // console.log(Register)
         // setUserID(user.id)
-        await checkCookie(username,setLog)
+        await checkCookie(username, setLog)
     }
 
     // --> if logout (erase cookie)
@@ -93,9 +90,3 @@ export function useAuth() {
 
 
 // credentials: "include" = send cookie's token
-
-// loading --> wait few mm secondes still we don't know if the
-// player is log in or out to avoid ugly fast visual change
-
-// finally --> to go out from the loading state, we said to do
-// something in everycase to avoid white screen
