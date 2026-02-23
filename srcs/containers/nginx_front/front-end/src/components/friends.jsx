@@ -1,20 +1,44 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../services/authProvider.jsx"
-import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond } from "../services/authService.js"
+import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship } from "../services/authService.js"
+import { ProfilePicture, IconText } from "./iconUtils.jsx"
 
-function Card({ title, friends, children }) {
-  const { userId } = useAuth()
-  //console.log("Friends in Card: ", friends)
+
+
+ function Button({text, onClick}){
+    return(
+        <button className="group relative flex items-center" onClick={onClick}>
+            <img src="/validation_icons/X_bold_cut.svg" alt="chopstick button icon" className="w-4 h-auto" />
+            <div className="absolute z-20 left-2/3 top-1/2 transform -translate-y-1/2 ml-2">
+                <IconText text={text} />
+            </div>
+        </button>
+    )
+}
+
+function Card({ friends, buttonText, onDelete, children }) {
+  //const { userId } = useAuth()
+
+ 
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+    
       <p className="text-gray-600">{children}</p>
       {friends && friends.map((friendship) => {
-        const myFriend = (friendship.user1_id === userId) ?  friendship.user2_id : friendship.user1_id
         return (
-        <div key={friendship.id}>
-         {friendship.online_status} {friendship.username} {friendship.avatar}
+          <div key={friendship.id} className="flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <ProfilePicture
+                src={friendship.avatar}
+                className="w-8 h-8"
+              />
+              <p>{friendship.username}</p>
+            </div>
+            <Button
+              text={buttonText}
+              onClick={() => onDelete(friendship.id)}
+            />
         </div>
         )
       })}
@@ -29,8 +53,8 @@ export function Friends({setScreen}) {
    const [pending, setPending] = useState([])
    const [requests, setRequests] = useState([])
 
-  //useEffect(() => {
-  //  if (!userId) return;
+  useEffect(() => {
+    if (!userId) return;
 
     async function fetchFriendships(fetchFct, setState) {
       try {
@@ -45,19 +69,31 @@ export function Friends({setScreen}) {
       }
     }
 
+
     fetchFriendships(getFriends, setFriends)
     fetchFriendships(getFriendsPending, setPending)
     fetchFriendships(getFriendsToRespond, setRequests)
- // }, [userId]);
+  }, [userId])
+
+ async function deleteFriendship(friendId) { 
+    try {
+      //console.log("friend id: ", friendId)
+      const data = await cancelFriendship(userId, friendId)
+      setFriends(prev =>
+      prev.filter(friend => friend.id !== friendId)
+    )
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="flex flex-col relative w-full h-full justify-center items-center">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-        <Card title="Friends" friends={ friends }>Content for the first section.</Card>
-        <Card title="Pending" friends={ pending }>Content for the second section.</Card>
-        <Card title="Requests to respond" friends={ requests }>Content for the third section.</Card>
+        <Card friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship}>Friends list</Card>
+        <Card friends={ pending } buttonText="Cancel invitation" onDelete={deleteFriendship}>Pending</Card>
+        <Card friends={ requests } buttonText="Decline invitation" onDelete={deleteFriendship}>Request confirmation</Card>
       </div>
     </div>
-  );
-
+  )
 }

@@ -10,9 +10,9 @@ async function addUser(username, password, email) {
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
 
     return db.connection(conn => conn.query(
-        `INSERT INTO users (username, email, password) 
-        VALUES (?, ?, ?)`,
-        [username, email, hashedPassword]
+        `INSERT INTO users (username, email, password, avatar, bio) 
+        VALUES (?, ?, ?, ?, ?)`,
+        [username, email, hashedPassword, "/avatars/cat.jpg", "Some words about you.. Are you a flower addict?... Are you a cat or a dog person ? Do you hate MAGA as such as the team? 4 x space or tab user? Are you in Epstein files ? Do you personally know anyone mentioned in it? Are you an A.C.A.B person? ... ..."]
     ))
 }
 

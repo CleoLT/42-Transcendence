@@ -106,3 +106,19 @@ export async function getUserInfo(id) {
   }
   return respond
 }
+
+export async function cancelFriendship(id1, id2) {
+  const res = await fetch(`${baseUrl}/api/users/friendships/cancel`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id1, id2 }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
