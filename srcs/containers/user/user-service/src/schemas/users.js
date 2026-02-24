@@ -177,7 +177,8 @@ const tryLogin = {
             type: 'object',
             properties: {
               valid: { type: 'boolean' },
-              userId: { type: 'number' }
+              userId: { type: 'number' },
+              email: { type: 'string' }
             }
         },
         401: errorResponse,
@@ -299,6 +300,26 @@ const deleteAvatar = {
     }
 };
 
+const disconnect = {
+  body: {
+    type: "object",
+    required: ["userId"],
+    properties: {
+      userId: { type: 'number' }
+    }
+  },
+};
+
+const connect = {
+  body: {
+    type: "object",
+    required: ["userId"],
+    properties: {
+      userId: { type: 'number' }
+    }
+  },
+};
+
 export default {
     getAllUsers,
     postUser,
@@ -310,5 +331,7 @@ export default {
     updateUserById,
     deleteUserById,
     uploadAvatar,
-    deleteAvatar
+    deleteAvatar,
+    disconnect,
+    connect
 }

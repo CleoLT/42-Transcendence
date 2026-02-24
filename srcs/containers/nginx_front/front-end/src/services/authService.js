@@ -55,6 +55,38 @@ export async function Logout(username) {
   return respond
 }
 
+export async function Login2FA(username, code) {
+  const res = await fetch(`${baseUrl}/api/auth/login/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, code }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function Register2FA(username, code) {
+  const res = await fetch(`${baseUrl}/api/auth/register/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, code }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
 export async function getFriends(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}/friendships`, {
     method: "GET",
