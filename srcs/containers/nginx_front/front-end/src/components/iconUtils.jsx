@@ -7,9 +7,9 @@ import {useAuth} from "../services/authProvider"
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
 
 
-export function IconText({text}){
+export function IconText({text, className=""}){
     return(
-        <span className="
+        <span className={`
             flex
             bg-red-900 rounded-lg
             my-1 px-2 py-0.5
@@ -17,7 +17,9 @@ export function IconText({text}){
             opacity-0
             group-hover:opacity-100
             transition-opacity duration-500
-            whitespace-nowrap ">
+            whitespace-nowrap 
+            ${className}`}
+        >
                 <CorbenBold className="text-[7px] md:text-[9px] text-shell">
                     {text}
                 </CorbenBold>   
@@ -162,4 +164,3 @@ export function LargeButton({children}){
         </button>
     )
 }
-

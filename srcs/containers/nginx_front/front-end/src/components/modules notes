@@ -18,7 +18,7 @@
 09.LogInInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
-10.IconText({text})
+10.IconText({text, className=""})
 11.Icon(props)
 12.IconsOverlayFrame()
 13.ProfilePicture({src, className=""})

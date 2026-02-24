@@ -11,7 +11,7 @@ export function ChangeAvatar({setScreenProfile}){
 
     return(
         <div className="flex flex-col relative w-full h-full justify-center items-center">
-            <Circle className="bg-shell border-2 border-greyish p-10">
+            <Circle className="bg-shell border-2 border-greyish px-10">
                 <div className="flex flex-col gap-2 justify-center items-center">
                     <div className="flex gap-2">
                         <DisplayIcon children="/avatars/cat.jpg" avatar={avatar} setAvatar={setAvatar}/>
@@ -28,6 +28,9 @@ export function ChangeAvatar({setScreenProfile}){
                     </div>
                     <CorbenRegular children="or" className="text-greyish pb-4" />
                     <LargeButton children="Upload your Avatar" />
+                    <button className="pt-7">
+                        <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
+                    </button>
                 </div>
             </Circle>
         </div>
