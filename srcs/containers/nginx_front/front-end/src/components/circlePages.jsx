@@ -30,7 +30,7 @@ export function PlayConnected({setScreen}){
 function ConfigSection({ title, children }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="font-corben text-shell text-[10px] xl:text-[18px]">{title}</span>
+      <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">{title}</span>
       <div className="flex gap-2 flex-wrap justify-center ">
         {children}
       </div>
@@ -229,7 +229,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                     Advanced Settings
                   </Sixtyfour>
 
-                    <div className="flex gap-5 xl:gap-10 " >
+                    <div className="flex gap-16 xl:gap-20 " >
                     {/* Total rounds */}
                     <ConfigSection title="Total rounds">
                       {[2, 3].map((r) => (
@@ -272,8 +272,8 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
       
                     {/* Player colors */}
                     <div className="flex flex-col items-center gap-0.5">
-                      <span className="font-corben text-shell xl:text-[18px]">Player colors</span>
-      
+                      <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">Player colors</span>
+
                       <div className="flex gap-1 items-center">
                           <span className="font-corben text-shell text-[8px] md:text-[15px]">P1</span>
                         <div className="flex flex-col items-center gap-1">
