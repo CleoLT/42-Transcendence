@@ -5,11 +5,11 @@ import projectIcon from "../assets/icons_svg/icon_project.svg"
 import rulesIcon from "../assets/icons_svg/icon_rules.svg"
 import {useAuth} from "../services/authProvider"
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
-import {Circle} from "./circleUtils"
 
-export function IconText({text}){
+
+export function IconText({text, className=""}){
     return(
-        <span className="
+        <span className={`
             flex
             bg-red-900 rounded-lg
             my-1 px-2 py-0.5
@@ -17,7 +17,9 @@ export function IconText({text}){
             opacity-0
             group-hover:opacity-100
             transition-opacity duration-500
-            whitespace-nowrap ">
+            whitespace-nowrap 
+            ${className}`}
+        >
                 <CorbenBold className="text-[7px] md:text-[9px] text-shell">
                     {text}
                 </CorbenBold>   
@@ -82,9 +84,12 @@ export function IconsOverlayFrame(){
 }
 
 
-export function ProfilePicture({src, className=""}){
+export function ProfilePicture({src, className="", onClick}){
     return(
-        <div className={`rounded-full border border-greyish overflow-hidden ${className}`}>
+        <div
+            className={`rounded-full border border-greyish overflow-hidden ${className}`}
+            onClick={onClick}
+            >
             <img
                 src={src}
                 alt="avatar image"
@@ -117,5 +122,45 @@ export function OverlayPage({children, onClose}){
                 onClick={onClose}
             />
         </div>
+    )
+}
+
+
+export function DisplayDate(string){
+    if (!string)
+        return null
+
+    const newString = string.slice(0,10)
+
+    return(newString)
+}
+
+
+export function DisplayIcon({children, avatar, setAvatar}){
+    return(
+        <ProfilePicture
+        src={children}
+        className={`w-8 h-8 sm:w-12 sm:h-12 cursor-pointer
+        ${avatar === children? "brightness-50" : "brightness-100"} filter`}
+        onClick={() => setAvatar(children)} />
+    )
+}
+
+
+export function LargeButton({children}){
+    return(
+        <button
+            className="
+                text-center
+                bg-greyish
+                rounded-3xl 
+                w-[150px] h-[17px]
+                md:w-[250px] md:h-[35px]
+                xl:w-[300px] xl:h-[40px]"
+        >
+            <CorbenRegular className="text-shell text-[10px] md:text-base">
+                {children}
+            </CorbenRegular>
+        </button>
     )
 }

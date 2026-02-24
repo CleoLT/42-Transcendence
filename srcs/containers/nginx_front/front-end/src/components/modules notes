@@ -18,12 +18,15 @@
 09.LogInInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
-10.IconText({text})
+10.IconText({text, className=""})
 11.Icon(props)
 12.IconsOverlayFrame()
 13.ProfilePicture({src, className=""})
 14.ChopstickButton({text, onClick})
 15.OverlayPage({children, onClose})
+16.DisplayDate(string)
+17.DisplayIcon({children, avatar, setAvatar})
+18.LargeButton({children})
 
 -->footer
 -->header
