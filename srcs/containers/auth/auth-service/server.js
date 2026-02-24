@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import auth from './auth.js';
 import jwt from 'jsonwebtoken';
 import cookie from '@fastify/cookie';
+import nodemailer from 'nodemailer';
 import fs from 'fs';
 
 const fastify = Fastify({ logger: true });
@@ -12,6 +13,20 @@ export function readSecret(path) {
   return fs.readFileSync(path, 'utf8').trim()
 }
 
+// 2FA en memoria
+const pending2FA = new Map();
+
+// Mail transporter
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // STARTTLS
+  auth: {
+    user: readSecret(process.env.MAILER_EMAIL),
+    pass: readSecret(process.env.MAILER_PASSWORD)
+  }
+});
+
 fastify.get('/', async () => {
   return { service: 'auth', status: 'running' };
 });
@@ -20,9 +35,9 @@ fastify.post('/login', async (req, reply) => {
   try {
     const { username, password } = req.body || {};
     if (auth.checkActiveSession(req))
-      return reply.code(403).send({ error: 'Ya hay una sesion activa' });
+      return reply.code(403).send({ error: 'There is an active session' });
 
-    if (!username || !password) return reply.code(400).send({ error: 'Credenciales invalidas' });
+    if (!username || !password) return reply.code(400).send({ error: 'Invalid credentials' });
 
     const coincidence = await fetch('http://user-service:3000/user/login',
     {
@@ -35,8 +50,17 @@ fastify.post('/login', async (req, reply) => {
 
     if (coincidence.ok)
     {
-      const token = jwt.sign({ userId: resValues.userId, username: username }, readSecret(process.env.JWT_SECRET_FILE), { expiresIn: '1h' });
-      reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
+
+      const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+      pending2FA.set(username, { code: code2FA, userId: resValues.userId, expires: Date.now() + 5*60*1000 });
+
+      await transporter.sendMail({
+        from: readSecret(process.env.MAILFROM_FILE),
+        to: resValues.email,
+        subject: '2FA code',
+        text: `Your verification code is: ${code2FA}`
+      });
+
     }
 
     return reply.code(coincidence.status).send(resValues); // 200 OK, o propaga error desde user-service
@@ -46,6 +70,49 @@ fastify.post('/login', async (req, reply) => {
     return reply.code(500).send({ error: 'Internal auth error' });
   }
 });
+
+fastify.post('/login/2fa', async (req, reply) => {
+  try {
+    const { username, code } = req.body || {};
+
+    if (!username || !code) return reply.code(400).send({ error: 'Missing data' });
+
+    const entry = pending2FA.get(username);
+
+    if (!entry) return reply.code(400).send({ error: 'No pending 2FA' });
+
+    if (entry.expires < Date.now()) {
+      pending2FA.delete(username);
+      return reply.code(400).send({ error: 'Expired code' });
+    }
+
+    if (entry.code !== code) return reply.code(401).send({ error: 'Incorrect code' });
+
+    //const resValues = entry.user || { userId: entry.userId };
+    const token = jwt.sign(
+      { userId: entry.userId, username: username },
+      readSecret(process.env.JWT_SECRET_FILE),
+      { expiresIn: '1h' }
+    );
+
+    reply.setCookie('access_token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+
+    pending2FA.delete(username);
+    return reply.code(200).send({ message: 'Successful 2FA' });
+
+  } catch (err) {
+    console.error('[2FA] CATCH ERROR:', err);
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
+
 
 fastify.post('/logout', async (req, reply) => {
 
@@ -70,13 +137,23 @@ fastify.post('/logout', async (req, reply) => {
 
 });
 
-fastify.post('/register', async (req, reply) => {
+fastify.post('/register/2fa', async (req, reply) => {
   try {
-    const { username, password, email } = req.body || {};
+    const { username, code } = req.body || {};
 
-    if (!username || !password || !email) {
-      return reply.code(400).send({ error: 'Credenciales invalidas' });
+    if (!username || !code) return reply.code(400).send({ error: 'Missing data' });
+
+    const entry = pending2FA.get(username);
+    const { email, password } = entry;
+
+    if (!entry) return reply.code(400).send({ error: 'No pending 2FA' });
+
+    if (entry.expires < Date.now()) {
+      pending2FA.delete(username);
+      return reply.code(400).send({ error: 'Expired code' });
     }
+
+    if (entry.code !== code) return reply.code(401).send({ error: 'Incorrect code' });
 
     const coincidence = await fetch('http://user-service:3000/', {
       method: 'POST',
@@ -85,13 +162,59 @@ fastify.post('/register', async (req, reply) => {
     });
     const resValues = await coincidence.json();
 
-    if (!coincidence.ok) {
+    if (!coincidence.ok)
       return reply.code(coincidence.status).send(resValues);
-    }
-    const token = jwt.sign({ userId: resValues.userId, username: username }, readSecret(process.env.JWT_SECRET_FILE), { expiresIn: '1h' });
-    reply.setCookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/' });
 
-    return reply.code(201).send(resValues);
+    //const resValues = entry.user || { userId: entry.userId };
+    const token = jwt.sign(
+      { userId: resValues.id, username: username },
+      readSecret(process.env.JWT_SECRET_FILE),
+      { expiresIn: '1h' }
+    );
+
+    reply.setCookie('access_token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+
+    pending2FA.delete(username);
+    return reply.code(200).send({ message: 'Successful 2FA' });
+
+  } catch (err) {
+    console.error('[2FA] CATCH ERROR:', err);
+    req.log.error(err);
+    return reply.code(500).send({ error: 'Internal auth error' });
+  }
+});
+
+fastify.post('/register', async (req, reply) => {
+  try {
+    const { username, password, email } = req.body || {};
+
+    if (!username || !password || !email) {
+      return reply.code(400).send({ error: 'Invalid credentials' });
+    }
+
+    const code2FA = Math.floor(100000 + Math.random() * 900000).toString();
+    pending2FA.set(username, { 
+      code: code2FA,
+      userId: 0, // userId = 0 temporal
+      email,
+      password,
+      expires: Date.now() + 5*60*1000
+    });
+
+    req.log.info({ email }, '2FA email destination'); // debug
+    await transporter.sendMail({
+      from: readSecret(process.env.MAILFROM_FILE),
+      to: email,
+      subject: '2FA code',
+      text: `Your verification code is: ${code2FA}`
+    });
+
+    return reply.code(201).send({ email });
 
   } catch (err) {
     req.log.error(err);
@@ -101,29 +224,33 @@ fastify.post('/register', async (req, reply) => {
 
 fastify.post('/validate', async (req, reply) => {
   try {
-    // const coincidence = await fetch('http://user-service:3000/user/validate', {
-    //   method: 'POST',
-    //   headers: {
-    //     cookie: req.headers.cookie
-    //   }
-    // });
 
-    // const resValues = await coincidence.json(); //esto no sirve ????
-
-
-  
     const token = req.cookies.access_token;
-    console.log("token: ", token)
+    const { lastUserId } = req.body || {};
 
     if (!token) {
-      return reply.code(401).send({ valid: false });
+      if (lastUserId) {
+        await fetch('http://user-service:3000/user/disconnect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': readSecret(process.env.API_KEY)
+          },
+          body: JSON.stringify({ userId: lastUserId })
+        });
+      }
+      return reply.code(200).send({ valid: false });
     }
 
-    console.log("secret: ", readSecret(process.env.JWT_SECRET_FILE))
-
     const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
-
-    
+    await fetch('http://user-service:3000/user/connect', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': readSecret(process.env.API_KEY)
+      },
+      body: JSON.stringify({ userId: decoded.userId })
+    });
 
     return reply.code(200).send({
       valid: true,
@@ -131,12 +258,9 @@ fastify.post('/validate', async (req, reply) => {
       username: decoded.username
     });
 
-    //return reply.code(coincidence.status).send(resValues);
-
   } catch (err) {
-    //req.log.error(err);
-    console.error("JWTerror: ", err.message)
-    //return reply.code(err.code).send(err.message);
+    console.error("JWT Error: ", err.message);
+    return reply.code(401).send({ valid: false, message: "Not authenticated" });
   }
 });
 
