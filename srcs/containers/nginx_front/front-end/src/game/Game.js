@@ -63,8 +63,6 @@ import {
 	PAUSE_TIMER_Y_OFFSET,
 	MAX_ROUNDS,
 	BLOSSOM_DESPAWN_Y_OFFSET,
-	RESET_BUTTON_RADIUS,
-	RESET_BUTTON_FONT
 } from './Constants.js';
 
 export class Game {
@@ -104,6 +102,16 @@ export class Game {
 		this.roundIndicatorCtx = null;
 		this.resetButtonBounds = null;
 		this.onBackToMenu = null;
+		this.onGameEnd = null;
+
+		this.roundTimeOverride = null;
+		this.totalRoundsOverride = null;
+		this.abilitiesEnabled = true;
+		this.playerColors = {
+			1: '#FF0000',
+			2: '#0000FF'
+		};
+		this.theme = 'classic';
 	}
 
 	/**
@@ -128,6 +136,15 @@ export class Game {
 	}
 
 	/**
+	 * Sets callback to run when the game reaches its end state.
+	 * React can use this to switch to a dedicated reset screen.
+	 * @param {Function} callback
+	 */
+	setOnGameEnd(callback) {
+		this.onGameEnd = callback;
+	}
+
+	/**
 	 * Asynchronously loads sprites and instantiates all game subsystems.
 	 */
 	async init() {
@@ -140,7 +157,7 @@ export class Game {
 			p.perfectMeter = new PerfectMeter(PERFECT_METER_MAX);
 		});
 
-		// Build and populate sprite library used by the renderer
+		// Build and populate sprite library used by the renderer (loads classic by default)
 		this.spriteLibrary = new SpriteLibrary();
 		await this.spriteLibrary.loadSprites();
 
@@ -150,6 +167,12 @@ export class Game {
 		this.blossomSystem = new BlossomSystem(this.laneSystem, this.canvas.width, this.canvas.height);
 		this.windSystem = new WindSystem();
 		this.roundSystem = new RoundSystem(this.players);
+		if (this.roundTimeOverride != null) {
+			this.roundSystem.setRoundTime(this.roundTimeOverride);
+		}
+		if (this.totalRoundsOverride != null) {
+			this.roundSystem.setMaxRounds(this.totalRoundsOverride);
+		}
 		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint);
 
 	  
@@ -171,7 +194,88 @@ export class Game {
 		const tableCenterY = tableTop + tableHeight / 2;
 		this.players.forEach(player => {
 			player.y = tableCenterY;
+			player.abilitiesEnabled = this.abilitiesEnabled;
 		});
+	}
+
+	setRoundTime(seconds) {
+		if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
+			return;
+		}
+		this.roundTimeOverride = seconds;
+		if (this.roundSystem) {
+			this.roundSystem.setRoundTime(seconds);
+		}
+	}
+
+	setTotalRounds(rounds) {
+		if (!Number.isInteger(rounds) || rounds <= 0) {
+			return;
+		}
+		this.totalRoundsOverride = rounds;
+		if (this.roundSystem) {
+			this.roundSystem.setMaxRounds(rounds);
+		}
+	}
+
+	setAbilitiesEnabled(enabled) {
+		this.abilitiesEnabled = !!enabled;
+		if (this.players) {
+			this.players.forEach(player => {
+				player.abilitiesEnabled = this.abilitiesEnabled;
+			});
+		}
+	}
+
+	setPlayerColors(color1, color2) {
+		if (typeof color1 === 'string') {
+			this.playerColors[1] = color1;
+		}
+		if (typeof color2 === 'string') {
+			this.playerColors[2] = color2;
+		}
+
+		if (this.laneTint && this.laneTint.playerColors) {
+			const parseHex = (hex) => {
+				if (!hex || typeof hex !== 'string') return null;
+				const value = hex.replace('#', '');
+				if (value.length !== 6) return null;
+				const r = parseInt(value.slice(0, 2), 16);
+				const g = parseInt(value.slice(2, 4), 16);
+				const b = parseInt(value.slice(4, 6), 16);
+				if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null;
+				return { r, g, b };
+			};
+
+			const p1 = parseHex(this.playerColors[1]);
+			const p2 = parseHex(this.playerColors[2]);
+
+			if (p1) {
+				this.laneTint.playerColors[1] = p1;
+			}
+			if (p2) {
+				this.laneTint.playerColors[2] = p2;
+			}
+
+			this.setupInitialLaneTints();
+		}
+	}
+
+	/**
+	 * Sets the game theme and reloads sprites for that theme.
+	 * Call before startGame() so the correct assets are loaded.
+	 *
+	 * @param {string} theme - One of: 'classic', 'sakura', 'dark', 'neon'
+	 * @returns {Promise<void>}
+	 */
+	async setTheme(theme) {
+		if (!theme || typeof theme !== 'string') {
+			return;
+		}
+		this.theme = theme;
+		if (this.spriteLibrary && typeof this.spriteLibrary.setTheme === 'function') {
+			await this.spriteLibrary.setTheme(theme);
+		}
 	}
 
 	/**
@@ -201,24 +305,13 @@ export class Game {
 		// which validates player names before calling startGame()
 		this.spaceKeyHandler = null;
 
-		// Handle pause button and game-end Reset button clicks
+		// Handle pause button clicks
 		this.canvasClickHandler = (e) => {
 			const rect = this.canvas.getBoundingClientRect();
 			const scaleX = this.canvas.width / rect.width;
 			const scaleY = this.canvas.height / rect.height;
 			const x = (e.clientX - rect.left) * scaleX;
 			const y = (e.clientY - rect.top) * scaleY;
-
-			if (this.state === 'gameEnd' && this.resetButtonBounds) {
-				const b = this.resetButtonBounds;
-				const dx = x - b.x;
-				const dy = y - b.y;
-				if (dx * dx + dy * dy <= b.radius * b.radius) {
-					this.resetGame();
-					this.onBackToMenu?.();
-				}
-				return;
-			}
 
 			if (this.pauseButtonBounds && (this.state === 'playing' || this.state === 'paused')) {
 				if (x >= this.pauseButtonBounds.x &&
@@ -247,6 +340,18 @@ export class Game {
 		}
 	}
 
+
+	truncateToWidth(ctx, text, maxWidth) {
+		if (ctx.measureText(text).width <= maxWidth) {
+		  return text;
+		}
+	  
+		while (text.length > 0 && ctx.measureText(text + '…').width > maxWidth) {
+		  text = text.slice(0, -1);
+		}
+	  
+		return text + '…';
+	  }
 	/**
 	 * Moves the game from the menu state into active play.
 	 * @param {string} player1Name - Name for player 1.
@@ -266,9 +371,11 @@ export class Game {
 		// Set player names
 		if (this.players[0]) {
 			this.players[0].name = player1Name.trim();
+			this.players[0].name = this.truncateToWidth(this.ctx, this.players[0].name, 150);
 		}
 		if (this.players[1]) {
 			this.players[1].name = player2Name.trim();
+			this.players[1].name = this.truncateToWidth(this.ctx, this.players[1].name, 150);
 		}
 
 		// Switch state - React will handle UI visibility based on state
@@ -668,6 +775,13 @@ export class Game {
 	 */
 	handleGameEnd() {
 		this.state = 'gameEnd';
+		if (this.onGameEnd) {
+			try {
+				this.onGameEnd();
+			} catch (error) {
+				console.error('onGameEnd callback error:', error);
+			}
+		}
 	}
 
 	/**
@@ -686,6 +800,12 @@ export class Game {
 		this.perfectCatchEffects = [];
 		this.missEffects = [];
 		this.roundSystem = new RoundSystem(this.players);
+		if (this.roundTimeOverride != null) {
+			this.roundSystem.setRoundTime(this.roundTimeOverride);
+		}
+		if (this.totalRoundsOverride != null) {
+			this.roundSystem.setMaxRounds(this.totalRoundsOverride);
+		}
 		this.showRoundIndicator = false;
 		this.roundIndicatorTimer = 0;
 		this.players.forEach(player => {
@@ -700,11 +820,6 @@ export class Game {
 		if (this.aiMode && this.ai) {
 			this.ai = new AI(this.players[1], this.aiDifficulty, this.canvas.width, this.canvas.height);
 		}
-		const startScreen = document.getElementById('start-screen');
-		const resetBtn = document.getElementById('reset-button');
-		if (startScreen) startScreen.classList.remove('hidden');
-		if (resetBtn) resetBtn.classList.add('hidden');
-
 		// Restore initial lane ownership and tint for the first round
 		this.laneSystem.lanes[0].owner = 1;
 		this.laneSystem.lanes[2].owner = 2;
@@ -718,7 +833,6 @@ export class Game {
 		// Reset systems that depend on time and random generation
 		this.blossomSystem.reset();
 		this.windSystem.reset();
-
 		// Decide if we are about to enter the special second round layout
 		const isRound2 = this.roundSystem.getCurrentRound() === 1;
 
@@ -839,15 +953,20 @@ export class Game {
 				ctx.fillText(`${timeRemaining}s`, centerX, pauseButtonY + 45);
 				ctx.restore();
 			}
-			this.renderer.renderPerfectMeter(ctx, this.players[0], centerX, barY);
-			this.renderer.renderPerfectMeter(ctx, this.players[1], centerX, barY);
+
+			if (this.abilitiesEnabled) {
+				this.renderer.renderPerfectMeter(ctx, this.players[0], centerX, barY);
+				this.renderer.renderPerfectMeter(ctx, this.players[1], centerX, barY);
+			}
 
 			this.renderer.renderPerfectMeterLabels(ctx, this.players[0], centerX, barY);
 			this.renderer.renderPerfectMeterLabels(ctx, this.players[1], centerX, barY);
 			
 			// Render ability indicator dots
-			this.renderer.renderAbilityIndicators(ctx, this.players[0], centerX, barY);
-			this.renderer.renderAbilityIndicators(ctx, this.players[1], centerX, barY);
+			if (this.abilitiesEnabled) {
+				this.renderer.renderAbilityIndicators(ctx, this.players[0], centerX, barY);
+				this.renderer.renderAbilityIndicators(ctx, this.players[1], centerX, barY);
+			}
 
 			this.renderer.renderWindEffect(this.windSystem);
 			this.renderer.renderMissEffects(this.missEffects);
@@ -875,8 +994,6 @@ export class Game {
 				this.renderPauseOverlay(ctx);
 			}
 
-		} else if (this.state === 'gameEnd') {
-			this.renderGameEndOverlay(ctx);
 		} else if (this.state === 'menu') {
 			// When in menu, background is sufficient; rest is HTML-driven
 		}
@@ -920,7 +1037,7 @@ export class Game {
 
 		// Subtitle: "1 / 2"
 		ctx.font = ROUND_INDICATOR_SUBTITLE_FONT;
-		ctx.fillText(`${currentRound} / ${MAX_ROUNDS}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET + 42);
+		ctx.fillText(`${currentRound} / ${this.totalRoundsOverride}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET + 42);
 
 		// Countdown (large, subtle)
 		ctx.fillStyle = `rgba(255, 255, 255, ${ROUND_INDICATOR_TIMER_ALPHA})`;
@@ -931,7 +1048,7 @@ export class Game {
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 		if (currentRound === 1) {
 			this.renderRound1Controls(ctx, centerX, centerY);
-		} else if (currentRound === 2) {
+		} else if (currentRound === 2 || currentRound === 3) {
 			this.renderRound2Scores(ctx, centerX, centerY);
 		}
 
@@ -965,13 +1082,17 @@ export class Game {
 		ctx.fillText('Move: A/D', leftX, startY + lineH);
 		ctx.fillText('Push: Left Shift', leftX, startY + lineH * 2);
 		ctx.fillText('Dash: Space', leftX, startY + lineH * 3);
-		ctx.fillText('Abilities: 1 / 2 / 3', leftX, startY + lineH * 4);
+		if (this.abilitiesEnabled) {
+			ctx.fillText('Abilities: 1 / 2 / 3', leftX, startY + lineH * 4);
+		}
 
 		// Controls: right column
 		ctx.fillText('Move: ←/→', rightX, startY + lineH);
 		ctx.fillText('Push: Right Ctrl', rightX, startY + lineH * 2);
 		ctx.fillText('Dash: Right Shift', rightX, startY + lineH * 3);
-		ctx.fillText('Abilities: Numpad 1 / 2 / 3', rightX, startY + lineH * 4);
+		if (this.abilitiesEnabled) {
+			ctx.fillText('Abilities: Numpad 1 / 2 / 3', rightX, startY + lineH * 4);
+		}
 	}
 
 	/**
@@ -1000,63 +1121,7 @@ export class Game {
 		ctx.fillText(`${this.players[1].score}`, rightX, startY + lineH);
 	}
 
-	/**
-	 * Renders the game-end overlay with winner and Reset button (round-indicator style).
-	 *
-	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
-	 */
-	renderGameEndOverlay(ctx) {
-		ctx.save();
-		const w = this.canvas.width;
-		const h = this.canvas.height;
-		const centerX = w / 2;
-		const centerY = h / 2;
-		const radius = 287;
-		// const radius = ROUND_INDICATOR_CIRCLE_RADIUS;
-
-		// Red circle (indicator style)
-		ctx.beginPath();
-		ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-		ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
-		ctx.fill();
-
-		// All content inside the circle, centered
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.font = '400 70px Sixtyfour, sans-serif';
-		ctx.fillText("THE END", centerX, centerY);
-
-		// Round-specific content inside circle
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		
-		// Column headers
-		ctx.font = ROUND_INDICATOR_SCORE_FONT;
-		ctx.textAlign = 'center';
-
-		// Points: left and right column
-		const winner = this.roundSystem.getWinner();
-		ctx.font = '500 40px Corben, sans-serif';
-		if (winner === 0) {
-			ctx.fillText('It\'s a draw!', centerX, centerY - 150);
-		} else {
-			ctx.fillText(`${this.players[winner - 1].name} wins!`, centerX, centerY - 150);
-		}
-		ctx.beginPath();
-		ctx.roundRect(centerX - 150, centerY + 100, 300, 100, 100);
-		ctx.fillStyle = "#820000";
-		ctx.fill();
-
-		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.font = RESET_BUTTON_FONT;
-		ctx.fillText('Reset', centerX, centerY + 150);
-
-		this.resetButtonBounds = { x: centerX, y: centerY + 100, radius: 150 };
-		// this.resetButtonBounds = { x: centerX - 150, y: centerY + 100, radius: 200 };
-
-		ctx.restore();
-	}
+	
 
 	/**
 	 * Renders the pause overlay with "PAUSED" text and remaining time.
