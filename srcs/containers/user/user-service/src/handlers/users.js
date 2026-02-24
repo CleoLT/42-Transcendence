@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 import { fileTypeFromBuffer } from 'file-type'
-
+import schema from '../schemas/users.js'
 
 function noFileUploadedError(str) {
     const err = new Error(str)
@@ -37,6 +37,7 @@ async function deleteAvatarFile(userId) {
     try {
         const oldAvatar = await query.getAvatarByUserId(userId)
 
+        if (schema.avatarImages.includes(oldAvatar)) return
         if (oldAvatar === null) return
 
         await access(oldAvatar.avatar, constants.F_OK)
@@ -140,10 +141,6 @@ async function logOut(req, reply) {
     }
 }
 
-async function validate(req, reply) {
-    return reply.code(200).send({ valid: true });
-}
-
 async function updateUserById(req, reply) {
     const modifiedData = req.body;
     const { username, email } = req.body
@@ -169,11 +166,23 @@ async function deleteUserById(req, reply) {
     
     try {
         await checkIfUserExists(userId)
-        
-        //poner anonymous los partidos en la database de games de este user ????
+
         await deleteAvatarFile(userId)
         await query.deleteUserById(userId)
         reply.code(204).send('user deleted')
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
+async function selectAvatar(req, reply) {
+    try {
+        const { userId } = req.params
+
+        await checkIfUserExists(userId)
+        await deleteAvatarFile(userId)
+
+
     } catch (error) {
         reply.send(error)
     }
@@ -250,7 +259,6 @@ export default {
     getUserByName,
     tryLogin,
     logOut,
-    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,

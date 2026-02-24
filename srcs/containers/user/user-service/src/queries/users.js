@@ -1,5 +1,6 @@
 import db  from '../db.js'
 import bcrypt from 'bcrypt'
+import schema from '../schemas/users.js'
 
 async function getAllUsers() {
     return db.connection(conn => conn.query('SELECT * FROM users'))
@@ -8,11 +9,13 @@ async function getAllUsers() {
 async function addUser(username, password, email) {
 
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
+    const randomAvatar = schema.avatarImages[Math.floor(Math.random() * schema.avatarImages.length)]
+    const bio = "Some words about you... \nAre you a flower addict?... \nAre you a cat or a dog person ? Do you hate MAGA as such as the team? \n4 x space or tab user? Are you in Epstein files ? \nDo you personally know anyone mentioned in it? \nAre you an A.C.A.B person? \n... \n..."
 
     return db.connection(conn => conn.query(
         `INSERT INTO users (username, email, password, avatar, bio) 
         VALUES (?, ?, ?, ?, ?)`,
-        [username, email, hashedPassword, "/avatars/cat.jpg", "Some words about you.. Are you a flower addict?... Are you a cat or a dog person ? Do you hate MAGA as such as the team? 4 x space or tab user? Are you in Epstein files ? Do you personally know anyone mentioned in it? Are you an A.C.A.B person? ... ..."]
+        [username, email, hashedPassword, randomAvatar, bio]
     ))
 }
 
@@ -23,7 +26,6 @@ async function getUserById(id) {
             [id]
         ))
     return rows[0] || null
-        //cuidado que esto devuelve el password !!!
 }
 
 async function getUserByName(username) {
@@ -67,6 +69,7 @@ async function tryLogin(username, password) {
 }
 
 async function updateUserById(id, modifiedData) {
+    //if modified password hash the password
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")

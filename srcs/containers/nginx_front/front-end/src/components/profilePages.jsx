@@ -94,8 +94,8 @@ export function Profile(){
             <div className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-x-16">
                 <button className="group relative" onClick={() =>setScreenProfile("avatar")} >
                     <ProfilePicture
-                        src="/avatars/cat.jpg"
-                        // src={data.avatar}
+                        //src="/avatars/cat.jpg"
+                         src={data.avatar}
                         className="w-24 h-24 sm:w-40 sm:h-40" />
                     <div className="absolute top-1/4 left-3/4">
                         <IconText text={"Change Avatar"} />
