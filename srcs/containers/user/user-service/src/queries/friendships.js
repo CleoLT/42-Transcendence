@@ -103,18 +103,13 @@ async function authorizeToPlay(id1, id2, revert) {
     ))
 }
 
-async function cancelFriendship(id1, id2, revert) {
-// SET ${revert ? "user2_accept" : "user1_accept"} = false, //BORRAR ESTE COMENTARIO Y EL ARGUMENTO REVERT
-    return db.connection(conn => conn.query(`
-      UPDATE friendships 
-      SET user1_accept = false,
-        user2_accept = false,
-        user1_authorization = false,
-        user2_authorization = false
-      WHERE user1_id = ? AND user2_id = ?
-      LIMIT 1`,
-      [id1, id2]
-    ))
+async function cancelFriendship(id1, id2) {
+  await db.connection(conn => conn.query(
+              `DELETE FROM friendships 
+              WHERE user1_id = ? AND user2_id = ?
+              LIMIT 1`,
+              [id1, id2]
+          ))
 }
 
 async function cancelAuthorization(id1, id2, revert) {

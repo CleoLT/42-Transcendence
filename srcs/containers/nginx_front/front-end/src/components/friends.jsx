@@ -27,7 +27,7 @@ function Card({ friends, buttonText, onDelete, onAccept, children }) {
       <p className="text-gray-600">{children}</p>
       {(children === "Friends list") ? <Button
               text="Add friend"
-              onClick={() => onAccept(4)}
+              onClick={() => onAccept(1)}
               src="/validation_icons/+_bold_cut_yellow.svg"
              /> : <div/>} 
             {/*no se si es correcto poner un if else con un div en caso de nada */}
@@ -102,7 +102,7 @@ export function Friends({setScreen}) {
       
       if (!result.isConfirmed) return
     
-      const data = await cancelFriendship(userId, friendId)
+      await cancelFriendship(userId, friendId)
      
       setFriends(prev => prev.filter(friend => friend.id !== friendId))
       setPending(prev => prev.filter(friend => friend.id !== friendId))
@@ -117,7 +117,7 @@ export function Friends({setScreen}) {
     } catch (error) {
       AlertMessage.fire({
         icon: "error",
-        text: err.message,
+        text: error.message,
       })
     }
   }

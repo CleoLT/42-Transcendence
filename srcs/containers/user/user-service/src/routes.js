@@ -13,9 +13,8 @@ const routes = async function(fastify, options) {
     fastify.post('/user/login', { schema: userSchema.tryLogin }, userHandler.tryLogin)
     fastify.post('/user/logout', { schema: userSchema.logOut }, userHandler.logOut)
 
-    //fastify.post('/user/validate', { preHandler: preHandler.verifySession }, userHandler.validate)
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
-    fastify.delete('/:userId', { schema: userSchema.deleteUserById/*, preHandler: preHandler.verifySessionFromPath */}, userHandler.deleteUserById)
+    fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)
     fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath }, userHandler.uploadAvatar)
     fastify.get('/:userId/avatar', { schema: userSchema.getAvatarById, preHandler: userHandler.verifySessionFromPath }, userHandler.getAvatarById)
     //fastify.post('/:userId/avatar/select', { schema: userSchema.selectAvatar },  userHandler.selectAvatar)
@@ -27,7 +26,7 @@ const routes = async function(fastify, options) {
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests, preHandler: preHandler.verifySessionFromPath }, friendHandler.getReceivedFriendRequests)
     fastify.post('/friendships', { schema: friendSchema.newFriendship, preHandler: preHandler.verifySessionFromBody }, friendHandler.newFriendship)
     fastify.patch('/friendships/accept', { schema: friendSchema.acceptFriendship, preHandler: preHandler.verifySessionFromBody }, friendHandler.acceptFriendship)
-    fastify.patch('/friendships/cancel', { schema: friendSchema.cancelFriendship, preHandler: preHandler.verifySessionFromBody }, friendHandler.cancelFriendship)
+    fastify.delete('/friendships/cancel', { schema: friendSchema.cancelFriendship, preHandler: preHandler.verifySessionFromBody }, friendHandler.cancelFriendship)
     fastify.patch('/friendships/authorization', { schema: friendSchema.addAuthorizationToPlay, preHandler: preHandler.verifySessionFromBody }, friendHandler.addAuthorizationToPlay)
     fastify.patch('/friendships/authorization/cancel', { schema: friendSchema.cancelAuthorization, preHandler: preHandler.verifySessionFromBody }, friendHandler.cancelAuthorization)
 }

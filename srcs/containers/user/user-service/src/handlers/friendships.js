@@ -150,8 +150,7 @@ async function cancelFriendship(req, reply) {
         await checkIfFriendshipExists(idA, idB)
 
         await query.cancelFriendship(idA, idB, revert)
-        const friendship = await query.getFriendshipById(idA, idB)
-        reply.code(201).send(friendship)
+        reply.code(201)
     } catch(err) {
         reply.send(err)
     }
