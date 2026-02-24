@@ -1,5 +1,5 @@
 import db  from '../db.js'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 async function getAllUsers() {
     return db.connection(conn => conn.query('SELECT * FROM users'))
