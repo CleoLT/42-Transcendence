@@ -29,7 +29,7 @@ export function PlayConnected({setScreen}){
 
 function ConfigSection({ title, children }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 lg:gap-2 xl:gap-3">
       <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">{title}</span>
       <div className="flex gap-2 flex-wrap justify-center ">
         {children}
@@ -44,7 +44,7 @@ function ToggleOption({ active, onClick, label }) {
       onClick={onClick}
       className={`
         cursor-pointer px-1 py-1 rounded-full border transition-colors
-        text-[0.3rem] md:text-sm lg:text-xs xl:text-sm
+        text-[0.3rem] md:text-sm lg:text-[0.6rem] xl:text-sm
         ${
           active
             ? "bg-red-700 text-shell border-red-700"
@@ -139,10 +139,12 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                   <CenterText
                     text="PLAY"
                     onClick={handlePlayClick}
-                    interactive={true}
+                    
+                    interactive={canPlay}
+                    
                     className={`
                       text-5xl md:text-7xl xl:text-8xl
-                      ${!canPlay ? "opacity-40" : ""}
+                      ${canPlay ? "" : "text-shell/50 cursor-not-allowed"}
                     `}
                   />
                 </button>
@@ -224,79 +226,81 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
             {/* ================= ADVANCED CONFIG ================= */}
             {/* <div className="flex flex-col gap-2 items-center w-full" > */}
                 {advancedConfigOpen && (
-                <div className="absolute flex flex-col items-center justify-center px-6 gap-1.5 md:gap-5 xl:gap-9 text-[10px] md:text-xs top-[18%]">
-                  <Sixtyfour className="text-shell text-[11px] md:text-base xl:text-2xl">
-                    Advanced Settings
+                <div className="absolute flex flex-col items-center justify-center px-6 gap-1 md:gap-5 lg:gap-3 xl:gap-8 text-[10px] md:text-xs top-[18%]">
+                  <Sixtyfour className="text-shell text-xl md:text-3xl xl:text-4xl">
+                    SETTINGS
                   </Sixtyfour>
 
-                    <div className="flex gap-16 xl:gap-20 " >
-                    {/* Total rounds */}
-                    <ConfigSection title="Total rounds">
-                      {[2, 3].map((r) => (
-                        <ToggleOption
-                          key={r}
-                          active={totalRounds === r}
-                          onClick={() => setTotalRounds(r)}
-                          label={r}
-                        />
-                      ))}
-                    </ConfigSection>
-
-                    {/* Abilities */}
-                    <ConfigSection title="Abilities">
-                      <ToggleOption
-                        active={abilitiesEnabled}
-                        onClick={() => setAbilitiesEnabled(true)}
-                        label="ON"
-                      />
-                      <ToggleOption
-                        active={!abilitiesEnabled}
-                        onClick={() => setAbilitiesEnabled(false)}
-                        label="OFF"
-                      />
-                    </ConfigSection>
-                  </div>
-
-                  <div className="flex gap-5 xl:gap-10">
-                    {/* Round time */}
-                    <ConfigSection title="Round time">
-                      {[20, 45, 60].map((time) => (
-                        <ToggleOption
-                          key={time}
-                          active={roundTime === time}
-                          onClick={() => setRoundTime(time)}
-                          label={`${time}s`}
-                        />
-                      ))}
-                    </ConfigSection>
-      
-                    {/* Player colors */}
-                    <div className="flex flex-col items-center gap-0.5">
-                      <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">Player colors</span>
-
-                      <div className="flex gap-1 items-center">
-                          <span className="font-corben text-shell text-[8px] md:text-[15px]">P1</span>
-                        <div className="flex flex-col items-center gap-1">
-                          <input
-                            type="color"
-                            value={player1Color}
-                            onChange={(e) => setPlayer1Color(e.target.value)}
-                            className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                  <div className="flex items-center justify-center gap-5 md:gap-9 xl:gap-12">
+                    <div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7" >
+                      {/* Total rounds */}
+                      <ConfigSection title="Total rounds">
+                        {[2, 3].map((r) => (
+                          <ToggleOption
+                            key={r}
+                            active={totalRounds === r}
+                            onClick={() => setTotalRounds(r)}
+                            label={r}
                           />
-                        </div>
-      
-                          <span className="font-corben text-shell text-[8px]  md:text-[15px]">P2</span>
-                        <div className="flex flex-col items-center gap-1">
-                          <input
-                            type="color"
-                            value={player2Color}
-                            onChange={(e) => setPlayer2Color(e.target.value)}
-                            className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                        ))}
+                      </ConfigSection>
+
+                               {/* Round time */}
+                      <ConfigSection title="Round time">
+                        {[20, 45, 60].map((time) => (
+                          <ToggleOption
+                            key={time}
+                            active={roundTime === time}
+                            onClick={() => setRoundTime(time)}
+                            label={`${time}s`}
                           />
+                        ))}
+                      </ConfigSection>
+                    </div>
+
+                    <div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7">
+                      {/* Abilities */}
+                      <ConfigSection title="Abilities">
+                        <ToggleOption
+                          active={abilitiesEnabled}
+                          onClick={() => setAbilitiesEnabled(true)}
+                          label="ON"
+                        />
+                        <ToggleOption
+                          active={!abilitiesEnabled}
+                          onClick={() => setAbilitiesEnabled(false)}
+                          label="OFF"
+                        />
+                      </ConfigSection>
+                   
+                      {/* Player colors */}
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">Player colors</span>
+
+                        <div className="flex gap-1 items-center">
+                            <span className="font-corben text-shell text-[8px] md:text-[15px]">P1</span>
+                          <div className="flex flex-col items-center gap-1">
+                            <input
+                              type="color"
+                              value={player1Color}
+                              onChange={(e) => setPlayer1Color(e.target.value)}
+                              className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                            />
+                          </div>
+      
+                            <span className="font-corben text-shell text-[8px]  md:text-[15px]">P2</span>
+                          <div className="flex flex-col items-center gap-1">
+                            <input
+                              type="color"
+                              value={player2Color}
+                              onChange={(e) => setPlayer2Color(e.target.value)}
+                              className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div>  
     
                   {/* Theme */}
                   <ConfigSection title="Theme">
@@ -309,7 +313,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                       />
                     ))}
                   </ConfigSection>
-                <div className="pt-1">
+                <div className="pt-0">
                   <ToggleOption
                     active={true}
                     onClick={() => setAdvancedConfigOpen(false)}
