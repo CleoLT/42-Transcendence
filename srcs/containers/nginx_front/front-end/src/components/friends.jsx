@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useAuth } from "../services/authProvider.jsx"
 import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship, acceptFriendship } from "../services/authService.js"
 import { ProfilePicture, IconText } from "./iconUtils.jsx"
+import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
 
 
@@ -15,6 +16,8 @@ import { ProfilePicture, IconText } from "./iconUtils.jsx"
         </button>
     )
 }
+
+
 
 function Card({ friends, buttonText, onDelete, onAccept, children }) {
 
@@ -52,10 +55,10 @@ function Card({ friends, buttonText, onDelete, onAccept, children }) {
 
 export function Friends({setScreen}) {
   const { userId } = useAuth()
-  console.log("userId ", userId)
-   const [friends, setFriends] = useState([])
-   const [pending, setPending] = useState([])
-   const [requests, setRequests] = useState([])
+  //console.log("userId ", userId)
+  const [friends, setFriends] = useState([])
+  const [pending, setPending] = useState([])
+  const [requests, setRequests] = useState([])
 
   useEffect(() => {
     if (!userId) return;
@@ -78,25 +81,56 @@ export function Friends({setScreen}) {
     fetchFriendships(getFriendsToRespond, setRequests)
   }, [userId])
 
- async function deleteFriendship(friendId) { 
+  async function deleteFriendship(friendId) {
     try {
+      const result = await OptionAlert.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      })
+      
+      if (!result.isConfirmed) return
+    
       const data = await cancelFriendship(userId, friendId)
+     
+      
       setFriends(prev => prev.filter(friend => friend.id !== friendId))
       setPending(prev => prev.filter(friend => friend.id !== friendId))
-      setRequests(prev => prev.filter(friend => friend.id !== friendId)) 
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))   
+      
+      await AlertMessage.fire({
+      title: "Deleted!",
+      text: "Friendship removed successfully.",
+      icon: "success"
+    })
+      
     } catch (error) {
-      console.error(error);
+      AlertMessage.fire({
+        icon: "error",
+        text: err.message,
+      })
     }
   }
 
-  async function acceptFriend(friendId) { 
+  async function acceptFriend(friendId) {
     try {
       const data = await acceptFriendship(userId, friendId)
-      setFriends(prev => prev.filter(friend => friend.id !== friendId))
-      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      const acceptedUser = requests.find(friend => friend.id === friendId)
+      if (acceptedUser) setFriends(prev => [...prev, acceptedUser])
       setRequests(prev => prev.filter(friend => friend.id !== friendId))
+      AlertMessage.fire({
+        icon: "success",
+        text: "You have a new friend!",
+      })
     } catch (error) {
-      console.error(error);
+      AlertMessage.fire({
+        icon: "error",
+        text: error.message,
+      })
     }
   }
 
