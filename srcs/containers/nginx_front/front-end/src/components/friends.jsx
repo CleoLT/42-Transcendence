@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../services/authProvider.jsx"
-import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship, acceptFriendship } from "../services/authService.js"
+import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship, acceptFriendship, newFriendship } from "../services/authService.js"
 import { ProfilePicture, IconText } from "./iconUtils.jsx"
 import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
@@ -25,6 +25,12 @@ function Card({ friends, buttonText, onDelete, onAccept, children }) {
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">
     
       <p className="text-gray-600">{children}</p>
+      {(children === "Friends list") ? <Button
+              text="Add friend"
+              onClick={() => onAccept(4)}
+              src="/validation_icons/+_bold_cut_yellow.svg"
+             /> : <div/>} 
+            {/*no se si es correcto poner un if else con un div en caso de nada */}
       {friends && friends.map((friendship) => {
         return (
           <div key={friendship.id} className="flex items-center justify-between py-2">
@@ -39,7 +45,8 @@ function Card({ friends, buttonText, onDelete, onAccept, children }) {
               text="Accept invitation"
               onClick={() => onAccept(friendship.id)}
               src="/validation_icons/V_bold_cut.svg"
-            /> : <div/>}
+             /> : <div/>} 
+            {/*no se si es correcto poner un if else con un div en caso de nada */}
             
             <Button
               text={buttonText}
@@ -97,7 +104,6 @@ export function Friends({setScreen}) {
     
       const data = await cancelFriendship(userId, friendId)
      
-      
       setFriends(prev => prev.filter(friend => friend.id !== friendId))
       setPending(prev => prev.filter(friend => friend.id !== friendId))
       setRequests(prev => prev.filter(friend => friend.id !== friendId))   
@@ -122,6 +128,7 @@ export function Friends({setScreen}) {
       const acceptedUser = requests.find(friend => friend.id === friendId)
       if (acceptedUser) setFriends(prev => [...prev, acceptedUser])
       setRequests(prev => prev.filter(friend => friend.id !== friendId))
+      
       AlertMessage.fire({
         icon: "success",
         text: "You have a new friend!",
@@ -134,10 +141,33 @@ export function Friends({setScreen}) {
     }
   }
 
+  async function newFriend(friendId) {
+    try {
+      const data = await newFriendship(userId, friendId)
+      //const acceptedUser = requests.find(friend => friend.id === friendId)
+      //if (acceptedUser) setFriends(prev => [...prev, acceptedUser])
+     // setRequests(prev => prev.filter(friend => friend.id !== friendId))
+      setFriends(prev => prev.filter(friend => friend.id !== friendId))
+      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))   
+
+
+      AlertMessage.fire({
+        icon: "success",
+        text: "You send a new friend request!",
+      })
+    } catch (error) {
+      AlertMessage.fire({
+        icon: "error",
+        text: error.message,
+      })
+    }
+  }
+
   return (
     <div className="flex flex-col relative w-full h-full justify-center items-center">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-        <Card friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship}>Friends list</Card>
+        <Card friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship} onAccept={newFriend}>Friends list</Card>
         <Card friends={ pending } buttonText="Cancel invitation" onDelete={deleteFriendship}>Pending</Card>
         <Card friends={ requests } buttonText="Decline invitation" onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</Card>
       </div>
