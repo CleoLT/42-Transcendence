@@ -5,6 +5,10 @@ import path from 'node:path'
 import { fileTypeFromBuffer } from 'file-type'
 
 
+export function readSecret(path) {
+    return fs.readFileSync(path, 'utf8').trim()
+}
+
 function noFileUploadedError(str) {
     const err = new Error(str)
     err.statusCode = 400
@@ -95,7 +99,11 @@ async function postUser(req, reply) {
         const result = await query.getUserById(user.insertId) 
     
         await query.updateUserById(user.insertId, { online_status: 1 });
-        reply.code(201).send(result);
+        reply.code(201).send({
+            id: result.id,
+            username: result.username,
+            email: result.email
+        });
     } catch (error) {
         reply.send(error)
     }
@@ -113,11 +121,12 @@ async function tryLogin(req, reply) {
 
         if (user.online_status === 1) userConflictError('You are already logged')
 
-        await query.updateUserById(user.id, { online_status: 1 });
+        //await query.updateUserById(user.id, { online_status: 1 });
 
         return reply.code(200).send({
             valid: true,
-            userId: user.id
+            userId: user.id,
+            email: user.email
         });        
     } catch (error) {
         reply.send(error)
@@ -240,6 +249,45 @@ async function deleteAvatar(req, reply) {
         reply.send(error)
     }
 }
+
+async function disconnect(req, reply) {
+    try {
+      const apiKey = req.headers['api-key'];
+  
+      if (apiKey !== readSecret(process.env.API_KEY)) {
+        return reply.code(401).send({ error: "Invalid API key" });
+      }
+  
+      const { userId } = req.body;
+  
+      await query.updateUserById(userId, { online_status: 0 });
+  
+      return reply.code(200).send({ message: `User ${userId} disconnected` });
+    } catch (err) {
+      console.error("Disconnect Error:", err);
+      return reply.code(500).send({ error: "Internal server error" });
+    }
+}
+
+async function connect(req, reply) {
+    try {
+      const apiKey = req.headers['api-key'];
+  
+      if (apiKey !== readSecret(process.env.API_KEY)) {
+        return reply.code(401).send({ error: "Invalid API key" });
+      }
+  
+      const { userId } = req.body;
+  
+      await query.updateUserById(userId, { online_status: 1 });
+  
+      return reply.code(200).send();
+    } catch (err) {
+      console.error("Connect Error:", err);
+      return reply.code(500).send({ error: "Internal server error" });
+    }
+}
+
   
 
 export default { 
@@ -255,5 +303,7 @@ export default {
     deleteUserById,
     uploadAvatar,
     getAvatarById,
-    deleteAvatar
+    deleteAvatar,
+    disconnect,
+    connect
 }
