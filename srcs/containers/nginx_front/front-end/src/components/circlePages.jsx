@@ -29,9 +29,9 @@ export function PlayConnected({setScreen}){
 
 function ConfigSection({ title, children }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <span className="font-corben text-shell">{title}</span>
-      <div className="flex gap-2 flex-wrap justify-center">
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-corben text-shell text-[10px] xl:text-[18px]">{title}</span>
+      <div className="flex gap-2 flex-wrap justify-center ">
         {children}
       </div>
     </div>
@@ -44,6 +44,7 @@ function ToggleOption({ active, onClick, label }) {
       onClick={onClick}
       className={`
         cursor-pointer px-1 py-1 rounded-full border transition-colors
+        text-[0.3rem] md:text-sm lg:text-xs xl:text-sm
         ${
           active
             ? "bg-red-700 text-shell border-red-700"
@@ -124,10 +125,16 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
             Loading...
           </Sixtyfour>
         ) : (
-          <>
+          <div className="flex flex-col gap-2 items-center w-full" >
             {/* ================= NORMAL CONFIG ================= */}
             {!advancedConfigOpen && (
               <>
+                <LogInInput
+                  placeholder="Player 1 name"
+                  value={username ? username : player1Name}
+                  onChange={(e) => setPlayer1Name(e.target.value.slice(0, 10))}
+                  className="flex justify-center items-center top-[23%]"
+                />
                 <button className="flex justify-center items-center">
                   <CenterText
                     text="PLAY"
@@ -139,16 +146,9 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                     `}
                   />
                 </button>
-  
-                <LogInInput
-                  placeholder="Player 1 name"
-                  value={username ? username : player1Name}
-                  onChange={(e) => setPlayer1Name(e.target.value.slice(0, 10))}
-                  className="top-1/4"
-                />
-  
+ 
                 {/* Mode selector */}
-                <div className="absolute bottom-[20%] flex flex-col items-center gap-2 text-[10px] md:text-xs">
+                <div className="absolute flex flex-col items-center gap-1 text-[10px] md:text-xs bottom-[8%]">
                   <span className="font-corben text-shell">Mode</span>
   
                   <div className="flex gap-2">
@@ -167,8 +167,8 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                             game?.setAIMode(ai, difficulty)
                           }}
                           className={`
-                            cursor-pointer px-3 py-1 rounded-full border
-                            transition-colors
+                            cursor-pointer px-2 py-1 rounded-full border
+                            transition-colors text-[0.3rem] md:text-xs
                             ${
                               active
                                 ? "bg-red-700 text-shell border-red-700"
@@ -185,7 +185,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   
                 {/* Difficulty */}
                 {vsAI && (
-                  <div className="absolute bottom-[10%] flex flex-col items-center gap-2 text-[10px] md:text-xs">
+                  <div className="absolute bottom-[25%] flex flex-col gap-1 items-center text-[10px] md:text-xs">
                     <span className="font-corben text-shell">Difficulty</span>
   
                     <div className="flex gap-2">
@@ -194,7 +194,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                           key={lvl}
                           onClick={() => setDifficulty(lvl)}
                           className={`
-                            cursor-pointer px-3 py-1 rounded-full border
+                            cursor-pointer px-2 py-1 rounded-full border text-[0.3rem] md:text-xs
                             transition-colors
                             ${
                               difficulty === lvl
@@ -215,105 +215,111 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                     placeholder="Player 2 name"
                     value={player2Name}
                     onChange={(e) => setPlayer2Name(e.target.value.slice(0, 10))}
-                    className="bottom-[30%] w-[50px] truncate"
+                    className="bottom-[25%] truncate"
                   />
                 )}
               </>
             )}
   
             {/* ================= ADVANCED CONFIG ================= */}
-            {advancedConfigOpen && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center px-6 gap-3 text-[10px] md:text-xs">
-                <Sixtyfour className="text-shell text-base md:text-2xl">
-                  Advanced Settings
-                </Sixtyfour>
-  
-  
-                {/* Round time */}
-                <ConfigSection title="Round time">
-                  {[20, 45, 60].map((time) => (
-                    <ToggleOption
-                      key={time}
-                      active={roundTime === time}
-                      onClick={() => setRoundTime(time)}
-                      label={`${time}s`}
-                    />
-                  ))}
-                </ConfigSection>
-  
-                {/* Total rounds */}
-                <ConfigSection title="Total rounds">
-                  {[2, 3].map((r) => (
-                    <ToggleOption
-                      key={r}
-                      active={totalRounds === r}
-                      onClick={() => setTotalRounds(r)}
-                      label={r}
-                    />
-                  ))}
-                </ConfigSection>
-  
-                {/* Abilities */}
-                <ConfigSection title="Abilities">
-                  <ToggleOption
-                    active={abilitiesEnabled}
-                    onClick={() => setAbilitiesEnabled(true)}
-                    label="ON"
-                  />
-                  <ToggleOption
-                    active={!abilitiesEnabled}
-                    onClick={() => setAbilitiesEnabled(false)}
-                    label="OFF"
-                  />
-                </ConfigSection>
-  
-                {/* Player colors */}
-                <div className="flex flex-col items-center gap-3">
-                  <span className="font-corben text-shell">Player colors</span>
-  
-                  <div className="flex gap-6 items-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="font-corben text-shell">P1</span>
-                      <input
-                        type="color"
-                        value={player1Color}
-                        onChange={(e) => setPlayer1Color(e.target.value)}
-                        className="w-10 h-10 cursor-pointer border border-shell/40 rounded-full bg-transparent"
+            {/* <div className="flex flex-col gap-2 items-center w-full" > */}
+                {advancedConfigOpen && (
+                <div className="absolute flex flex-col items-center justify-center px-6 gap-1.5 md:gap-5 xl:gap-9 text-[10px] md:text-xs top-[18%]">
+                  <Sixtyfour className="text-shell text-[11px] md:text-base xl:text-2xl">
+                    Advanced Settings
+                  </Sixtyfour>
+
+                    <div className="flex gap-5 xl:gap-10 " >
+                    {/* Total rounds */}
+                    <ConfigSection title="Total rounds">
+                      {[2, 3].map((r) => (
+                        <ToggleOption
+                          key={r}
+                          active={totalRounds === r}
+                          onClick={() => setTotalRounds(r)}
+                          label={r}
+                        />
+                      ))}
+                    </ConfigSection>
+
+                    {/* Abilities */}
+                    <ConfigSection title="Abilities">
+                      <ToggleOption
+                        active={abilitiesEnabled}
+                        onClick={() => setAbilitiesEnabled(true)}
+                        label="ON"
                       />
-                    </div>
-  
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="font-corben text-shell">P2</span>
-                      <input
-                        type="color"
-                        value={player2Color}
-                        onChange={(e) => setPlayer2Color(e.target.value)}
-                        className="w-10 h-10 cursor-pointer border border-shell/40 rounded-full bg-transparent"
+                      <ToggleOption
+                        active={!abilitiesEnabled}
+                        onClick={() => setAbilitiesEnabled(false)}
+                        label="OFF"
                       />
+                    </ConfigSection>
+                  </div>
+
+                  <div className="flex gap-5 xl:gap-10">
+                    {/* Round time */}
+                    <ConfigSection title="Round time">
+                      {[20, 45, 60].map((time) => (
+                        <ToggleOption
+                          key={time}
+                          active={roundTime === time}
+                          onClick={() => setRoundTime(time)}
+                          label={`${time}s`}
+                        />
+                      ))}
+                    </ConfigSection>
+      
+                    {/* Player colors */}
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="font-corben text-shell xl:text-[18px]">Player colors</span>
+      
+                      <div className="flex gap-1 items-center">
+                          <span className="font-corben text-shell text-[8px] md:text-[15px]">P1</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <input
+                            type="color"
+                            value={player1Color}
+                            onChange={(e) => setPlayer1Color(e.target.value)}
+                            className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                          />
+                        </div>
+      
+                          <span className="font-corben text-shell text-[8px]  md:text-[15px]">P2</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <input
+                            type="color"
+                            value={player2Color}
+                            onChange={(e) => setPlayer2Color(e.target.value)}
+                            className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
+    
+                  {/* Theme */}
+                  <ConfigSection title="Theme">
+                    {["classic", "sakura", "dark", "neon"].map((t) => (
+                      <ToggleOption
+                        key={t}
+                        active={theme === t}
+                        onClick={() => setTheme(t)}
+                        label={t}
+                      />
+                    ))}
+                  </ConfigSection>
+                <div className="pt-1">
+                  <ToggleOption
+                    active={true}
+                    onClick={() => setAdvancedConfigOpen(false)}
+                    label="SAVE & BACK"
+                  />
                 </div>
-  
-                {/* Theme */}
-                <ConfigSection title="Theme">
-                  {["classic", "sakura", "dark", "neon"].map((t) => (
-                    <ToggleOption
-                      key={t}
-                      active={theme === t}
-                      onClick={() => setTheme(t)}
-                      label={t}
-                    />
-                  ))}
-                </ConfigSection>
-  
-                <ToggleOption
-                  active={true}
-                  onClick={() => setAdvancedConfigOpen(false)}
-                  label="SAVE & BACK"
-                />
-              </div>
-            )}
-          </>
+                </div>
+              )}
+            </div>  
+          // </div>
         )}
       </Circle>
     </div>
