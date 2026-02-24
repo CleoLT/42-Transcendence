@@ -147,9 +147,10 @@ export function DisplayIcon({children, avatar, setAvatar}){
 }
 
 
-export function LargeButton({children}){
+export function LargeButton({children, onClick}){
     return(
         <button
+            onClick={onClick}
             className="
                 text-center
                 bg-greyish
