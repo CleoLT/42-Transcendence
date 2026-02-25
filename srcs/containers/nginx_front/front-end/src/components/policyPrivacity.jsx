@@ -1,8 +1,6 @@
 
-import {IconsOverlayFrame} from "./iconUtils"
-import { CorbenBold, Sixtyfour, P, H2, H3, LI, UL } from "./typography"
-
-
+import { IconsOverlayFrame } from "./iconUtils"
+import { Sixtyfour, P, H2, H3, LI, UL } from "./typography"
 
 export function Privacy() {
     return (
@@ -10,11 +8,9 @@ export function Privacy() {
             <div className="absolute inset-0">
                 <IconsOverlayFrame />
             </div>
-            <div className="relative w-full max-w-3xl rounded-2xl  p-8 max-h-[80vh] overflow-y-auto">
+            <div className="relative w-full max-w-3xl rounded-2xl p-8 max-h-[80vh] overflow-y-auto">
                 <Sixtyfour className="text-2xl">Privacy Policy</Sixtyfour>
-                <br/>
                 <P>Last updated: February 24, 2026</P>
-                <br/>
                 <P>
                     Welcome to the Blossom Clash Family.
                     This Privacy Policy explains how we collect, use, and protect your information when you use our application.

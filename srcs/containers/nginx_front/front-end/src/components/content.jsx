@@ -6,6 +6,7 @@ import {Rules, Project} from "./iconPages"
 import {Profile} from "./profilePages"
 import {Friends} from "./friends.jsx"
 import {Privacy} from "./policyPrivacity.jsx"
+import { TermsOfServices } from "./termsOfService.jsx"
 
 
 export default function Content({screen, setScreen}){
@@ -40,6 +41,7 @@ export default function Content({screen, setScreen}){
                 {screen === "rules" && (<Rules setScreen={setScreen} />)}
                 {screen === "project" && (<Project />)}
                 {screen === "privacy" && (<Privacy />)}
+                {screen === "terms" && (<TermsOfServices />)}
             </div>
         </div>
     )
