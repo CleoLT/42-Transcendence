@@ -35,6 +35,15 @@ export function P({children}) {
     )
 }
 
+export function H4({children}) {
+    return (
+        <>
+            <h3 className="font-corben underline "
+        style={{ letterSpacing: "-0.12em" }}>{children}</h3>
+        </>
+    )
+}
+
 export function H3({children}) {
     return (
         <>

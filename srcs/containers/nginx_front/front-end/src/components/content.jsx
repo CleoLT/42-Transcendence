@@ -2,11 +2,12 @@ import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
-import {Rules, Project} from "./iconPages"
+import {Project} from "./iconPages"
 import {Profile} from "./profilePages"
 import {Friends} from "./friends.jsx"
 import {Privacy} from "./policyPrivacity.jsx"
 import { TermsOfServices } from "./termsOfService.jsx"
+import { Rules } from "./rulesPage.jsx"
 
 
 export default function Content({screen, setScreen}){
