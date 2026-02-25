@@ -1,4 +1,4 @@
-FROM node:20.18.1-alpine
+FROM node:20.19.6-alpine
 
 ARG VITE_BASE_URL
 ENV VITE_BASE_URL=$VITE_BASE_URL
@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Only dependencies are baked into the image
 COPY front-end/package*.json ./
-RUN npm install
+RUN npm ci
 
 # EMILIE added for hot reloaded on windows
 ENV CHOKIDAR_USEPOLLING=true
