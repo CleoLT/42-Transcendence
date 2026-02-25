@@ -69,7 +69,12 @@ async function tryLogin(username, password) {
 }
 
 async function updateUserById(id, modifiedData) {
-    //if modified password hash the password
+
+    if (modifiedData.password) {
+        const hashedPassword = await bcrypt.hash(modifiedData.password, 10)
+        modifiedData.password = hashedPassword
+    }
+
     const keys = Object.keys(modifiedData)
     console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")

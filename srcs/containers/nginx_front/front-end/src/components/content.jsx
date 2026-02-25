@@ -5,6 +5,7 @@ import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from
 import {Rules, Project} from "./iconPages"
 import {Profile} from "./profilePages"
 import {Friends} from "./friends.jsx"
+import {Privacy} from "./policyPrivacity.jsx"
 
 
 export default function Content({screen, setScreen}){
@@ -38,6 +39,7 @@ export default function Content({screen, setScreen}){
                 {screen === "friends" && (<Friends setScreen={setScreen} />)}
                 {screen === "rules" && (<Rules setScreen={setScreen} />)}
                 {screen === "project" && (<Project />)}
+                {screen === "privacy" && (<Privacy />)}
             </div>
         </div>
     )
