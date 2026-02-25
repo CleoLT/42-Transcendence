@@ -1,11 +1,81 @@
 import { CorbenBold , CorbenRegular, Sixtyfour } from "./typography"
 import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPage, DisplayDate, LargeButton, DisplayIcon} from "./iconUtils"
 import {useRef, useState, useEffect} from "react"
-import { Circle } from "./circleUtils"
+import {Circle, LogInInput } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo, uploadAvatarFile, uploadAvatar} from "../services/authService"
+import {getUserInfo, uploadAvatarFile, uploadAvatar, ChangeUsername} from "../services/authService"
 import { AlertMessage } from "../services/alertMessage"
 
+
+export function ChangeName({userName, setScreenProfile}){
+    const [username, setUsername] = useState("")
+    const [repeatUsername, setRepeatUsername] = useState("")
+    const {userId} = useAuth()
+
+    const handleChangeLogin = async () => {
+        if (!username || !repeatUsername)
+        throw new Error("All fields are required")
+        if (username != repeatUsername)
+            throw new Error("Usernames don't match!")
+        if (username === userName)
+            throw new Error("You submitted the same username!")
+
+        await ChangeUsername(userId, username)
+    }
+
+    return(
+        <div className="flex flex-col relative w-full h-full justify-center items-center">
+            <Circle className="bg-shell border-2 border-greyish px-10">
+                <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
+                    <form
+                        onSubmit={async (e) => {
+                        e.preventDefault()
+                        try {
+                            await handleChangeLogin()
+                            AlertMessage.fire({
+                                icon: "success",
+                                text: "Username changed!",
+                            }) 
+                        setScreenProfile("profile")
+                        }
+                        catch(err) {
+                            AlertMessage.fire({
+                            icon: "error",
+                            text: err.message,
+                            })
+                        }
+                        }}
+                        className="
+                            relative flex flex-col
+                            justify-center
+                            items-center
+                            h-full w-full
+                            gap-2 md:gap-4"
+                    >
+                        <LogInInput
+                            placeholder="New Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="!static"
+                        />
+                        <LogInInput
+                            placeholder="New Username confirmation"
+                            value={repeatUsername}
+                            onChange={(e) => setRepeatUsername(e.target.value)}
+                            className="!static"
+                        />
+                        <button type="submit" className="pt-4 md:pt-10">
+                            <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
+                        </button>
+                    </form>
+                </div>
+            </Circle>
+        </div>
+    )
+}
+//checker que ca retourne bien a la page profil
+//que le nom de userName (from data) change bien, car la on peut remplacer par le mm car il garde l'ancien
+//checker si pas de pb avec useAuth et l'ancien nom/nouveau nom dans les autres pages
 
 export function ChangeAvatar({setScreenProfile}){
     const [avatar, setAvatar] = useState(null)
@@ -47,7 +117,7 @@ export function ChangeAvatar({setScreenProfile}){
                 await uploadAvatarFile(userId, formData)
             
             } else {
-                await uploadAvatar(userId)
+                await uploadAvatar(userId, avatar)
             }
                 
             AlertMessage.fire({
@@ -184,6 +254,11 @@ export function Profile(){
             {screenProfile === "avatar" && (
                 <OverlayPage onClose={() => setScreenProfile("profile")}> 
                     <ChangeAvatar setScreenProfile={setScreenProfile}/>
+                </OverlayPage>    
+            )}
+            {screenProfile === "name" && (
+                <OverlayPage onClose={() => setScreenProfile("profile")}> 
+                    <ChangeName userName={data.username} setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
         </div>

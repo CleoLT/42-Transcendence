@@ -1,5 +1,6 @@
 const baseUrl = import.meta.env.VITE_BASE_URL
 
+
 export async function Login(username, password) {
   const res = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
@@ -15,6 +16,7 @@ export async function Login(username, password) {
   }
   return respond
 }
+
 
 export async function Register(username, password, email) {
   const res = await fetch(`${baseUrl}/api/auth/register`, {
@@ -55,6 +57,7 @@ export async function Logout(username) {
   return respond
 }
 
+
 export async function Login2FA(username, code) {
   const res = await fetch(`${baseUrl}/api/auth/login/2fa`, {
     method: "POST",
@@ -70,6 +73,7 @@ export async function Login2FA(username, code) {
   }
   return respond
 }
+
 
 export async function Register2FA(username, code) {
   const res = await fetch(`${baseUrl}/api/auth/register/2fa`, {
@@ -87,6 +91,7 @@ export async function Register2FA(username, code) {
   return respond
 }
 
+
 export async function getFriends(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}/friendships`, {
     method: "GET",
@@ -99,6 +104,7 @@ export async function getFriends(id) {
   }
   return respond
 }
+
 
 export async function getFriendsPending(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}/friendships/pending`, {
@@ -113,6 +119,7 @@ export async function getFriendsPending(id) {
   return respond
 }
 
+
 export async function getFriendsToRespond(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}/friendships/requests`, {
     method: "GET",
@@ -125,6 +132,7 @@ export async function getFriendsToRespond(id) {
   }
   return respond
 }
+
 
 export async function getUserInfo(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}`, {
@@ -139,6 +147,7 @@ export async function getUserInfo(id) {
   return respond
 }
 
+
 export async function cancelFriendship(id1, id2) {
   const res = await fetch(`${baseUrl}/api/users/friendships/cancel`, {
     method: "DELETE",
@@ -150,8 +159,8 @@ export async function cancelFriendship(id1, id2) {
   if (!res.ok) {
     throw new Error(respond.message)
   }
-
 }
+
 
 export async function acceptFriendship(id1, id2) {
   const res = await fetch(`${baseUrl}/api/users/friendships/accept`, {
@@ -168,6 +177,7 @@ export async function acceptFriendship(id1, id2) {
   }
   return respond
 }
+
 
 export async function newFriendship(id1, id2) {
   const res = await fetch(`${baseUrl}/api/users/friendships`, {
@@ -195,7 +205,7 @@ export async function uploadAvatarFile(id, formData) {
 
   const respond = await res.json()
 
-  console.log("RESPONSE= ", respond)
+  console.log("RESPONSE FROM FILE= ", respond)
 
   if (!res.ok) {
     throw new Error(respond.message)
@@ -215,6 +225,25 @@ export async function uploadAvatar(id, avatarPath) {
   const respond = await res.json()
 
   console.log("RESPONSE= ", respond)
+  
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function ChangeUsername(id, username) {
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: username }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  console.log("RESPONSE CHANGE USERNAME= ", respond)
   
   if (!res.ok) {
     throw new Error(respond.message)
