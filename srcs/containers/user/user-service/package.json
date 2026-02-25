@@ -8,16 +8,16 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "nodemon": "^3.0.0",
-    "fastify": "4.0.0",
+    "nodemon": "3.1.14",
+    "fastify": "5.7.3",
     "mariadb": "3.3.0",
-    "@fastify/swagger": "^8.0.0",
-    "@fastify/swagger-ui": "^2.0.0",
-    "@fastify/multipart": "^8.1.0",
-    "bcrypt": "^5.1.0",
-    "@faker-js/faker": "^10.2.0",
-    "@fastify/cookie": "^9.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "file-type": "^18.0.0"
+    "@fastify/swagger": "9.0.0",
+    "@fastify/swagger-ui": "5.2.1",
+    "@fastify/multipart": "9.4.0",
+    "bcryptjs": "3.0.3",
+    "@faker-js/faker": "9.9.0",
+    "@fastify/cookie": "10.0.1",
+    "jsonwebtoken": "9.0.2",
+    "file-type": "18.0.0"
   }
 }

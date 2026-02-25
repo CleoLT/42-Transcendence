@@ -1,7 +1,7 @@
 import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
-import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig} from "./circlePages.jsx"
+import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig, GameReset} from "./circlePages.jsx"
 import {Rules, Project} from "./iconPages"
 import {Profile} from "./profilePages"
 import {Friends} from "./friends.jsx"
@@ -14,6 +14,13 @@ export default function Content({screen, setScreen}){
     const onGameReady = (gameInstance) => {
         setGame(gameInstance);
         gameInstance?.setOnBackToMenu?.(() => setHasStarted(false));
+        gameInstance?.setOnGameEnd?.(() => setScreen("gameReset"));
+    };
+
+    const handlePlayAgain = () => {
+        game?.resetGame?.();
+        setHasStarted(false);
+        setScreen("game");
     };
 
     return (
@@ -21,13 +28,18 @@ export default function Content({screen, setScreen}){
             <IconsList setScreen={setScreen} />
             <div className="flex-1 flex justify-center items-center relative overflow-validate">
                 {screen === "homePlay" && (<PlayConnected setScreen={setScreen} />)}
-                {screen === "game" && (
+                {(screen === "game" || screen === "gameReset") && (
                     <>
                         <GameContainer onGameReady={onGameReady} />
                         <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-                        <div className="pointer-events-none w-full h-full flex justify-center items-center">
-                            <GameConfig game={game} hasStarted={hasStarted} setHasStarted={setHasStarted} />
-                        </div>
+                            <div className="pointer-events-none w-full h-full flex justify-center items-center">
+                                {screen === "game" && (
+                                    <GameConfig game={game} hasStarted={hasStarted} setHasStarted={setHasStarted} />
+                                )}
+                                {screen === "gameReset" && (
+                                    <GameReset game={game} setScreen={setScreen} onPlayAgain={handlePlayAgain} />
+                                )}
+                            </div>
                         </div>
                     </>
                 )}

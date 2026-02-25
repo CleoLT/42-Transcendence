@@ -1,9 +1,17 @@
-FROM node:20.18.1-alpine
+FROM node:20.19.6-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache python3 make g++
+
 COPY package*.json ./
-RUN npm install
+#
+# Needed for bcrypt
+
+#RUN npm install
+#RUN npm update
+#RUN npm rebuild
+RUN npm ci
 
 # Nodemon needs file system events
 # this one makes sure nodemon uses polls, which is necessary with alpine

@@ -136,13 +136,13 @@ export function DisplayDate(string){
 }
 
 
-export function DisplayIcon({children, avatar, setAvatar}){
+export function DisplayIcon({children, avatar, setAvatar, setAvatarFile}){
     return(
         <ProfilePicture
         src={children}
         className={`w-8 h-8 sm:w-12 sm:h-12 cursor-pointer
         ${avatar === children? "brightness-50" : "brightness-100"} filter`}
-        onClick={() => setAvatar(children)} />
+        onClick={() => {setAvatar(children); setAvatarFile(null)}} />
     )
 }
 

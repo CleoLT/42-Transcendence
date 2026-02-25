@@ -55,6 +55,38 @@ export async function Logout(username) {
   return respond
 }
 
+export async function Login2FA(username, code) {
+  const res = await fetch(`${baseUrl}/api/auth/login/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, code }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function Register2FA(username, code) {
+  const res = await fetch(`${baseUrl}/api/auth/register/2fa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, code }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
 export async function getFriends(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}/friendships`, {
     method: "GET",
@@ -147,6 +179,43 @@ export async function newFriendship(id1, id2) {
 
   const respond = await res.json()
 
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function uploadAvatarFile(id, formData) {
+  const res = await fetch(`${baseUrl}/api/users/${id}/avatar/upload`, {
+    method: "POST",
+    body: formData,
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  console.log("RESPONSE= ", respond)
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function uploadAvatar(id, avatarPath) {
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ avatar: avatarPath }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  console.log("RESPONSE= ", respond)
+  
   if (!res.ok) {
     throw new Error(respond.message)
   }

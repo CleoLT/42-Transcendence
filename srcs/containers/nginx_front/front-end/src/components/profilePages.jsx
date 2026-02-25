@@ -3,13 +3,16 @@ import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPag
 import {useRef, useState, useEffect} from "react"
 import { Circle } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo} from "../services/authService"
+import {getUserInfo, uploadAvatarFile, uploadAvatar} from "../services/authService"
 import { AlertMessage } from "../services/alertMessage"
 
 
 export function ChangeAvatar({setScreenProfile}){
     const [avatar, setAvatar] = useState(null)
+    const [avatarFile, setAvatarFile] = useState(null)
     const inputRef = useRef(null)
+    const [buttonClick, setButtonClick] = useState(false)
+    const {userId} = useAuth()
 
     const handleFileChange = (e) => {
         const file = e.target.files[0]
@@ -25,8 +28,43 @@ export function ChangeAvatar({setScreenProfile}){
 
         if (file){
             const imageUrl = URL.createObjectURL(file);
-            setAvatar(imageUrl);
+            setAvatar(imageUrl)
+            setAvatarFile(file)
             e.target.value = null
+        }
+    }
+
+    const handleConfirm = async () => {
+        if (!avatar) return;
+    
+        try {
+            setButtonClick(true)
+
+            if (avatarFile){
+                const formData = new FormData();
+                formData.append("avatar", avatarFile);
+
+                await uploadAvatarFile(userId, formData)
+            
+            } else {
+                await uploadAvatar(userId)
+            }
+                
+            AlertMessage.fire({
+                icon: "success",
+                text: "Avatar updated!"
+        })
+    
+        } catch (error) {
+            AlertMessage.fire({
+                icon: "error",
+                text: "Upload failed"
+        })
+
+        } finally {
+            setButtonClick(false)
+            setAvatar(null)
+            setAvatarFile(null)
         }
     }
 
@@ -35,17 +73,17 @@ export function ChangeAvatar({setScreenProfile}){
             <Circle className="bg-shell border-2 border-greyish px-10">
                 <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
                     <div className="flex gap-1 md:gap-2">
-                        <DisplayIcon children="/avatars/cat.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/bird_04.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/butterfly_02.png" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/dragonfly.jpg" avatar={avatar} setAvatar={setAvatar}/>
+                        <DisplayIcon children="/avatars/cat.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/bird_04.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/butterfly_02.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/dragonfly.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <div className="flex gap-1 md:gap-2 md:pb-4 lg:pb-1 xl:pb-4">
-                        <DisplayIcon children="/avatars/jellyfish_01.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/koi_carp_03.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/moonfish.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/sushi.jpg" avatar={avatar} setAvatar={setAvatar}/>
-                        <DisplayIcon children="/avatars/swan.jpg" avatar={avatar} setAvatar={setAvatar}/>
+                        <DisplayIcon children="/avatars/jellyfish_01.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/koi_carp_03.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/moonfish.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/sushi.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/swan.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <CorbenRegular children="or" className="text-greyish text-xs md:text-base pb-1 md:pb-4 lg:pb-1 xl:pb-4" />
                     <LargeButton children="Upload your Avatar" onClick={() => inputRef.current.click()} />
@@ -63,7 +101,7 @@ export function ChangeAvatar({setScreenProfile}){
                             className="mt-2 w-10 h-10 md:mt-3 md:w-24 md:h-24 lg:w-15 lg:h-15 rounded-full object-cover border-2 border-greyish"
                         />
                     )}
-                    <button className=" pt-1 md:pt-2">
+                    <button onClick={handleConfirm} className=" pt-1 md:pt-2">
                         <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
                     </button>
                 </div>
@@ -71,8 +109,6 @@ export function ChangeAvatar({setScreenProfile}){
         </div>
     )
 }
-
-//<button disabled={!selectedAvatar} ...>Confirmer</button>
 
 
 export function UserData({data, setScreenProfile}){
@@ -129,8 +165,8 @@ export function Profile(){
             <div className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-x-16">
                 <button className="group relative" onClick={() =>setScreenProfile("avatar")} >
                     <ProfilePicture
-                        src="/avatars/cat.jpg"
-                        // src={data.avatar}
+                        // src="/avatars/cat.jpg"
+                        src={data.avatar}
                         className="w-24 h-24 sm:w-40 sm:h-40" />
                     <div className="absolute top-1/4 left-3/4">
                         <IconText text={"Change Avatar"} />
