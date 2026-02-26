@@ -192,6 +192,12 @@ export function DeleteAccount({setScreenProfile}){
         //     )
 
         //--> borrar el cookie
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        })
+        //--> end borrar el cookie
+
         setScreenProfile("playNC")
         
         } catch(err) {
