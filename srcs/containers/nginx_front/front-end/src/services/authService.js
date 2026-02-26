@@ -287,3 +287,21 @@ export async function loginUser(username, password) {
   }
   return respond.valid
 }
+
+
+export async function DeleteUserId(userId) {
+  const res = await fetch(`${baseUrl}/api/users/${userId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+  console.log("respond DeleteUser", respond)
+
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+

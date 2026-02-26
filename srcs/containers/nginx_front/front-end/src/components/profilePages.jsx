@@ -3,7 +3,7 @@ import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPag
 import {useRef, useState, useEffect} from "react"
 import {Circle, LogInInput } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser} from "../services/authService"
+import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser, DeleteUserId} from "../services/authService"
 import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
 
@@ -176,37 +176,39 @@ export function ChangePassword({setScreenProfile}){
 }
 
 
-// export function DeleteAccount({setScreenProfile}){
-//     const {userId} = useAuth()
+export function DeleteAccount({setScreenProfile}){
+    const {userId} = useAuth()
 
-//     const handleDeleteAccount = async () => {
-//         try {
-//             await patchDeleteAccount(userId)
-//             AlertMessage.fire({
-//                 icon: "success",
-//                 text: "Account deleted!",
-//         })
-//         // setData(prev => ({
-//         //         ...prev,
-//         //         username: username})
-//         //     )
-//         setScreenProfile("playNC")
+    const handleDeleteAccount = async () => {
+        try {
+            await DeleteUserId(userId)
+            AlertMessage.fire({
+                icon: "success",
+                text: "Account deleted!",
+        })
+        // setData(prev => ({
+        //         ...prev,
+        //         username: username})
+        //     )
+
+        //--> borrar el cookie
+        setScreenProfile("playNC")
         
-//         } catch(err) {
-//             AlertMessage.fire({
-//             icon: "error",
-//             text: err.message,
-//             })
-//         }
-//     }
+        } catch(err) {
+            AlertMessage.fire({
+            icon: "error",
+            text: err.message,
+            })
+        }
+    }
 
-//     return(
-//         OptionAlert.fire({
-//             icon: "question",
-//             text: "Are you sure you want to delete your account?"
-//         })
-//     )
-// }
+    return(
+        OptionAlert.fire({
+            icon: "question",
+            text: "Are you sure you want to delete your account?"
+        })
+    )
+}
 
 
 export function ChangeAvatar({setData, setScreenProfile}){
@@ -402,11 +404,11 @@ export function Profile(){
                     <ChangePassword setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
-            {/* {screenProfile === "delete" && (
+            {screenProfile === "delete" && (
                 <OverlayPage onClose={() => setScreenProfile("profile")}> 
                     <DeleteAccount setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
-            )} */}
+            )}
         </div>
     )
 }
