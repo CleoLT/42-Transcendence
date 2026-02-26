@@ -37,8 +37,8 @@ async function deleteAvatarFile(userId) {
     try {
         const oldAvatar = await query.getAvatarByUserId(userId)
 
-        if (schema.avatarImages.includes(oldAvatar)) return
         if (oldAvatar === null) return
+        if (schema.avatarImages.includes(oldAvatar)) return
 
         await access(oldAvatar.avatar, constants.F_OK)
         await unlink(oldAvatar.avatar)
