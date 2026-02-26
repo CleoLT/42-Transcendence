@@ -31,7 +31,7 @@ export function AuthProvider({children}){
               setUsername(data.username ?? null);
               setUserId(data.userId ?? null);
           
-              console.log("/validate:", data);
+            //   console.log("/validate:", data);
 
               if (!data.valid)
                 localStorage.removeItem("lastUserId");
@@ -52,11 +52,11 @@ export function AuthProvider({children}){
     useEffect(() => {
         checkCookie();
 
-        const interval = setInterval(() => {
-            checkCookie();
-        }, 1500);
+        // const interval = setInterval(() => {
+        //     checkCookie();
+        // }, 1500);
 
-        return () => clearInterval(interval);
+        // return () => clearInterval(interval);
     }, [])
 
     // --> if login    

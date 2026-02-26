@@ -53,6 +53,11 @@ fastify.register(swaggerUI, {
   uiConfig: { docExpansion: 'list' }
 })
 
+// fastify.register(require('@fastify/static'), {
+//   root: path.join(__dirname, '/uploads', 'avatar'),
+//   prefix: '/uploads/',
+// })
+
 fastify.register(routes)
 
 // Health check

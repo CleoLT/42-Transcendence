@@ -2,9 +2,12 @@ import {IconsList} from "./iconUtils"
 import { useState } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig, GameReset} from "./circlePages.jsx"
-import {Rules, Project} from "./iconPages"
+import {Project} from "./iconPages"
 import {Profile} from "./profilePages"
 import {Friends} from "./friends.jsx"
+import {Privacy} from "./policyPrivacity.jsx"
+import { TermsOfServices } from "./termsOfService.jsx"
+import { Rules } from "./rulesPage.jsx"
 
 
 export default function Content({screen, setScreen}){
@@ -50,6 +53,8 @@ export default function Content({screen, setScreen}){
                 {screen === "friends" && (<Friends setScreen={setScreen} />)}
                 {screen === "rules" && (<Rules setScreen={setScreen} />)}
                 {screen === "project" && (<Project />)}
+                {screen === "privacy" && (<Privacy />)}
+                {screen === "terms" && (<TermsOfServices />)}
             </div>
         </div>
     )

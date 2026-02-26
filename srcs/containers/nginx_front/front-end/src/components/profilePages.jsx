@@ -185,7 +185,7 @@ export function ChangePassword({setScreenProfile}){
 }
 
 
-export function ChangeAvatar({setScreenProfile}){
+export function ChangeAvatar({setData, setScreenProfile}){
     const [avatar, setAvatar] = useState(null)
     const [avatarFile, setAvatarFile] = useState(null)
     const inputRef = useRef(null)
@@ -232,6 +232,11 @@ export function ChangeAvatar({setScreenProfile}){
                 icon: "success",
                 text: "Avatar updated!"
         })
+        setData(prev => ({
+            ...prev,
+            avatar: avatar})
+        )
+        setScreenProfile("profile")
     
         } catch (error) {
             AlertMessage.fire({
@@ -333,7 +338,7 @@ export function Profile(){
     }, [userId])
 
     if (!data) return <div>Loading...</div>
-    // console.log("LOG TRUE: ", log, "Username: ", username, "userId: ", userId)
+    console.log("PROFILE: avatar= ", data.avatar)
     
     return(
         <div className="flex flex-col relative w-full h-full justify-center items-center">       
@@ -343,7 +348,6 @@ export function Profile(){
             <div className="relative z-10 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-x-16">
                 <button className="group relative" onClick={() =>setScreenProfile("avatar")} >
                     <ProfilePicture
-                        // src="/avatars/cat.jpg"
                         src={data.avatar}
                         className="w-24 h-24 sm:w-40 sm:h-40" />
                     <div className="absolute top-1/4 left-3/4">
@@ -361,7 +365,7 @@ export function Profile(){
             </div>
             {screenProfile === "avatar" && (
                 <OverlayPage onClose={() => setScreenProfile("profile")}> 
-                    <ChangeAvatar setScreenProfile={setScreenProfile}/>
+                    <ChangeAvatar setData={setData} setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
             {screenProfile === "name" && (

@@ -4,7 +4,6 @@ const userResponse = {
         id: { type: 'number' },
         username: { type: 'string' },
         email: { type: 'string' },
-        //alias: { type: 'string' }, Borrar de la base de datos
         bio: { type: 'string' },
         avatar: { type: 'string' },
         online_status: { type: 'boolean' },
@@ -49,6 +48,18 @@ const email = {
     format: 'email',
     maxLength: 255
 }
+
+const avatarImages = [
+    "/avatars/bird_04.jpg",
+    "/avatars/cat.jpg",
+    "/avatars/butterfly_02.png",
+    "/avatars/dragonfly.jpg",
+    "/avatars/jellyfish_01.jpg",
+    "/avatars/koi_carp_03.jpg",
+    "/avatars/moonfish.jpg",
+    "/avatars/sushi.jpg",
+    "/avatars/swan.jpg"
+]
 
 /*-----------------------SCHEMAS--------------------*/
 
@@ -210,7 +221,7 @@ const logOut = {
     },
     404: errorResponse
   }
-};
+}
 
 const updateUserById = {
     description: 'Partially update user by id',
@@ -224,7 +235,10 @@ const updateUserById = {
             username: username,
             password: password,
             email: email,
-            alias: username,
+            avatar: {
+              type: "string",
+              enum: avatarImages
+            },
             bio: { type: 'string', minLength: 3, maxLength: 200 }
         },
         additionalProperties: false
@@ -321,6 +335,7 @@ const connect = {
 };
 
 export default {
+    avatarImages,
     getAllUsers,
     postUser,
     getUserById,

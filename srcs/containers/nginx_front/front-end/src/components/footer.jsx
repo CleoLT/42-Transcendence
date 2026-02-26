@@ -5,9 +5,9 @@ export function Footer({screen, setScreen}){
 
     return(
         <footer className="flex justify-between w-[92%] mt-1 sm:mt-2">
-            <FooterButton text="Terms of Service" onClick={() => setScreen("homePlay")}/>
+            <FooterButton text="Terms of Service" onClick={() => setScreen("terms")}/>
             <FooterButton text="Contacts" onClick={() => setScreen("homePlay")}/>
-            <FooterButton text="Privacy Policy" onClick={() => setScreen("homePlay")}/>
+            <FooterButton text="Privacy Policy" onClick={() => setScreen("privacy")}/>
         </footer>
     )
 }
