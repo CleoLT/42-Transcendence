@@ -18,7 +18,7 @@ services:
       context: ./containers/user/user-service
       dockerfile: Dockerfile.prod
     volumes:
-      - user_uploads_volume:/uploads/avatars
+      - ./containers/user/user-service/uploads/avatars:/uploads/avatars
     secrets:
       - db_host
       - db_username
@@ -82,14 +82,6 @@ volumes:
   db_volume:
     driver: local
   # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
-
-  user_uploads_volume:
-    driver: local
-    #  driver_opts:
-    #    type: none
-    #    o: bind
-    #    device: ./containers/user/user-service/user_uploads/avatars
-  # esto seria para hacer named volumes stored as bind mounts, como en inception
 
 secrets:
   db_host:
