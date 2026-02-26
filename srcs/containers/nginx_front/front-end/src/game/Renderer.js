@@ -799,7 +799,7 @@ export class Renderer {
 		const shadowRadiusX = bowlRadius - BOWL_SHADOW_RADIUS_X_OFFSET;
 		const shadowRadiusY = bowlRadius * BOWL_SHADOW_RADIUS_Y_FACTOR;
 		const lineWidth = Math.max(2, bowlRadius * BOWL_LINE_WIDTH_FACTOR);
-		const labelYOffset = BOWL_LABEL_Y_OFFSET;
+		const labelYOffset = 45;
 		const fontSize = Math.round(bowlRadius * BOWL_FONT_SIZE_FACTOR);
 		const inkBloomSize = bowlRadius * BOWL_INK_BLOOM_SIZE_FACTOR;
 
@@ -877,7 +877,7 @@ export class Renderer {
 		ctx.restore();
 
 		// Draw player label inside the bowl
-		ctx.fillStyle = BOWL_LABEL_COLOR;
+		ctx.fillStyle = '#000';
 		ctx.font = BOWL_LABEL_FONT + ' ' + fontSize + 'px Georgia';
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
