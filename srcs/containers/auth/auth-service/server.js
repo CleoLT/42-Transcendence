@@ -92,7 +92,7 @@ fastify.post('/login/2fa', async (req, reply) => {
     const token = jwt.sign(
       { userId: entry.userId, username: username },
       readSecret(process.env.JWT_SECRET_FILE),
-      { expiresIn: '1h' }
+      { expiresIn: '30d' }
     );
 
     reply.setCookie('access_token', token, {
@@ -111,7 +111,6 @@ fastify.post('/login/2fa', async (req, reply) => {
     return reply.code(500).send({ error: 'Internal auth error' });
   }
 });
-
 
 
 fastify.post('/logout', async (req, reply) => {
@@ -169,7 +168,7 @@ fastify.post('/register/2fa', async (req, reply) => {
     const token = jwt.sign(
       { userId: resValues.id, username: username },
       readSecret(process.env.JWT_SECRET_FILE),
-      { expiresIn: '1h' }
+      { expiresIn: '30d' }
     );
 
     reply.setCookie('access_token', token, {
@@ -264,6 +263,37 @@ fastify.post('/validate', async (req, reply) => {
   }
 });
 
+fastify.post('/update/:username', async (req, reply) => {
+  try {
+    const token = req.cookies.access_token;
+    if (!token) return reply.code(401).send({ error: 'Not authenticated' });
+
+    const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
+
+    const newUsername = req.params.username;
+    if (!newUsername) return reply.code(400).send({ error: 'Missing username' });
+
+    const newToken = jwt.sign(
+      { userId: decoded.userId, username: newUsername },
+      readSecret(process.env.JWT_SECRET_FILE),
+      { expiresIn: '30d' }
+    );
+
+    reply.setCookie('access_token', newToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+
+    return reply.code(200).send({ message: 'Username updated' });
+
+  } catch (err) {
+    req.log.error(err);
+    return reply.code(401).send({ error: 'Invalid token' });
+  }
+});
+
 // Health check
 fastify.get('/health', async () => {
   return { status: 'ok', service: 'auth-service' };
@@ -278,6 +308,7 @@ const start = async () => {
     process.exit(1)
   }
 }
+
 
 export default {readSecret}
 

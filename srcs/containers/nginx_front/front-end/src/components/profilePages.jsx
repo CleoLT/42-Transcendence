@@ -48,6 +48,14 @@ export function ChangeName({setData, setScreenProfile}){
                             username: userName})
                         )
                         setUsername(userName)
+                        
+                        //--> cambia el nombre en la cookie
+                        await fetch(`/api/auth/update/${userName}`, {
+                            method: 'POST',
+                            credentials: 'include'
+                        })
+                        //--> end cambia el nombre en la cookie
+
                         setScreenProfile("profile")
                         }
                         catch(err) {
