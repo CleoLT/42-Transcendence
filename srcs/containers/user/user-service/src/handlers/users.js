@@ -201,7 +201,7 @@ async function uploadAvatar(req, reply) {
         const type = await fileTypeFromBuffer(buffer)
         if (!type || !['image/png','image/jpeg'].includes(type.mime)) noFileUploadedError('only .jpg and .png images are allowed')
     
-        const uploadDir = path.join(__dirname, '/uploads', 'avatars');
+        const uploadDir = path.join('/uploads', 'avatars');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }

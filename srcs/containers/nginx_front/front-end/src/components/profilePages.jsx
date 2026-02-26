@@ -4,7 +4,7 @@ import {useRef, useState, useEffect} from "react"
 import {Circle, LogInInput } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
 import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser} from "../services/authService"
-import { AlertMessage } from "../services/alertMessage"
+import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
 
 export function ChangeName({setData, setScreenProfile}){
@@ -86,8 +86,6 @@ export function ChangeName({setData, setScreenProfile}){
     )
 }
 
-//checker si pas de pb avec useAuth et l'ancien nom/nouveau nom dans les autres pages 
-
 
 export function ChangePassword({setScreenProfile}){
     const [actualPassword, setActualPassword] = useState("")
@@ -133,10 +131,6 @@ export function ChangePassword({setScreenProfile}){
                                 icon: "success",
                                 text: "Password changed!",
                             })
-                        // setData(prev => ({
-                        //         ...prev,
-                        //         username: username})
-                        //     )
                         setScreenProfile("profile")
                         }
                         catch(err) {
@@ -185,6 +179,39 @@ export function ChangePassword({setScreenProfile}){
 }
 
 
+// export function DeleteAccount({setScreenProfile}){
+//     const {userId} = useAuth()
+
+//     const handleDeleteAccount = async () => {
+//         try {
+//             await patchDeleteAccount(userId)
+//             AlertMessage.fire({
+//                 icon: "success",
+//                 text: "Account deleted!",
+//         })
+//         // setData(prev => ({
+//         //         ...prev,
+//         //         username: username})
+//         //     )
+//         setScreenProfile("playNC")
+        
+//         } catch(err) {
+//             AlertMessage.fire({
+//             icon: "error",
+//             text: err.message,
+//             })
+//         }
+//     }
+
+//     return(
+//         OptionAlert.fire({
+//             icon: "question",
+//             text: "Are you sure you want to delete your account?"
+//         })
+//     )
+// }
+
+
 export function ChangeAvatar({setData, setScreenProfile}){
     const [avatar, setAvatar] = useState(null)
     const [avatarFile, setAvatarFile] = useState(null)
@@ -230,7 +257,7 @@ export function ChangeAvatar({setData, setScreenProfile}){
                 
             AlertMessage.fire({
                 icon: "success",
-                text: "Avatar updated!"
+                text: "Avatar uploaded!"
         })
         setData(prev => ({
             ...prev,
@@ -378,6 +405,11 @@ export function Profile(){
                     <ChangePassword setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
+            {/* {screenProfile === "delete" && (
+                <OverlayPage onClose={() => setScreenProfile("profile")}> 
+                    <DeleteAccount setScreenProfile={setScreenProfile}/>
+                </OverlayPage>    
+            )} */}
         </div>
     )
 }
