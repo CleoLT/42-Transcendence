@@ -3,24 +3,31 @@ import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPag
 import {useRef, useState, useEffect} from "react"
 import {Circle, LogInInput } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo, uploadAvatarFile, uploadAvatar, ChangeUsername} from "../services/authService"
+import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser} from "../services/authService"
 import { AlertMessage } from "../services/alertMessage"
 
 
-export function ChangeName({userName, setScreenProfile}){
-    const [username, setUsername] = useState("")
+export function ChangeName({setData, setScreenProfile}){
+    const [userName, setUserName] = useState("")
     const [repeatUsername, setRepeatUsername] = useState("")
-    const {userId} = useAuth()
+    const {userId, username, setUsername} = useAuth()
 
     const handleChangeLogin = async () => {
-        if (!username || !repeatUsername)
+        if (!userName || !repeatUsername)
         throw new Error("All fields are required")
-        if (username != repeatUsername)
+        if (userName != repeatUsername)
             throw new Error("Usernames don't match!")
-        if (username === userName)
+        if (userName === username)
             throw new Error("You submitted the same username!")
+        
+        const regexName = /^[a-zA-Z][a-zA-Z0-9_-]*$/
 
-        await ChangeUsername(userId, username)
+        if (userName.length < 2 || userName.length > 10)
+            throw new Error("Username must contain between 2 and 10 characters")
+        if (!regexName.test(userName))
+            throw new Error("Invalid username. Only letters, numbers, and '_' are allowed, and the first character must be a letter")
+
+        await patchChangeUsername(userId, userName)
     }
 
     return(
@@ -35,7 +42,12 @@ export function ChangeName({userName, setScreenProfile}){
                             AlertMessage.fire({
                                 icon: "success",
                                 text: "Username changed!",
-                            }) 
+                            })
+                        setData(prev => ({
+                            ...prev,
+                            username: userName})
+                        )
+                        setUsername(userName)
                         setScreenProfile("profile")
                         }
                         catch(err) {
@@ -54,8 +66,8 @@ export function ChangeName({userName, setScreenProfile}){
                     >
                         <LogInInput
                             placeholder="New Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
                             className="!static"
                         />
                         <LogInInput
@@ -73,9 +85,105 @@ export function ChangeName({userName, setScreenProfile}){
         </div>
     )
 }
-//checker que ca retourne bien a la page profil
-//que le nom de userName (from data) change bien, car la on peut remplacer par le mm car il garde l'ancien
-//checker si pas de pb avec useAuth et l'ancien nom/nouveau nom dans les autres pages
+
+//checker si pas de pb avec useAuth et l'ancien nom/nouveau nom dans les autres pages 
+
+
+export function ChangePassword({setScreenProfile}){
+    const [actualPassword, setActualPassword] = useState("")
+    const [password, setPassword] = useState("")
+    const [repeatPassword, setRepeatPassword] = useState("")
+    const {userId} = useAuth()
+
+    const handleChangePassword = async () => {
+        if (!actualPassword || !password || !repeatPassword)
+            throw new Error("All fields are required")
+        if (password != repeatPassword)
+            throw new Error("New passwords don't match!")
+        if (password === actualPassword)
+            throw new Error("You submitted the same password!")
+
+        const regexPw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]+$/
+
+        if (password.length < 6 || password.length > 20)
+            throw new Error("Password must contain between 6 and 20 characters")
+          if (!regexPw.test(repeatPassword))
+            throw new Error("Password must contain uppercase, lowercase, number, and at least one special character @$!%*#?&")
+        
+        try{
+            await loginUser(username, actualPassword)
+        }
+        catch{
+            throw new Error("Actual password is not correct!")
+        }
+
+        await patchChangePassword(userId, password)
+    }
+
+    return(
+        <div className="flex flex-col relative w-full h-full justify-center items-center">
+            <Circle className="bg-shell border-2 border-greyish px-10">
+                <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
+                    <form
+                        onSubmit={async (e) => {
+                        e.preventDefault()
+                        try {
+                            await handleChangePassword()
+                            AlertMessage.fire({
+                                icon: "success",
+                                text: "Password changed!",
+                            })
+                        // setData(prev => ({
+                        //         ...prev,
+                        //         username: username})
+                        //     )
+                        setScreenProfile("profile")
+                        }
+                        catch(err) {
+                            AlertMessage.fire({
+                            icon: "error",
+                            text: err.message,
+                            })
+                        }
+                        }}
+                        className="
+                            relative flex flex-col
+                            justify-center
+                            items-center
+                            h-full w-full
+                            gap-2 md:gap-4"
+                    >
+                        <LogInInput
+                            type="password" 
+                            placeholder="Actual Password"
+                            value={actualPassword}
+                            onChange={(e) => setActualPassword(e.target.value)}
+                            className="!static"
+                        />
+                        <LogInInput
+                            type="password" 
+                            placeholder="New Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="!static"
+                        />
+                        <LogInInput
+                            type="password"
+                            placeholder="New Password confirmation"
+                            value={repeatPassword}
+                            onChange={(e) => setRepeatPassword(e.target.value)}
+                            className="!static"
+                        />
+                        <button type="submit" className="pt-4 md:pt-10">
+                            <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
+                        </button>
+                    </form>
+                </div>
+            </Circle>
+        </div>
+    )
+}
+
 
 export function ChangeAvatar({setScreenProfile}){
     const [avatar, setAvatar] = useState(null)
@@ -258,7 +366,12 @@ export function Profile(){
             )}
             {screenProfile === "name" && (
                 <OverlayPage onClose={() => setScreenProfile("profile")}> 
-                    <ChangeName userName={data.username} setScreenProfile={setScreenProfile}/>
+                    <ChangeName setData={setData} setScreenProfile={setScreenProfile}/>
+                </OverlayPage>    
+            )}
+            {screenProfile === "password" && (
+                <OverlayPage onClose={() => setScreenProfile("profile")}> 
+                    <ChangePassword setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
         </div>
@@ -291,3 +404,14 @@ ref={inputRef}
 onChange={handleFileChange}
 className="hidden"
 /> */}
+
+
+//to re-render when I change juste one info (changeName for exemple)
+// setData(prev => ({
+//     ...prev,
+//     username: username
+// }))
+// prev --> value of the state before the re-render
+// ... prev --> copy all the state before to make the change
+// username: username --> will chnage only the username part and the rest still the same
+// if prev is not use all the object will be delete and we will keep just the modification (username)

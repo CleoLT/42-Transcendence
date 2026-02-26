@@ -233,7 +233,7 @@ export async function uploadAvatar(id, avatarPath) {
 }
 
 
-export async function ChangeUsername(id, username) {
+export async function patchChangeUsername(id, username) {
   const res = await fetch(`${baseUrl}/api/users/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -245,6 +245,42 @@ export async function ChangeUsername(id, username) {
 
   console.log("RESPONSE CHANGE USERNAME= ", respond)
   
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function patchChangePassword(id, password) {
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: password }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
+  console.log("RESPONSE CHANGE PASSWORD= ", respond)
+  
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function loginUser(username, password) {
+  const res = await fetch(`${baseUrl}/api/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
   if (!res.ok) {
     throw new Error(respond.message)
   }

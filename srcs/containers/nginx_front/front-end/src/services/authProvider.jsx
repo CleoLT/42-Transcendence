@@ -31,7 +31,8 @@ export function AuthProvider({children}){
               setUsername(data.username ?? null);
               setUserId(data.userId ?? null);
           
-              //console.log("/validate:", data);
+              console.log("/validate:", data);
+
               if (!data.valid)
                 localStorage.removeItem("lastUserId");
             } catch {
@@ -117,7 +118,8 @@ export function AuthProvider({children}){
                 userId,
                 login,
                 register,
-                logout
+                logout,
+                setUsername
             }} >
             {children}
         </AuthContext.Provider>

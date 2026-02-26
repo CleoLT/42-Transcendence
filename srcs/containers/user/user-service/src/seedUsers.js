@@ -21,6 +21,8 @@ export default async function seedUsers() {
         console.log('Seeded 20 users')
 
         await usersQueries.addUser("Cleo", "Pass1!", "cleo.letron@gmail.com")
+        // await usersQueries.addUser("Emilie", "1234Es#", "emiliesellier21@gmail.com")
+
 
 
         for (let i = 1; i <= nb; i += 2)
