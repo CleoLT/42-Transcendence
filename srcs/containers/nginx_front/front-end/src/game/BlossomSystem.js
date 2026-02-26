@@ -11,6 +11,7 @@ import {
 	BLOSSOM_DESPAWN_Y_OFFSET,
 	BLOSSOM_DESPAWN_X_OFFSET
 } from './Constants.js';
+import { SpriteLibrary } from './SpriteLibrary.js';
 
 export class BlossomSystem {
 	/**
@@ -19,8 +20,9 @@ export class BlossomSystem {
 	 * @param {LaneSystem} laneSystem - Reference used to choose spawn lanes.
 	 * @param {number} canvasWidth - Width of the game canvas.
 	 * @param {number} canvasHeight - Height of the game canvas.
+	 * @param {SpriteLibrary} spriteLibrary - The theme of the game.
 	 */
-	constructor(laneSystem, canvasWidth, canvasHeight) {
+	constructor(laneSystem, canvasWidth, canvasHeight, spriteLibrary) {
 		// Store references to layout and canvas bounds
 		this.laneSystem = laneSystem;
 		this.canvasWidth = canvasWidth;
@@ -35,6 +37,7 @@ export class BlossomSystem {
 
 		// Track horizontal wind influence for all active blossoms
 		this.windDrift = 0;
+		this.spriteLibrary = spriteLibrary;
 	}
 
 	/**
@@ -71,7 +74,19 @@ export class BlossomSystem {
 			blossom.x += (Math.random() - 0.5) * BLOSSOM_SWAY_AMOUNT * deltaTime;
 
 			// Rotate blossom sprite smoothly over time
-			blossom.rotation += blossom.rotationSpeed * deltaTime;
+			const damping = 6; // higher = faster return
+
+			if (this.spriteLibrary.theme === 'fishbowl') {
+
+				if (windActive) {
+					blossom.rotation += 2 * deltaTime * -windDirection;
+				} else {
+					blossom.rotation += (0 - blossom.rotation) * damping * deltaTime;
+				}
+
+			} else {
+				blossom.rotation += blossom.rotationSpeed * deltaTime;
+			}
 
 			// Deactivate blossoms that have moved outside the play area
 			if (blossom.y > this.canvasHeight + BLOSSOM_DESPAWN_Y_OFFSET) {
@@ -103,7 +118,7 @@ export class BlossomSystem {
 			active: true,
 			golden: isGolden,
 			size: isGolden ? BLOSSOM_SIZE_GOLDEN : BLOSSOM_SIZE_NORMAL,
-			rotation: Math.random() * Math.PI * 2,
+			rotation: this.spriteLibrary.theme === 'fishbowl' ? 0 : Math.random() * Math.PI * 2,
 			rotationSpeed: (Math.random() - 0.5) * 2,
 			vx: (Math.random() - 0.5) * 20,
 			vy: this.fallSpeed

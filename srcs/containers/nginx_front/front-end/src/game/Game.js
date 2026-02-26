@@ -164,7 +164,7 @@ export class Game {
 		// Construct world systems for lanes, blossoms, wind, rounds and UI
 		this.laneSystem = new LaneSystem(this.canvas.width, this.canvas.height);
 		this.laneTint = new LaneTint(this.laneSystem, this.canvas.width, this.canvas.height);
-		this.blossomSystem = new BlossomSystem(this.laneSystem, this.canvas.width, this.canvas.height);
+		this.blossomSystem = new BlossomSystem(this.laneSystem, this.canvas.width, this.canvas.height, this.spriteLibrary);
 		this.windSystem = new WindSystem();
 		this.roundSystem = new RoundSystem(this.players);
 		if (this.roundTimeOverride != null) {
@@ -1071,8 +1071,8 @@ export class Game {
 		// Column headers
 		ctx.font = ROUND_INDICATOR_CONTROLS_FONT;
 		ctx.textAlign = 'center';
-		ctx.fillText('Player 1', leftX, startY);
-		ctx.fillText('Player 2', rightX, startY);
+		ctx.fillText(`${this.players[0].name}`, leftX, startY);
+		ctx.fillText(`${this.players[1].name}`, rightX, startY);
 
 		// Separator "|" in the center
 		// ctx.fillText('|', centerX, startY);

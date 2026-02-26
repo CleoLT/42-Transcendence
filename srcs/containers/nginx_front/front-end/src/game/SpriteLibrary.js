@@ -32,7 +32,6 @@ export class SpriteLibrary {
 	 * Safe to call multiple times; skips only when already loaded for current theme.
 	 */
 	async loadSprites() {
-		console.log(this.theme);
 		if (this.loaded && this._loadedTheme === this.theme) {
 			return this;
 		}

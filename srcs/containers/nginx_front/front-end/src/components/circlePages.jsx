@@ -304,7 +304,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
     
                   {/* Theme */}
                   <ConfigSection title="Theme">
-                    {["classic", "sakura", "dark", "neon"].map((t) => (
+                    {["classic", "fishbowl", "sushiland"].map((t) => (
                       <ToggleOption
                         key={t}
                         active={theme === t}
