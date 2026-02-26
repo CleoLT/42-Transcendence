@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import proxy from "@fastify/http-proxy";
-import cors from "@fastify/cors"
+import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
 
 const app = Fastify({ 
   logger: true, 
@@ -9,6 +10,10 @@ const app = Fastify({
 // la opcion 'logger: true' muestra logs de incoming requests, redirecciones y codigos de respuesta 
 // la opcion 'trustproxy: true' confia que el proxy(nginx o vite) viene con https
 
+app.register(rateLimit, {
+  max: 100,               // máximo 100 requests
+  timeWindow: "1 minute", // por minuto
+});
 
 // 🔐 HTTPS enforcement
 //app.addHook('onRequest', async (req, reply) => {

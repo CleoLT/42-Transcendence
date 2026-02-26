@@ -25,6 +25,7 @@ services:
       - db_user_password
       - db_name
       - jwt_secret
+      - api_key
     environment: 
       DB_HOST_FILE: /run/secrets/db_host
       DB_PORT: 3306
@@ -32,6 +33,7 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_user_password
       DB_NAME_FILE: /run/secrets/db_name
       JWT_SECRET_FILE: /run/secrets/jwt_secret
+      API_KEY: /run/secrets/api_key
     networks:
       - main
     restart: always
@@ -72,8 +74,16 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       JWT_SECRET_FILE: /run/secrets/jwt_secret
+      MAILFROM_FILE: /run/secrets/mailfrom
+      MAILER_EMAIL: /run/secrets/mailer_email
+      MAILER_PASSWORD: /run/secrets/mailer_password
+      API_KEY: /run/secrets/api_key
     secrets:
       - jwt_secret
+      - mailfrom
+      - mailer_email
+      - mailer_password
+      - api_key
     networks:
       - main
     restart: always
@@ -98,6 +108,14 @@ secrets:
     file: ../secrets/db_port.txt
   jwt_secret:
     file: ../secrets/jwt_secret.txt
+  mailer_email:
+    file: ../secrets/mailer_email.txt
+  mailer_password:
+    file: ../secrets/mailer_password.txt
+  mailfrom:
+    file: ../secrets/mailfrom.txt
+  api_key:
+    file: ../secrets/api_key.txt
 
 networks:
    main:

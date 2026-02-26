@@ -33,6 +33,7 @@ clean:
 deep-clean: clean
 	$(DC) down -v --rmi all || true
 	docker system prune -a -f || true
+	docker builder prune -a -f || true
 	docker volume prune -f || true
 
 remake:

@@ -75,7 +75,7 @@ export const WIND_DIRECTION_LEFT = -1;
 export const WIND_DIRECTION_RIGHT = 1;
 
 // Round system
-export const ROUND_TIME = 30; // seconds per round
+export const ROUND_TIME = 5; // seconds per round
 export const MAX_ROUNDS = 2;
 export const ROUND_INDICATOR_DURATION = 5.0; // seconds
 export const ROUND_RESET_DELAY = 2000; // milliseconds

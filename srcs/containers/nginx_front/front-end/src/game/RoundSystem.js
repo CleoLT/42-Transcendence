@@ -22,6 +22,20 @@ export class RoundSystem {
 		this.roundScores = [];
 	}
 
+	setRoundTime(seconds) {
+		if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
+			return;
+		}
+		this.roundTime = seconds;
+	}
+
+	setMaxRounds(rounds) {
+		if (!Number.isInteger(rounds) || rounds <= 0) {
+			return;
+		}
+		this.maxRounds = rounds;
+	}
+
 	/**
 	 * Starts a new round and resets the internal timer.
 	 */
