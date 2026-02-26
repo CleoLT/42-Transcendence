@@ -226,6 +226,8 @@ export function ChangeAvatar({setData, setScreenProfile}){
             
             } else {
                 await uploadAvatar(userId, avatar)
+
+                console.log("AVATAR:", avatar)
             }
                 
             AlertMessage.fire({
@@ -236,6 +238,10 @@ export function ChangeAvatar({setData, setScreenProfile}){
             ...prev,
             avatar: avatar})
         )
+
+        console.log("avatar:", avatar)
+
+
         setScreenProfile("profile")
     
         } catch (error) {
