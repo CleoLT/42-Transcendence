@@ -134,6 +134,26 @@ async function tryLogin(req, reply) {
     }
 }
 
+async function tryPassword(req, reply) {
+    try {
+        const { username, password } = req.body;
+
+        const match = await query.tryLogin(username, password)
+        if (!match) invalidCredentialsError()
+
+        // const user = await query.getUserByName(username);
+        // if (!user || !user.id) userNotFoundError()
+
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id,
+            email: user.email
+        });        
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
 async function logOut(req, reply) {
     try {
         const { username } = req.body;
@@ -293,6 +313,7 @@ export default {
     postUser, 
     getUserByName,
     tryLogin,
+    tryPassword,
     logOut,
     updateUserById,
     deleteUserById,

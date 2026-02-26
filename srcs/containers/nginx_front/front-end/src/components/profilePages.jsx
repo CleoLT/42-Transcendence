@@ -91,7 +91,7 @@ export function ChangePassword({setScreenProfile}){
     const [actualPassword, setActualPassword] = useState("")
     const [password, setPassword] = useState("")
     const [repeatPassword, setRepeatPassword] = useState("")
-    const {userId} = useAuth()
+    const {userId, username} = useAuth()
 
     const handleChangePassword = async () => {
         if (!actualPassword || !password || !repeatPassword)
@@ -108,13 +108,10 @@ export function ChangePassword({setScreenProfile}){
           if (!regexPw.test(repeatPassword))
             throw new Error("Password must contain uppercase, lowercase, number, and at least one special character @$!%*#?&")
         
-        try{
-            await loginUser(username, actualPassword)
-        }
-        catch{
+        const res = await loginUser(username, actualPassword)
+        if (!res)
             throw new Error("Actual password is not correct!")
-        }
-
+  
         await patchChangePassword(userId, password)
     }
 

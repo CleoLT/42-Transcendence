@@ -14,6 +14,7 @@ const routes = async function(fastify, options) {
     fastify.post('/user/logout', { schema: userSchema.logOut }, userHandler.logOut)
     fastify.post('/user/connect', { schema: userSchema.connect }, userHandler.connect)
     fastify.post('/user/disconnect', { schema: userSchema.disconnect }, userHandler.disconnect)
+    fastify.post('/user/password', { schema: userSchema.tryPassword }, userHandler.tryPassword)
 
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
     fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)

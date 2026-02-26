@@ -272,7 +272,7 @@ export async function patchChangePassword(id, password) {
 
 
 export async function loginUser(username, password) {
-  const res = await fetch(`${baseUrl}/api/users/login`, {
+  const res = await fetch(`${baseUrl}/api/users/user/password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -280,9 +280,10 @@ export async function loginUser(username, password) {
   })
 
   const respond = await res.json()
+  console.log("respond loginUser", respond.valid)
 
   if (!res.ok) {
-    throw new Error(respond.message)
+    throw new Error("Actual password is not correct!")
   }
-  return respond
+  return respond.valid
 }
