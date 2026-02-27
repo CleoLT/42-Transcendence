@@ -1,5 +1,6 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
+import fs from 'fs';
 
 export default defineConfig({
   plugins: [react()],
@@ -8,9 +9,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true,
+    https: {
+      key: fs.readFileSync('/certs/nginx_front.key'),
+      cert: fs.readFileSync('/certs/nginx_front.crt')
+    },
     proxy: {
       '/api': {
-        target: 'http://api_gateway:3000',
+        target: 'https://api_gateway:3000',
         changeOrigin: true,
         secure: false,
       },

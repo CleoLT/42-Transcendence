@@ -17,8 +17,8 @@ ENV CHOKIDAR_USEPOLLING=true
 
 COPY ./tools/dev-start.sh /tools/dev-start.sh
 
-RUN chmod 700 /tools/start.sh
+RUN chmod 700 /tools/dev-start.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["./tools/dev-start.sh"]
+ENTRYPOINT ["/tools/dev-start.sh"]
