@@ -30,8 +30,13 @@ function userNotFoundError() {
     throw err
 }
 
+<<<<<<< HEAD
 function userConflictError(str) {
     const err = new Error(str)
+=======
+function userConflictError(string) {
+    const err = new Error(string)
+>>>>>>> f1f11d2e12b2818def2787cb4f08bf93e1bff637
     err.statusCode = 409
     err.name = 'Conflict'
     throw err
