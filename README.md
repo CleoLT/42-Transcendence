@@ -123,7 +123,7 @@ Similarly, when Manu was working on the 2FA, he handled teh rate limiting and pa
 We all collaborated and helped each other, prioritizing the mandatory elements of the subject and making sure we followed our module's requirements. 
 
 We created a Whatsapp group to communicate with each other and we set up weekly meetings to keep track of our progress and updates. \
-In the meetings, everyone went over what they had accomplished so far, explained any new behaviours of the program, and set individual goals for the following week.\
+In the meetings, everyone went over what they had accomplished so far, explained any new behaviours of the program, and set individual goals for the following week.
 
 In terms of our Git workflow, we decided to work on individual branches from the main branch and to establish mandatory pull requests whenever we wanted to merge with main. The request had to be review by one of the members of the team, ususally Manu, our *technical lead*. \
 Before doing any pull request though, we always had the golden rule of doing a pull from main, to update our branch with any new updates and avoid conflicts during the merge. If there were conflicts, resolve them locally and then do the pull request.
@@ -429,12 +429,13 @@ Here you can see who implemented each feature, the issues we faced, and how we s
 - HTTPS configuration and certificate automation
 - Service communication and API gateway integration
 
-My first objective as the Dev->Ops designated person was to provide a basic structure of containers for the whole team that was funcional, easy to scale, and easy for them to work on independently.\
+My first objective as the Dev-Ops designated person was to provide a basic structure of containers for the whole team that was funcional, easy to scale, and easy for them to work on independently.
 
 In order to do that, I had to learn what was actually strictly necessary for each service to work, and then learn about the frameworks and libraries we were gonna use, and how to install and configure them properly. That's why I started creating my own mini react projects and testing how Node.js worked. It was very overwhelming in the beggining, because all of these languages and technologies were new to me as well, but after some research and tests I was able to create the following structure:
 
-	> Makefile
-	> srcs/
+    > Makefile
+	 > docker-compose.yml
+	 > srcs/
 		- nginx_front (no front logic yet, serving pure .html, would later add node and vite)
  		- api_gateway (node, redirecting to user & auth microservices)
  		- user-service (node)
@@ -444,7 +445,7 @@ In order to do that, I had to learn what was actually strictly necessary for eac
 With time, I added the React and Tailwind in the frontend, in a multi-stage Dockerfile.
 One of the things that has taken me the most time to do proprely are the two modes: DEV and PROD.
 
-From the start I only considered having the project be production-ready, but as the project grew, the files multiplied, and compiling time got longuer, the front and back developers needed to work and see changes in the moment, not recompile images and wait. That was when I decided to create the DEV mode, where vite runs as server, we have hot module reload, and nodemon runs in the backend, also giving immediate updates that eliminate the need to recompile.
+From the start I only considered having the project be production-ready, but as the project grew, the files multiplied, and compiling time got longer, the front and back developers needed to work and see changes in the moment, not recompile images and wait. That was when I decided to create the DEV mode, where vite runs as server, we have hot module reload, and nodemon runs in the backend, also giving immediate updates that eliminate the need to recompile.
 
 After that, and after we connected the front with the back (which was fun to say the least), I focused more on security: docker networks, volumes, ports, secrets and HTTPS connection.
 
@@ -630,7 +631,7 @@ The player with the highest score wins Blossom Clash.
 <br>
 
 
-## 11. Resources
+## 10. Resources
 > section listing classic references related to the topic (documentation, articles, tutorials, etc.), as well as a description of how AI was used — specifying for which tasks and which parts of the project.
 
 This is a list with all the resources we used classified by topics. It contains a mix of websites, tutorials and videos that helped us understand how we should approach the project and helped us learn new tools.\
