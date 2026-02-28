@@ -10,12 +10,11 @@ while [ ! -f "$CERT_DIR/ca.crt" ] || \
   sleep 1
 done
 
-echo "[user-service] Certificates ready. Waiting for DB..."
+#echo "[user-service] Certificates ready. Waiting for DB..."
+#until nc -z user-db 3306; do
+#  echo "[user-service] Waiting for user-db..."
+#  sleep 1
+#done
 
-until nc -z user-db 3306; do
-  echo "[user-service] Waiting for user-db..."
-  sleep 1
-done
-
-echo "[user-service] DB ready. Starting service."
+echo "[user-service] Starting service."
 exec node src/server.js
