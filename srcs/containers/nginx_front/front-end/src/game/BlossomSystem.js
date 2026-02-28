@@ -1,13 +1,7 @@
 // BlossomSystem - Free-falling blossoms with natural physics
 import {
-	BLOSSOM_SPAWN_INTERVAL,
 	BLOSSOM_FALL_SPEED,
-	BLOSSOM_GOLDEN_CHANCE,
-	BLOSSOM_SIZE_NORMAL,
-	BLOSSOM_SIZE_GOLDEN,
 	BLOSSOM_WIND_DRIFT,
-	BLOSSOM_SWAY_AMOUNT,
-	BLOSSOM_SPAWN_Y,
 	BLOSSOM_DESPAWN_Y_OFFSET,
 	BLOSSOM_DESPAWN_X_OFFSET
 } from './Constants.js';
@@ -31,9 +25,9 @@ export class BlossomSystem {
 		// Initialise blossom collection and spawn tuning
 		this.blossoms = [];
 		this.spawnTimer = 0;
-		this.spawnInterval = BLOSSOM_SPAWN_INTERVAL;
+		this.spawnInterval = 1.0;
 		this.fallSpeed = BLOSSOM_FALL_SPEED;
-		this.goldenChance = BLOSSOM_GOLDEN_CHANCE;
+		this.goldenChance = 0.1;
 
 		// Track horizontal wind influence for all active blossoms
 		this.windDrift = 0;
@@ -71,7 +65,8 @@ export class BlossomSystem {
 			blossom.x += this.windDrift * deltaTime;
 
 			// Add small random sway for a natural falling path
-			blossom.x += (Math.random() - 0.5) * BLOSSOM_SWAY_AMOUNT * deltaTime;
+			const blossomSwayAmount = 10;
+			blossom.x += (Math.random() - 0.5) * blossomSwayAmount * deltaTime;
 
 			// Rotate blossom sprite smoothly over time
 			const damping = 6; // higher = faster return
@@ -111,13 +106,14 @@ export class BlossomSystem {
 		const isGolden = Math.random() < this.goldenChance;
 
 		// Push a fully-configured blossom object into the active list
+		const blossomSpawnY = -30;
 		this.blossoms.push({
 			x: spawnPos.x,
-			y: BLOSSOM_SPAWN_Y,
+			y: blossomSpawnY,
 			spawnLane: laneIndex,
 			active: true,
 			golden: isGolden,
-			size: isGolden ? BLOSSOM_SIZE_GOLDEN : BLOSSOM_SIZE_NORMAL,
+			size: isGolden ? 25 : 20,
 			rotation: this.spriteLibrary.theme === 'fishbowl' ? 0 : Math.random() * Math.PI * 2,
 			rotationSpeed: (Math.random() - 0.5) * 2,
 			vx: (Math.random() - 0.5) * 20,

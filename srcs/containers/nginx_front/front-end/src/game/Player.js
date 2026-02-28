@@ -5,18 +5,9 @@ import {
 	PLAYER_INITIAL_X_LEFT,
 	PLAYER_INITIAL_X_RIGHT,
 	PLAYER_INITIAL_Y_OFFSET,
-	DASH_DURATION,
-	DASH_COOLDOWN,
-	DASH_SPEED_MULTIPLIER,
-	PUSH_COOLDOWN_NORMAL,
-	PUSH_IMPULSE,
 	PUSH_MAX_SPEED,
-	PUSH_DAMPING,
-	PUSH_VELOCITY_THRESHOLD,
 	ABILITY_COSTS,
-	ABILITY_COOLDOWNS,
 	PERFECT_METER_MAX,
-	MOMENTUM_SPEED_MULTIPLIER
 } from './Constants.js';
 
 export class Player {
@@ -54,9 +45,9 @@ export class Player {
 		// Dash state, duration and invulnerability
 		this.dashing = false;
 		this.dashTimer = 0;
-		this.dashDuration = DASH_DURATION;
+		this.dashDuration = 0.2;
 		this.dashCooldown = 0;
-		this.dashCooldownTime = DASH_COOLDOWN;
+		this.dashCooldownTime = 2.5;
 		this.dashDirection = { x: 0 };
 		this.pushInvulnerable = false;
 
@@ -201,12 +192,13 @@ export class Player {
 		// Calculate effective movement speed before applying input
 		let moveSpeed = this.speed;
 		if (this.dashing) {
-			moveSpeed *= DASH_SPEED_MULTIPLIER;
+			moveSpeed *= 2.0;
 			this.x += this.dashDirection.x * moveSpeed * deltaTime;
 		} else {
 			// Momentum buff slightly increases base movement speed
 			if (this.momentumActive) {
-				moveSpeed *= MOMENTUM_SPEED_MULTIPLIER;
+				const momentum_speed_multiplier = 1.5;
+				moveSpeed *= momentum_speed_multiplier;
 			}
 
 			// Horizontal movement only. The "reversePush" ability inverts the
@@ -234,11 +226,12 @@ export class Player {
 			this.x += this.pushVelocityX * deltaTime;
 
 			// Exponential damping keeps the motion feeling like a shove
-			const decay = Math.exp(-PUSH_DAMPING * deltaTime);
+			const damping = 6;
+			const decay = Math.exp(-damping * deltaTime);
 			this.pushVelocityX *= decay;
-
+			const push_velocity_threshold = 5;
 			// Snap to zero once the remaining speed is visually negligible
-			if (Math.abs(this.pushVelocityX) < PUSH_VELOCITY_THRESHOLD) {
+			if (Math.abs(this.pushVelocityX) < push_velocity_threshold) {
 				this.pushVelocityX = 0;
 			}
 		}
@@ -318,7 +311,12 @@ export class Player {
 	 * @returns {number} Cooldown duration in seconds.
 	 */
 	getAbilityCooldown(abilityName) {
-		return ABILITY_COOLDOWNS[abilityName] || 5;
+		const ability_cooldowns = {
+			reversePush: 5,
+			inkFreeze: 5,
+			momentumSurge: 10
+		};
+		return ability_cooldowns[abilityName] || 5;
 	}
 
 	/**
@@ -401,7 +399,7 @@ export class Player {
 
 		// Abilities no longer modify push behaviour; apply a standard push.
 		this.applyPush(otherPlayer, false);
-		this.pushCooldown = PUSH_COOLDOWN_NORMAL;
+		this.pushCooldown = 1.0;
 		return true;
 	}
 
@@ -433,7 +431,7 @@ export class Player {
 
 		// Apply the impulse as an additive velocity on the target. While the
 		// momentum ability is active, pushes are stronger.
-		const baseImpulse = PUSH_IMPULSE * (this.momentumActive ? this.momentumPushMultiplier : 1);
+		const baseImpulse = 900 * (this.momentumActive ? this.momentumPushMultiplier : 1);
 		const impulseX = directionX * baseImpulse;
 
 		otherPlayer.pushVelocityX += impulseX;

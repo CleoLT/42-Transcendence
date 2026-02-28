@@ -1,11 +1,3 @@
-import {
-	WIND_GUST_DURATION,
-	WIND_MIN_COOLDOWN,
-	WIND_MAX_COOLDOWN,
-	WIND_DIRECTION_LEFT,
-	WIND_DIRECTION_RIGHT
-} from './Constants.js';
-
 export class WindSystem {
 	/**
 	 * Controls intermittent wind gusts which influence blossom trajectories.
@@ -19,9 +11,9 @@ export class WindSystem {
 		this.timer = 0;
 		this.duration = 0;
 		this.cooldown = 0;
-		this.minCooldown = WIND_MIN_COOLDOWN;
-		this.maxCooldown = WIND_MAX_COOLDOWN;
-		this.gustDuration = WIND_GUST_DURATION;
+		this.minCooldown = 10;
+		this.maxCooldown = 20;
+		this.gustDuration = 3;
 	}
 
 	/**
@@ -49,7 +41,7 @@ export class WindSystem {
 	 */
 	triggerGust() {
 		this.active = true;
-		this.direction = Math.random() < 0.5 ? WIND_DIRECTION_LEFT : WIND_DIRECTION_RIGHT;
+		this.direction = Math.random() < 0.5 ? -1 : 1;
 		this.timer = this.gustDuration;
 	}
 

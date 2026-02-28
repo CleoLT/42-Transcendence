@@ -1,346 +1,813 @@
-import {
-	AI_CAPABILITIES,
-	AI_CONFIG,
-	AI_REACTION_TIME,
-	AI_PERFECT_ZONE,
-	AI_PREDICTION_TIME,
-	AI_AIM_ERROR_MULTIPLIER,
-	AI_AIM_JITTER_THRESHOLD,
-	AI_IMMINENT_BLOSSOM_THRESHOLD,
-	AI_PUSH_CHANCE_EASY,
-	AI_PUSH_CHANCE_NORMAL,
-	AI_GOLDEN_BLOSSOM_SCORE,
-	AI_PERFECT_CATCH_SCORE,
-	AI_DISTANCE_PENALTY,
-	AI_OPPONENT_CLOSER_PENALTY,
-	AI_OPPONENT_BLOCKING_PENALTY,
-	AI_OPPONENT_CLOSER_THRESHOLD,
-	AI_BLOCKING_DISTANCE,
-	AI_STOP_DISTANCE,
-	AI_STEER_THRESHOLD,
-	AI_DASH_DISTANCE_THRESHOLD,
-	AI_GOLDEN_NEARBY_DISTANCE,
-	AI_LANE_STREAK_THRESHOLD,
-	AI_WIND_PREDICTION_TIME,
-	BLOSSOM_FALL_SPEED,
-	BLOSSOM_WIND_DRIFT,
-	ABILITY_COSTS
-} from './Constants.js';
+import { PLAYER_SPEED, BLOSSOM_FALL_SPEED, BLOSSOM_WIND_DRIFT, ABILITY_COSTS } from './Constants.js';
 
+/**
+ * Sistema de IA completamente reescrito desde cero.
+ * Arquitectura modular basada en Strategy Pattern para diferentes dificultades.
+ * 
+ * Estructura:
+ * - AIStrategy: Clase base abstracta para estrategias de dificultad
+ * - EasyStrategy, MediumStrategy, HardStrategy: Implementaciones específicas
+ * - AI: Coordinador principal que delega a la estrategia correspondiente
+ */
+
+/**
+ * Clase base abstracta para estrategias de dificultad de IA.
+ * Define la interfaz común que todas las dificultades deben implementar.
+ */
+class AIStrategy {
+	/**
+	 * @param {Player} player - El jugador controlado por esta IA
+	 * @param {number} canvasWidth - Ancho del canvas
+	 * @param {number} canvasHeight - Alto del canvas
+	 */
+	constructor(player, canvasWidth, canvasHeight) {
+		this.player = player;
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
+	}
+
+	/**
+	 * Calcula la posición objetivo X basada en el estado del juego.
+	 * 
+	 * @param {Array<Object>} blossoms - Lista de blossoms activos
+	 * @param {Player} otherPlayer - Jugador oponente
+	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
+	 * @param {WindSystem} windSystem - Sistema de viento (opcional)
+	 * @returns {number|null} Posición X objetivo, o null si no hay objetivo
+	 */
+	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
+		throw new Error('calculateTargetX must be implemented by subclass');
+	}
+
+	/**
+	 * Calcula si debe activarse el push.
+	 * 
+	 * @param {Player} otherPlayer - Jugador oponente
+	 * @param {Array<Object>} blossoms - Lista de blossoms activos
+	 * @returns {boolean} True si debe activarse push
+	 */
+	shouldPush(otherPlayer, blossoms) {
+		return false;
+	}
+
+	/**
+	 * Calcula si debe usarse dash.
+	 * 
+	 * @param {number} targetX - Posición objetivo X
+	 * @param {Array<Object>} blossoms - Lista de blossoms activos
+	 * @returns {boolean} True si debe usarse dash
+	 */
+	shouldDash(targetX, blossoms) {
+		return false;
+	}
+
+	/**
+	 * Calcula qué habilidad debe usarse, si alguna.
+	 * 
+	 * @param {Player} otherPlayer - Jugador oponente
+	 * @param {Array<Object>} blossoms - Lista de blossoms activos
+	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
+	 * @returns {string|null} Nombre de la habilidad a usar ('reversePush', 'inkFreeze', 'momentumSurge') o null
+	 */
+	shouldUseAbility(otherPlayer, blossoms, laneSystem) {
+		return null;
+	}
+
+	/**
+	 * Predice la posición futura de un blossom considerando viento.
+	 * 
+	 * @param {Object} blossom - Blossom a predecir
+	 * @param {number} timeToReach - Tiempo estimado para alcanzar la altura del jugador
+	 * @param {WindSystem} windSystem - Sistema de viento
+	 * @returns {number} Posición X predicha
+	 */
+	predictBlossomPosition(blossom, timeToReach, windSystem) {
+		let predictedX = blossom.x;
+		
+		// Aplicar velocidad horizontal actual
+		if (blossom.vx) {
+			predictedX += blossom.vx * timeToReach;
+		}
+		
+		// Aplicar deriva del viento si está activo
+		if (windSystem && windSystem.isActive()) {
+			const windDirection = windSystem.getDirection();
+			predictedX += windDirection * BLOSSOM_WIND_DRIFT * timeToReach;
+		}
+		
+		return predictedX;
+	}
+
+	/**
+	 * Calcula el tiempo estimado para que un blossom alcance la altura del jugador.
+	 * 
+	 * @param {Object} blossom - Blossom a evaluar
+	 * @returns {number} Tiempo en segundos, o Infinity si no es alcanzable
+	 */
+	calculateTimeToReach(blossom) {
+		if (blossom.y >= this.player.y) {
+			// El blossom ya está a la altura del jugador o más abajo
+			return 0;
+		}
+		
+		const verticalDistance = this.player.y - blossom.y;
+		const fallSpeed = blossom.vy || BLOSSOM_FALL_SPEED;
+		
+		if (fallSpeed <= 0) {
+			return Infinity;
+		}
+		
+		return verticalDistance / fallSpeed;
+	}
+}
+
+/**
+ * Estrategia Easy: IA básica con limitaciones artificiales.
+ * - Delay artificial en reacciones
+ * - Errores pequeños en el seguimiento
+ * - Sin predicción de movimiento
+ * - Velocidad limitada
+ */
+class EasyStrategy extends AIStrategy {
+	constructor(player, canvasWidth, canvasHeight) {
+		super(player, canvasWidth, canvasHeight);
+		
+		// Estado interno para delay artificial
+		this.reactionDelay = 0.5; // segundos de delay (aumentado para hacer más fácil)
+		this.reactionTimer = 0;
+		this.lastTargetX = null;
+		
+		// Parámetros de error artificial (aumentados para hacer más fácil)
+		this.trackingError = 40; // píxeles de offset máximo (aumentado)
+		this.errorChance = 0.5; // probabilidad de cometer error (aumentado)
+	}
+
+	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
+		// Filtrar blossoms activos y alcanzables
+		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
+		
+		if (activeBlossoms.length === 0) {
+			return null;
+		}
+
+		// Aplicar delay artificial: solo actualizar objetivo cada cierto tiempo
+		// Nota: el timer se actualiza en AI.update() con deltaTime real
+		if (this.reactionTimer < this.reactionDelay) {
+			return this.lastTargetX;
+		}
+		this.reactionTimer = 0;
+
+		// Seleccionar el blossom más cercano verticalmente
+		let bestBlossom = null;
+		let minVerticalDistance = Infinity;
+
+		for (const blossom of activeBlossoms) {
+			const verticalDistance = this.player.y - blossom.y;
+			if (verticalDistance < minVerticalDistance && verticalDistance > 0) {
+				minVerticalDistance = verticalDistance;
+				bestBlossom = blossom;
+			}
+		}
+
+		if (!bestBlossom) {
+			return null;
+		}
+
+		// Sin predicción: usar posición actual
+		let targetX = bestBlossom.x;
+
+		// Aplicar error artificial ocasional
+		if (Math.random() < this.errorChance) {
+			const errorOffset = (Math.random() - 0.5) * 2 * this.trackingError;
+			targetX += errorOffset;
+		}
+
+		this.lastTargetX = targetX;
+		return targetX;
+	}
+
+	shouldPush(otherPlayer, blossoms) {
+		// Easy raramente hace push
+		return false;
+	}
+
+	shouldUseAbility(otherPlayer, blossoms, laneSystem) {
+		// Easy no usa habilidades o las usa muy mal (muy raramente)
+		if (!this.player.abilitiesEnabled) {
+			return null;
+		}
+
+		// Solo usar habilidades muy ocasionalmente y sin estrategia (muy raro)
+		if (Math.random() < 0.01) { // 1% de probabilidad por frame (reducido)
+			// Usar la habilidad más barata si está disponible
+			const cost = ABILITY_COSTS.reversePush;
+			if (this.player.perfectMeter.value >= cost && 
+			    this.player.abilities.reversePush.cooldown <= 0) {
+				return 'reversePush';
+			}
+		}
+
+		return null;
+	}
+}
+
+/**
+ * Estrategia Medium: IA intermedia sin limitaciones extremas.
+ * - Sin delay artificial
+ * - Sigue correctamente el objetivo
+ * - Predicción básica (sin viento)
+ * - Velocidad normal
+ * - Usa habilidades básicamente (sin mucha estrategia)
+ */
+class MediumStrategy extends AIStrategy {
+	constructor(player, canvasWidth, canvasHeight) {
+		super(player, canvasWidth, canvasHeight);
+		this.lastAbilityUse = 0;
+		this.abilityCooldown = 3.0; // Segundos entre usos de habilidades
+	}
+
+	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
+		// Filtrar blossoms activos y alcanzables
+		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
+		
+		if (activeBlossoms.length === 0) {
+			return null;
+		}
+
+		// Priorizar blossoms dorados
+		const goldenBlossoms = activeBlossoms.filter(b => b.golden);
+		const candidates = goldenBlossoms.length > 0 ? goldenBlossoms : activeBlossoms;
+
+		// Seleccionar el mejor blossom basado en distancia y valor
+		let bestBlossom = null;
+		let bestScore = Infinity;
+
+		for (const blossom of candidates) {
+			const timeToReach = this.calculateTimeToReach(blossom);
+			
+			if (timeToReach === Infinity || timeToReach < 0) {
+				continue;
+			}
+
+			// Predicción básica: solo posición actual + velocidad horizontal (sin viento)
+			const predictedX = this.predictBlossomPosition(blossom, timeToReach, null);
+			
+			// Calcular distancia horizontal
+			const horizontalDistance = Math.abs(predictedX - this.player.x);
+			
+			// Score: distancia vertical + distancia horizontal (normalizada)
+			const score = (this.player.y - blossom.y) + horizontalDistance * 0.5;
+			
+			// Penalizar si el oponente está más cerca (umbral más permisivo para Medium)
+			const opponentDistance = Math.abs(predictedX - otherPlayer.x);
+			if (opponentDistance < horizontalDistance * 0.5) {
+				continue; // Oponente mucho más cerca, ignorar este blossom
+			}
+
+			if (score < bestScore) {
+				bestScore = score;
+				bestBlossom = blossom;
+			}
+		}
+
+		if (!bestBlossom) {
+			return null;
+		}
+
+		const timeToReach = this.calculateTimeToReach(bestBlossom);
+		return this.predictBlossomPosition(bestBlossom, timeToReach, null);
+	}
+
+	shouldPush(otherPlayer, blossoms) {
+		// Medium hace push ocasionalmente cuando está superpuesto (menos agresivo)
+		if (!this.player.overlaps(otherPlayer)) {
+			return false;
+		}
+
+		// Verificar si hay blossoms cercanos
+		const nearbyBlossoms = blossoms.filter(b => 
+			b.active && 
+			Math.abs(b.y - this.player.y) < 100
+		);
+
+		return nearbyBlossoms.length > 0 && Math.random() < 0.25; // Reducido de 0.4 a 0.25
+	}
+
+	shouldDash(targetX, blossoms) {
+		if (!targetX || this.player.dashCooldown > 0 || this.player.dashing) {
+			return false;
+		}
+
+		const distance = Math.abs(targetX - this.player.x);
+		// Dash si el objetivo está lejos y hay un blossom dorado cerca
+		const hasGoldenNearby = blossoms.some(b => 
+			b.active && 
+			b.golden && 
+			Math.abs(b.x - this.player.x) < 200
+		);
+
+		return distance > 150 && hasGoldenNearby;
+	}
+
+	shouldUseAbility(otherPlayer, blossoms, laneSystem) {
+		if (!this.player.abilitiesEnabled) {
+			return null;
+		}
+
+		// Medium usa habilidades básicamente cuando tiene recursos suficientes
+		// Sin mucha estrategia, más reactivo que proactivo
+		// Evaluar todas las habilidades y elegir la mejor según la situación
+
+		const abilityScores = [];
+
+		// 1. Evaluar inkFreeze (la más potente) - prioridad alta
+		const inkFreezeCost = ABILITY_COSTS.inkFreeze;
+		if (this.player.perfectMeter.value >= inkFreezeCost && 
+		    this.player.abilities.inkFreeze.cooldown <= 0 &&
+		    !otherPlayer.frozen) {
+			let score = 0;
+			const goldenBlossoms = blossoms.filter(b => b.active && b.golden);
+			if (goldenBlossoms.length > 0) {
+				const targetBlossom = goldenBlossoms[0];
+				const opponentDistance = Math.abs(targetBlossom.x - otherPlayer.x);
+				const myDistance = Math.abs(targetBlossom.x - this.player.x);
+				
+				// Score alto si el oponente está más cerca de un objetivo dorado
+				if (opponentDistance < myDistance && opponentDistance < 120) {
+					score = 80 + (120 - opponentDistance); // Más cerca = más score
+				}
+			}
+			
+			// También score si el oponente está bloqueando el camino
+			if (this.player.overlaps(otherPlayer)) {
+				const nearbyBlossoms = blossoms.filter(b => 
+					b.active && 
+					Math.abs(b.y - this.player.y) < 100
+				);
+				if (nearbyBlossoms.length > 0) {
+					score = Math.max(score, 50);
+				}
+			}
+			
+			if (score > 0 && Math.random() < 0.4) { // 40% de probabilidad si hay score
+				abilityScores.push({ ability: 'inkFreeze', score });
+			}
+		}
+
+		// 2. Evaluar reversePush
+		const reversePushCost = ABILITY_COSTS.reversePush;
+		if (this.player.perfectMeter.value >= reversePushCost && 
+		    this.player.abilities.reversePush.cooldown <= 0 &&
+		    !otherPlayer.invertControlsActive) {
+			let score = 0;
+			const distanceToOpponent = Math.abs(this.player.x - otherPlayer.x);
+			const hasImportantBlossoms = blossoms.some(b => 
+				b.active && 
+				(b.golden || Math.abs(b.y - this.player.y) < 100)
+			);
+			
+			if (distanceToOpponent < 180 && hasImportantBlossoms) {
+				score = 30 + (180 - distanceToOpponent) * 0.2;
+			}
+			
+			if (score > 0 && Math.random() < 0.3) { // 30% de probabilidad
+				abilityScores.push({ ability: 'reversePush', score });
+			}
+		}
+
+		// 3. Evaluar momentumSurge
+		const momentumSurgeCost = ABILITY_COSTS.momentumSurge;
+		if (this.player.perfectMeter.value >= momentumSurgeCost && 
+		    this.player.abilities.momentumSurge.cooldown <= 0) {
+			let score = 0;
+			
+			// Score alto si está en situación de push competitiva
+			if (this.player.overlaps(otherPlayer)) {
+				const nearbyBlossoms = blossoms.filter(b => 
+					b.active && 
+					Math.abs(b.y - this.player.y) < 120
+				);
+				if (nearbyBlossoms.length > 0) {
+					score = 40;
+				}
+			}
+			
+			if (score > 0 && Math.random() < 0.25) { // 25% de probabilidad
+				abilityScores.push({ ability: 'momentumSurge', score });
+			}
+		}
+
+		// Elegir la habilidad con mayor score
+		if (abilityScores.length > 0) {
+			abilityScores.sort((a, b) => b.score - a.score);
+			return abilityScores[0].ability;
+		}
+
+		return null;
+	}
+}
+
+/**
+ * Estrategia Hard: IA avanzada con predicción completa.
+ * - Sin delay
+ * - Predice posición futura del objetivo con viento
+ * - Reacción inmediata
+ * - Usa velocidad máxima
+ * - Sin errores artificiales
+ * - Usa habilidades de forma estratégica e inteligente
+ */
+class HardStrategy extends AIStrategy {
+	constructor(player, canvasWidth, canvasHeight) {
+		super(player, canvasWidth, canvasHeight);
+	}
+
+	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
+		// Filtrar blossoms activos y alcanzables
+		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
+		
+		if (activeBlossoms.length === 0) {
+			return null;
+		}
+
+		// Priorizar blossoms dorados
+		const goldenBlossoms = activeBlossoms.filter(b => b.golden);
+		const candidates = goldenBlossoms.length > 0 ? goldenBlossoms : activeBlossoms;
+
+		// Evaluar cada candidato con predicción completa
+		let bestBlossom = null;
+		let bestScore = -Infinity;
+
+		for (const blossom of candidates) {
+			const timeToReach = this.calculateTimeToReach(blossom);
+			
+			if (timeToReach === Infinity || timeToReach < 0) {
+				continue;
+			}
+
+			// Predicción completa con viento
+			const predictedX = this.predictBlossomPosition(blossom, timeToReach, windSystem);
+			
+			// Calcular si el jugador puede alcanzar esa posición
+			const horizontalDistance = Math.abs(predictedX - this.player.x);
+			const timeToMove = horizontalDistance / PLAYER_SPEED;
+			
+			// Verificar si es alcanzable
+			if (timeToMove > timeToReach * 1.1) {
+				continue; // No alcanzable
+			}
+
+			// Calcular score basado en valor y accesibilidad
+			let score = 0;
+			
+			// Bonus por blossom dorado
+			if (blossom.golden) {
+				score += 200;
+			}
+			
+			// Bonus por perfect catch potencial (si hay laneSystem)
+			if (laneSystem) {
+				const laneRegion = laneSystem.getLaneRegionForPoint(predictedX);
+				if (laneRegion >= 0 && laneSystem.isInLaneCenter(predictedX, laneRegion)) {
+					score += 100;
+				}
+			}
+			
+			// Penalizar por distancia
+			score -= horizontalDistance * 0.3;
+			
+			// Penalizar si el oponente está más cerca
+			const opponentDistance = Math.abs(predictedX - otherPlayer.x);
+			if (opponentDistance < horizontalDistance * 0.8) {
+				score -= 50;
+			}
+
+			// Penalizar si el oponente está bloqueando el camino
+			const isBlocked = (this.player.x < predictedX && otherPlayer.x > this.player.x && otherPlayer.x < predictedX) ||
+			                  (this.player.x > predictedX && otherPlayer.x < this.player.x && otherPlayer.x > predictedX);
+			if (isBlocked && Math.abs(otherPlayer.x - predictedX) < 80) {
+				score -= 80;
+			}
+
+			if (score > bestScore) {
+				bestScore = score;
+				bestBlossom = blossom;
+			}
+		}
+
+		if (!bestBlossom) {
+			return null;
+		}
+
+		const timeToReach = this.calculateTimeToReach(bestBlossom);
+		return this.predictBlossomPosition(bestBlossom, timeToReach, windSystem);
+	}
+
+	shouldPush(otherPlayer, blossoms) {
+		if (!this.player.overlaps(otherPlayer)) {
+			return false;
+		}
+
+		// Hard hace push estratégicamente cuando hay blossoms cercanos
+		const nearbyBlossoms = blossoms.filter(b => 
+			b.active && 
+			Math.abs(b.y - this.player.y) < 120
+		);
+
+		if (nearbyBlossoms.length === 0) {
+			return false;
+		}
+
+		// Push si hay un blossom objetivo cerca del oponente
+		const targetBlossom = nearbyBlossoms[0];
+		const distanceToBlossom = Math.abs(targetBlossom.x - this.player.x);
+		const opponentDistanceToBlossom = Math.abs(targetBlossom.x - otherPlayer.x);
+
+		return opponentDistanceToBlossom < distanceToBlossom * 0.9;
+	}
+
+	shouldDash(targetX, blossoms) {
+		if (!targetX || this.player.dashCooldown > 0 || this.player.dashing) {
+			return false;
+		}
+
+		const distance = Math.abs(targetX - this.player.x);
+		
+		// Dash si el objetivo está lejos y es alcanzable con dash
+		if (distance > 120) {
+			// Verificar si hay un blossom dorado como objetivo
+			const hasGoldenTarget = blossoms.some(b => 
+				b.active && 
+				b.golden && 
+				Math.abs(b.x - targetX) < 30
+			);
+
+			return hasGoldenTarget || distance > 200;
+		}
+
+		return false;
+	}
+
+	shouldUseAbility(otherPlayer, blossoms, laneSystem) {
+		if (!this.player.abilitiesEnabled) {
+			return null;
+		}
+
+		// Hard usa habilidades de forma estratégica e inteligente
+		// Evaluar todas las habilidades y elegir la mejor según la situación
+		// Priorizar inkFreeze cuando sea más útil (es la más potente)
+
+		const abilityScores = [];
+
+		// 1. Evaluar inkFreeze (la más potente) - máxima prioridad
+		const inkFreezeCost = ABILITY_COSTS.inkFreeze;
+		if (this.player.perfectMeter.value >= inkFreezeCost && 
+		    this.player.abilities.inkFreeze.cooldown <= 0 &&
+		    !otherPlayer.frozen) {
+			let score = 0;
+			
+			const goldenBlossoms = blossoms.filter(b => b.active && b.golden);
+			if (goldenBlossoms.length > 0) {
+				const targetBlossom = goldenBlossoms[0];
+				const timeToReach = this.calculateTimeToReach(targetBlossom);
+				const predictedX = this.predictBlossomPosition(targetBlossom, timeToReach, null);
+				
+				const opponentDistance = Math.abs(predictedX - otherPlayer.x);
+				const myDistance = Math.abs(predictedX - this.player.x);
+				
+				// Score muy alto si el oponente está más cerca y está a punto de alcanzarlo
+				if (opponentDistance < myDistance && 
+				    opponentDistance < 70 && 
+				    timeToReach < 1.0) {
+					score = 150 + (70 - opponentDistance) * 2; // Score muy alto
+				}
+			}
+			
+			// También score alto si el oponente está bloqueando el camino
+			const tempTargetX = this.calculateTargetX(blossoms, otherPlayer, laneSystem, null);
+			if (tempTargetX !== null) {
+				const isBlocked = (this.player.x < tempTargetX && otherPlayer.x > this.player.x && otherPlayer.x < tempTargetX) ||
+				                  (this.player.x > tempTargetX && otherPlayer.x < this.player.x && otherPlayer.x > tempTargetX);
+				if (isBlocked && Math.abs(otherPlayer.x - tempTargetX) < 120) {
+					score = Math.max(score, 120);
+				}
+			}
+			
+			if (score > 0) {
+				abilityScores.push({ ability: 'inkFreeze', score });
+			}
+		}
+
+		// 2. Evaluar reversePush
+		const reversePushCost = ABILITY_COSTS.reversePush;
+		if (this.player.perfectMeter.value >= reversePushCost && 
+		    this.player.abilities.reversePush.cooldown <= 0 &&
+		    !otherPlayer.invertControlsActive) {
+			let score = 0;
+			
+			const goldenBlossoms = blossoms.filter(b => b.active && b.golden);
+			if (goldenBlossoms.length > 0) {
+				const targetBlossom = goldenBlossoms[0];
+				const timeToReach = this.calculateTimeToReach(targetBlossom);
+				const predictedX = this.predictBlossomPosition(targetBlossom, timeToReach, null);
+				
+				const opponentDistance = Math.abs(predictedX - otherPlayer.x);
+				const myDistance = Math.abs(predictedX - this.player.x);
+				
+				// Score si el oponente está más cerca y está a punto de alcanzarlo
+				if (opponentDistance < myDistance && 
+				    opponentDistance < 90 && 
+				    timeToReach < 1.2) {
+					score = 60 + (90 - opponentDistance);
+				}
+			}
+			
+			// También score cuando el oponente está moviéndose activamente
+			if (this.player.overlaps(otherPlayer)) {
+				const nearbyBlossoms = blossoms.filter(b => 
+					b.active && 
+					Math.abs(b.y - this.player.y) < 120
+				);
+				if (nearbyBlossoms.length > 0) {
+					score = Math.max(score, 50);
+				}
+			}
+			
+			if (score > 0) {
+				abilityScores.push({ ability: 'reversePush', score });
+			}
+		}
+
+		// 3. Evaluar momentumSurge
+		const momentumSurgeCost = ABILITY_COSTS.momentumSurge;
+		if (this.player.perfectMeter.value >= momentumSurgeCost && 
+		    this.player.abilities.momentumSurge.cooldown <= 0) {
+			let score = 0;
+			
+			// Score alto en situaciones de control de carril
+			if (laneSystem) {
+				const myLane = this.player.getLaneRegion(laneSystem);
+				const opponentLane = otherPlayer.getLaneRegion(laneSystem);
+				
+				if (myLane >= 0 && myLane === opponentLane) {
+					const laneBlossoms = blossoms.filter(b => {
+						if (!b.active) return false;
+						const timeToReach = this.calculateTimeToReach(b);
+						const predictedX = this.predictBlossomPosition(b, timeToReach, null);
+						const laneRegion = laneSystem.getLaneRegionForPoint(predictedX);
+						return laneRegion === myLane;
+					});
+					
+					if (laneBlossoms.length > 0 && this.player.overlaps(otherPlayer)) {
+						score = 80;
+					}
+				}
+			}
+			
+			// También score cuando hay múltiples blossoms dorados
+			const goldenBlossoms = blossoms.filter(b => b.active && b.golden);
+			if (goldenBlossoms.length >= 2 && this.player.overlaps(otherPlayer)) {
+				score = Math.max(score, 70);
+			}
+			
+			if (score > 0) {
+				abilityScores.push({ ability: 'momentumSurge', score });
+			}
+		}
+
+		// Elegir la habilidad con mayor score
+		if (abilityScores.length > 0) {
+			abilityScores.sort((a, b) => b.score - a.score);
+			return abilityScores[0].ability;
+		}
+
+		return null;
+	}
+}
+
+/**
+ * Clase principal de IA que coordina las estrategias de dificultad.
+ * Completamente desacoplada del render y basada en lógica determinista.
+ */
 export class AI {
 	/**
-	 * Creates an AI controller that drives a `Player` using heuristics based on
-	 * difficulty, wind, lane ownership and opponent positioning.
-	 *
-	 * @param {Player} player - The player instance controlled by this AI.
-	 * @param {'easy' | 'normal' | 'hard'} [difficulty='easy'] - Difficulty preset.
-	 * @param {number} canvasWidth - Canvas width for fallback targeting.
-	 * @param {number} canvasHeight - Canvas height (reserved for future use).
+	 * Crea un controlador de IA que maneja un jugador usando estrategias de dificultad.
+	 * 
+	 * @param {Player} player - Instancia del jugador controlado por esta IA
+	 * @param {'easy' | 'medium' | 'hard'} difficulty - Nivel de dificultad
+	 * @param {number} canvasWidth - Ancho del canvas
+	 * @param {number} canvasHeight - Alto del canvas
 	 */
 	constructor(player, difficulty = 'easy', canvasWidth, canvasHeight) {
-		// Core references and tuning parameters
 		this.player = player;
 		this.difficulty = difficulty;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
-
-		// Targeting and reaction state
-		this.targetBlossom = null;
-		this.targetX = 0;
-		this.reactionTime = AI_REACTION_TIME;
-		this.reactionTimer = 0;
-		this.lastDecision = 0;
-
-		// Additional timers used by the hard AI behaviours
-		this.defensiveTimer = 0;
+		// Crear estrategia según dificultad
+		this.strategy = this.createStrategy(difficulty, player, canvasWidth, canvasHeight);
+		
+		// Estado interno
+		this.targetX = null;
+		this.pushActive = false;
+		this.abilityToUse = null;
+		this.currentBlossoms = [];
+		this.currentOtherPlayer = null;
+		this.currentLaneSystem = null;
 	}
 
 	/**
-	 * Executes a single AI decision step appropriate to the difficulty.
-	 *
-	 * @param {number} deltaTime - Time step for this frame.
-	 * @param {Array<Object>} blossoms - Current blossom list.
-	 * @param {Player} otherPlayer - Opposing player.
-	 * @param {LaneSystem} laneSystem - Lanes used for perfect detection.
-	 * @param {WindSystem} windSystem - Wind used for trajectory prediction.
-	 * @param {InputManager} inputManager - Input manager for dash simulation.
+	 * Factory method para crear la estrategia apropiada según la dificultad.
+	 * 
+	 * @param {string} difficulty - Nivel de dificultad
+	 * @param {Player} player - Jugador controlado
+	 * @param {number} canvasWidth - Ancho del canvas
+	 * @param {number} canvasHeight - Alto del canvas
+	 * @returns {AIStrategy} Instancia de la estrategia
+	 */
+	createStrategy(difficulty, player, canvasWidth, canvasHeight) {
+		switch (difficulty.toLowerCase()) {
+			case 'easy':
+				return new EasyStrategy(player, canvasWidth, canvasHeight);
+			case 'medium':
+			case 'normal': // Compatibilidad con dificultad anterior
+				return new MediumStrategy(player, canvasWidth, canvasHeight);
+			case 'hard':
+				return new HardStrategy(player, canvasWidth, canvasHeight);
+			default:
+				return new EasyStrategy(player, canvasWidth, canvasHeight);
+		}
+	}
+
+	/**
+	 * Actualiza la lógica de IA en cada frame del juego.
+	 * Completamente determinista y desacoplada del render.
+	 * 
+	 * @param {number} deltaTime - Tiempo transcurrido desde el último frame (en segundos)
+	 * @param {Array<Object>} blossoms - Lista actual de blossoms
+	 * @param {Player} otherPlayer - Jugador oponente
+	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
+	 * @param {WindSystem} windSystem - Sistema de viento (opcional)
+	 * @param {InputManager} inputManager - Gestor de entrada (no usado aquí, solo para compatibilidad)
 	 */
 	update(deltaTime, blossoms, otherPlayer, laneSystem, windSystem, inputManager) {
-		// Accumulate elapsed time and only act when reaction threshold is met
-		this.reactionTimer += deltaTime;
-
-		// Route to simple or advanced logic based on difficulty selection
-		if (this.difficulty === 'easy' || this.difficulty === 'normal') {
-			const config = AI_CONFIG[this.difficulty] || AI_CONFIG.normal;
-			this.updateEasy(blossoms, this.player, otherPlayer, config);
-		} else {
-			this.updateHard(deltaTime, blossoms, otherPlayer, laneSystem, windSystem, inputManager);
+		// Actualizar delay timer para Easy (si es necesario)
+		if (this.strategy instanceof EasyStrategy) {
+			this.strategy.reactionTimer += deltaTime;
 		}
+
+		// Calcular posición objetivo usando la estrategia
+		this.targetX = this.strategy.calculateTargetX(
+			blossoms,
+			otherPlayer,
+			laneSystem,
+			windSystem
+		);
+
+		// Calcular si debe hacer push
+		this.pushActive = this.strategy.shouldPush(otherPlayer, blossoms);
+		
+		// Calcular qué habilidad usar (si alguna)
+		this.abilityToUse = this.strategy.shouldUseAbility(otherPlayer, blossoms, laneSystem);
+		
+		// Guardar blossoms para uso en getMovementInput
+		this.currentBlossoms = blossoms;
+		this.currentOtherPlayer = otherPlayer;
+		this.currentLaneSystem = laneSystem;
 	}
 
 	/**
-	 * Simpler heuristic for easy/normal AI: prioritises reachable blossoms and
-	 * occasionally pushes when overlapping the opponent.
-	 *
-	 * @param {Array<Object>} blossoms - Current blossoms in play.
-	 * @param {Player} player - Controlled player reference.
-	 * @param {Player} otherPlayer - Opponent reference.
-	 * @param {Object} config - Difficulty tuning (hesitation, aim error, etc.).
-	 */
-	updateEasy(blossoms, player, otherPlayer, config) {
-		// Exit when there are no blossom targets to consider
-		if (!blossoms || blossoms.length === 0) return;
-
-		// Step 1: Choose the best reachable blossom based on vertical and horizontal cost
-		let target = null;
-		let bestScore = Infinity;
-
-		for (const b of blossoms) {
-			const dy = b.y - player.y;
-			if (dy < 0) continue;
-
-			// Combine vertical distance and horizontal offset into a simple score
-			const score = dy + Math.abs(b.x - player.x) * 0.3;
-
-			if (score < bestScore) {
-				bestScore = score;
-				target = b;
-			}
-		}
-
-		// Give up when no viable blossom candidate is found
-		if (!target) return;
-
-		// Step 2: Predict landing X coordinate with a small bias towards safety
-		let predictedX = target.x + (target.vx || 0) * AI_PREDICTION_TIME;
-
-		// Step 3: Add occasional hesitation without discarding the current target
-		if (Math.random() < config.hesitationChance && this.targetX !== null) {
-			return;
-		}
-
-		// Step 4: Decide whether this is near-perfect and adjust aim
-		const distanceFromCenter = Math.abs(predictedX - player.x);
-		const nearPerfect = distanceFromCenter < AI_PERFECT_ZONE;
-
-		// Step 5: Sometimes deliberately offset away from a perfect catch
-		if (nearPerfect && Math.random() > config.perfectChance) {
-			predictedX += (Math.random() - 0.5) * config.aimError * AI_AIM_ERROR_MULTIPLIER;
-		}
-
-		// Step 6: Add aim jitter only when already close to the target
-		if (distanceFromCenter < AI_AIM_JITTER_THRESHOLD) {
-			predictedX += (Math.random() * 2 - 1) * config.aimError;
-		}
-
-		// Cache the new X destination for movement steering
-		this.targetX = predictedX;
-
-		// Step 7: Decide whether to push the opponent when overlapping and a blossom is imminent
-		this.pushActive = false;
-
-		if (this.player.overlaps(otherPlayer)) {
-			const imminentBlossom = blossoms.some(b =>
-				Math.abs(b.y - player.y) < AI_IMMINENT_BLOSSOM_THRESHOLD
-			);
-
-			if (imminentBlossom) {
-				const pushChance = this.difficulty === 'easy' ? AI_PUSH_CHANCE_EASY : AI_PUSH_CHANCE_NORMAL;
-				this.pushActive = Math.random() < pushChance;
-			}
-		}
-	}
-
-	/**
-	 * Advanced AI logic for hard difficulty, including lane and wind-aware
-	 * targeting plus ability usage.
-	 *
-	 * @param {number} deltaTime - Time step for this frame.
-	 * @param {Array<Object>} blossoms - Full blossom list.
-	 * @param {Player} otherPlayer - Opponent reference.
-	 * @param {LaneSystem} laneSystem - Lane system for perfect and control.
-	 * @param {WindSystem} windSystem - Wind state for drift prediction.
-	 * @param {InputManager} inputManager - Input manager for dash simulation.
-	 */
-	updateHard(deltaTime, blossoms, otherPlayer, laneSystem, windSystem, inputManager) {
-		// Respect a shorter reaction time so this AI feels more responsive
-		if (this.reactionTimer < this.reactionTime) {
-			return;
-		}
-		this.reactionTimer = 0;
-
-		// Tick down internal behaviour timers
-		this.defensiveTimer -= deltaTime;
-
-		// Filter down to active blossoms that can still be interacted with
-		const activeBlossoms = blossoms.filter(b => b.active);
-
-		// Default to center position when no blossoms are available
-		if (activeBlossoms.length === 0) {
-			this.targetX = this.canvasWidth * 0.5;
-			return;
-		}
-
-		// Prefer golden blossoms first, then any remaining active blossoms
-		const goldenBlossoms = activeBlossoms.filter(b => b.golden);
-		const targetBlossoms = goldenBlossoms.length > 0 ? goldenBlossoms : activeBlossoms;
-
-		// Score each candidate blossom based on value, distance and blocking
-		let bestBlossom = null;
-		let bestScore = -Infinity;
-
-		targetBlossoms.forEach(blossom => {
-			// Predict where the blossom will land vertically aligned with the player
-			const timeToLand = (blossom.y - this.player.y) / (blossom.vy || BLOSSOM_FALL_SPEED);
-			let predictedX = blossom.x;
-
-			// Integrate wind drift over time to refine the landing estimate
-			if (windSystem && windSystem.isActive()) {
-				predictedX += windSystem.getDirection() * BLOSSOM_WIND_DRIFT * timeToLand;
-			}
-
-			// Check if this predicted position would yield a perfect catch
-			const laneRegion = laneSystem.getLaneRegionForPoint(predictedX);
-			const isPerfect = laneRegion >= 0 && laneSystem.isInLaneCenter(predictedX, laneRegion);
-
-			// Combine blossom type, perfect opportunity and distance into a score
-			let score = 0;
-			if (blossom.golden) score += AI_GOLDEN_BLOSSOM_SCORE;
-			if (isPerfect) score += AI_PERFECT_CATCH_SCORE;
-
-			const distance = Math.abs(predictedX - this.player.x);
-			score -= distance * AI_DISTANCE_PENALTY;
-
-			// Penalise targets where the opponent is significantly closer
-			const distToOther = Math.abs(predictedX - otherPlayer.x);
-			if (distToOther < distance * AI_OPPONENT_CLOSER_THRESHOLD) {
-				score -= AI_OPPONENT_CLOSER_PENALTY;
-			}
-
-			// Reduce desirability when the opponent is physically blocking the path
-			if (Math.abs(otherPlayer.x - predictedX) < AI_BLOCKING_DISTANCE && otherPlayer.x > this.player.x && predictedX > this.player.x) {
-				score -= AI_OPPONENT_BLOCKING_PENALTY;
-			}
-			if (Math.abs(otherPlayer.x - predictedX) < AI_BLOCKING_DISTANCE && otherPlayer.x < this.player.x && predictedX < this.player.x) {
-				score -= AI_OPPONENT_BLOCKING_PENALTY;
-			}
-
-			// Keep track of the best-scoring blossom candidate
-			if (score > bestScore) {
-				bestScore = score;
-				bestBlossom = {
-					x: predictedX,
-					blossom: blossom,
-					isPerfect: isPerfect
-				};
-			}
-		});
-
-		// Lock onto the highest scoring target and its predicted X
-		if (bestBlossom) {
-			this.targetBlossom = bestBlossom.blossom;
-			this.targetX = bestBlossom.x;
-		}
-
-		// Layer lane-control behaviour on top: try to intercept streak lanes
-		const lanes = laneSystem.lanes;
-		lanes.forEach(lane => {
-			if (lane.catchStreak.player1 > AI_LANE_STREAK_THRESHOLD && this.player.id === 2) {
-				// Look for blossoms falling within this lane's horizontal bounds
-				const laneBlossoms = activeBlossoms.filter(b => {
-					const predictedX = b.x + (windSystem && windSystem.isActive() ? windSystem.getDirection() * BLOSSOM_WIND_DRIFT * AI_WIND_PREDICTION_TIME : 0);
-					return predictedX >= lane.leftEdge && predictedX <= lane.rightEdge;
-				});
-				if (laneBlossoms.length > 0) {
-					this.targetBlossom = laneBlossoms[0];
-					this.targetX = lane.centerX;
-				}
-			}
-		});
-
-		// Evaluate push strategy when opponent blocks access to our target
-		this.pushActive = false;
-		if (this.targetBlossom && this.player.overlaps(otherPlayer)) {
-			const laneRegion = this.player.getLaneRegion(laneSystem);
-			const otherLaneRegion = otherPlayer.getLaneRegion(laneSystem);
-
-			if (laneRegion >= 0 && laneRegion === otherLaneRegion) {
-				const lane = laneSystem.getLane(laneRegion);
-				if (lane.owner === this.player.id) {
-					// Favour aggression when we own the contested lane
-					this.pushActive = true;
-				} else if (lane.owner === otherPlayer.id) {
-					// Attempt to dash away when the opponent owns the lane
-					if (this.player.dashCooldown <= 0 && !this.player.dashing) {
-						const dashKeys = this.player.id === 1
-							? { dash: 'Space' }
-							: { dash: 'ShiftRight' };
-						inputManager.simulateKeyPress(dashKeys.dash);
-					}
-				}
-			}
-
-			// Push if the opponent stands directly between the AI and its target
-			if (this.targetBlossom) {
-				const targetX = this.targetX;
-				const playerX = this.player.x;
-				const otherX = otherPlayer.x;
-
-				if ((playerX < targetX && otherX > playerX && otherX < targetX) ||
-					(playerX > targetX && otherX < playerX && otherX > targetX)) {
-					this.pushActive = true;
-				}
-			}
-		}
-
-		// Allow higher difficulties to use special abilities as part of their plan
-		const caps = AI_CAPABILITIES[this.difficulty];
-
-		if (caps.canUseAbilities) {
-			this.useAbilities(otherPlayer, laneSystem, activeBlossoms);
-		}
-
-	}
-
-	// Ability usage for AI is intentionally disabled for now; all abilities other
-	// than the input inversion are placeholders, and inversion is handled by the
-	// same cooldown/resource rules as human players.
-
-	/**
-	 * Converts AI targeting decisions into horizontal input via InputManager.
-	 *
-	 * @param {InputManager} inputManager - Input API to simulate key presses on.
+	 * Convierte las decisiones de IA en entradas de teclado simuladas.
+	 * Este método aplica el movimiento calculado por la estrategia.
+	 * 
+	 * @param {InputManager} inputManager - Gestor de entrada para simular teclas
 	 */
 	getMovementInput(inputManager) {
-		// If there is no target, clear inputs so the player remains idle
-		if (!this.targetX) {
-			const keys = this.player.id === 1
-				? { left: 'KeyA', right: 'KeyD', dash: 'Space', push: 'ControlRight' }
-				: { left: 'ArrowLeft', right: 'ArrowRight', dash: 'ShiftRight', push: 'ControlRight' };
-			inputManager.simulateKeyRelease(keys.left);
-			inputManager.simulateKeyRelease(keys.right);
-			return;
-		}
-
-		// Work out the horizontal delta to the target X
-		const dx = this.targetX - this.player.x;
-		const distance = Math.abs(dx);
-
+		// Obtener mapeo de teclas según el ID del jugador
 		const keys = this.player.id === 1
 			? { left: 'KeyA', right: 'KeyD', dash: 'Space', push: 'ControlRight' }
 			: { left: 'ArrowLeft', right: 'ArrowRight', dash: 'ShiftRight', push: 'ControlRight' };
 
-		// Reset movement keys so we don't accumulate stale input
+		// Limpiar todas las entradas de movimiento primero
 		inputManager.simulateKeyRelease(keys.left);
 		inputManager.simulateKeyRelease(keys.right);
 
-		// Stop issuing movement input once we are close enough
-		if (distance < AI_STOP_DISTANCE) {
+		// Si no hay objetivo, no hacer nada
+		if (this.targetX === null) {
 			return;
 		}
 
-		// Gently steer left or right towards the target without snapping
-		if (Math.abs(dx) > AI_STEER_THRESHOLD) {
+		// Calcular distancia y dirección al objetivo
+		const dx = this.targetX - this.player.x;
+		const distance = Math.abs(dx);
+
+		// Si estamos suficientemente cerca, no moverse
+		const stopThreshold = 8; // píxeles
+		if (distance < stopThreshold) {
+			return;
+		}
+
+		// Determinar dirección de movimiento
+		const moveThreshold = 3; // píxeles mínimos para iniciar movimiento
+		if (Math.abs(dx) > moveThreshold) {
 			if (dx < 0) {
 				inputManager.simulateKeyPress(keys.left);
 			} else {
@@ -348,24 +815,43 @@ export class AI {
 			}
 		}
 
-		// Consider dashing for golden blossoms or defensive escapes
-		const caps = AI_CAPABILITIES[this.difficulty];
-
-		if (caps.canDash && this.player.dashCooldown <= 0 && !this.player.dashing) {
-			// Offensive dash to reach distant golden blossoms
-			if (distance > AI_DASH_DISTANCE_THRESHOLD && this.targetBlossom && this.targetBlossom.golden) {
-				if (inputManager.wasKeyJustPressed(keys.dash)) {
-					inputManager.consumeKey(keys.dash);
-				} else {
-					inputManager.simulateKeyPress(keys.dash);
-				}
+		// Evaluar dash según la estrategia
+		const blossoms = this.currentBlossoms || [];
+		if (this.strategy.shouldDash(this.targetX, blossoms)) {
+			if (this.player.dashCooldown <= 0 && !this.player.dashing) {
+				inputManager.simulateKeyPress(keys.dash);
 			}
-			// Defensive dash when a defensive window is active
-			if (this.defensiveTimer > 0) {
-				if (inputManager.wasKeyJustPressed(keys.dash)) {
-					inputManager.consumeKey(keys.dash);
-				} else {
-					inputManager.simulateKeyPress(keys.dash);
+		}
+
+		// Aplicar push si está activo
+		if (this.pushActive && this.player.pushCooldown <= 0) {
+			inputManager.simulateKeyPress(keys.push);
+		}
+
+		// Usar habilidad si está disponible y la estrategia lo recomienda
+		if (this.abilityToUse && this.player.abilitiesEnabled) {
+			// Mapeo de habilidades a teclas (jugador 2 usa Numpad)
+			const abilityKeys = {
+				reversePush: 'Numpad1',
+				inkFreeze: 'Numpad2',
+				momentumSurge: 'Numpad3'
+			};
+
+			const abilityKey = abilityKeys[this.abilityToUse];
+			if (abilityKey) {
+				// Verificar que la habilidad esté disponible con doble verificación
+				const ability = this.player.abilities[this.abilityToUse];
+				const requiredCost = ABILITY_COSTS[this.abilityToUse];
+				
+				// Verificar cooldown, recursos y que la habilidad exista
+				if (ability && 
+				    ability.cooldown <= 0 && 
+				    this.player.perfectMeter.value >= requiredCost &&
+				    !this.player.frozen) {
+					// Simular presión de tecla (edge-triggered)
+					if (!inputManager.wasKeyJustPressed(abilityKey)) {
+						inputManager.simulateKeyPress(abilityKey);
+					}
 				}
 			}
 		}

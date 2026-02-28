@@ -10,58 +10,32 @@ import { LaneTint } from './LaneTint.js';
 import { PerfectMeter } from './PerfectMeter.js';
 import { InputManager } from './InputManager.js';
 import {
+	RED,
 	PLAYER_RADIUS,
 	PERFECT_METER_MAX,
 	PERFECT_CATCH_FACTOR,
 	PERFECT_CATCH_EFFECT_DURATION,
-	PERFECT_CATCH_EFFECT_SCALE,
-	PERFECT_METER_GOLDEN_BONUS,
 	MISS_EFFECT_DURATION,
-	MISS_EFFECT_Y_OFFSET,
-	MISS_EFFECT_SIZE_MIN,
-	MISS_EFFECT_SIZE_MAX,
-	MISS_EFFECT_ALPHA,
 	ROUND_INDICATOR_DURATION,
-	ROUND_RESET_DELAY,
 	TABLE_WIDTH_FACTOR,
 	TABLE_HEIGHT_FACTOR,
 	TABLE_INSET_FACTOR,
 	TABLE_BOTTOM_OFFSET,
 	TABLE_MIN_INSET,
-	COLLISION_WALL_THRESHOLD,
-	PLAYER_COLLISION_TARGET_DISTANCE,
-	PAUSE_BUTTON_X_OFFSET,
-	PAUSE_BUTTON_Y_OFFSET,
-	PAUSE_BUTTON_SIZE,
-	PAUSE_BUTTON_COLOR,
-	PAUSE_BUTTON_TEXT_COLOR,
 	PAUSE_BUTTON_FONT,
 	LOADING_BACKGROUND_COLOR,
 	LOADING_TEXT_COLOR,
 	LOADING_TEXT_FONT,
-	ROUND_INDICATOR_BG_ALPHA,
-	ROUND_INDICATOR_CIRCLE_COLOR,
-	ROUND_INDICATOR_CIRCLE_RADIUS,
 	ROUND_INDICATOR_TEXT_COLOR,
 	ROUND_INDICATOR_TITLE_FONT,
 	ROUND_INDICATOR_SUBTITLE_FONT,
 	ROUND_INDICATOR_CONTROLS_FONT,
 	ROUND_INDICATOR_CONTROLS_SMALL_FONT,
 	ROUND_INDICATOR_SCORE_FONT,
-	ROUND_INDICATOR_SCORE_SUB_FONT,
 	ROUND_INDICATOR_TIMER_FONT,
-	ROUND_INDICATOR_TIMER_ALPHA,
-	ROUND_INDICATOR_Y_OFFSET,
 	ROUND_INDICATOR_COLUMN_OFFSET,
-	ROUND_INDICATOR_RESET_SUB_FONT,
-	ROUND_INDICATOR_SCORE_Y_OFFSET,
-	PAUSE_OVERLAY_ALPHA,
 	PAUSE_TEXT_FONT,
-	PAUSE_TEXT_Y_OFFSET,
 	PAUSE_TIMER_FONT,
-	PAUSE_TIMER_COLOR,
-	PAUSE_TIMER_Y_OFFSET,
-	MAX_ROUNDS,
 	BLOSSOM_DESPAWN_Y_OFFSET,
 } from './Constants.js';
 
@@ -173,7 +147,8 @@ export class Game {
 		if (this.totalRoundsOverride != null) {
 			this.roundSystem.setMaxRounds(this.totalRoundsOverride);
 		}
-		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint);
+		console.log("theme game constructor", this.theme);
+		this.renderer = new Renderer(this.ctx, this.canvas.width, this.canvas.height, this.spriteLibrary, this.laneTint, this.theme);
 
 	  
 		// Seed starting lane ownership so the UI has clear sides
@@ -275,6 +250,9 @@ export class Game {
 		this.theme = theme;
 		if (this.spriteLibrary && typeof this.spriteLibrary.setTheme === 'function') {
 			await this.spriteLibrary.setTheme(theme);
+		}
+		if (this.renderer?.setTheme) {
+			this.renderer.setTheme(theme);
 		}
 	}
 
@@ -497,12 +475,12 @@ export class Game {
 		if (this.laneTint) {
 			this.laneTint.update(dt);
 		}
-
+		const perfect_catch_effect_scale = 0.3;
 		// Animate and fade perfect catch feedback sprites (always runs for visual continuity)
 		this.perfectCatchEffects.forEach(e => {
 			e.timer -= dt;
 			e.alpha = e.timer / PERFECT_CATCH_EFFECT_DURATION;
-			e.scale = 1 + (1 - e.alpha) * PERFECT_CATCH_EFFECT_SCALE;
+			e.scale = 1 + (1 - e.alpha) * perfect_catch_effect_scale;
 		});
 
 		this.perfectCatchEffects =
@@ -540,7 +518,8 @@ export class Game {
 		const right = left === p1 ? p2 : p1;
 	
 		const minDistance = left.radius + right.radius - 10;
-		const targetDistance = minDistance * PLAYER_COLLISION_TARGET_DISTANCE;
+		const collisionTargetDistance = 0.99;
+		const targetDistance = minDistance * collisionTargetDistance;
 
 		const distance = right.x - left.x;
 		if (distance >= targetDistance) {
@@ -553,8 +532,9 @@ export class Game {
 		const minLeftX = this.arenaLeft;
 		const maxRightX = this.arenaRight;
 		
-		const leftAtWall = left.x <= minLeftX + COLLISION_WALL_THRESHOLD;
-		const rightAtWall = right.x >= maxRightX - COLLISION_WALL_THRESHOLD;
+		const wallThreshold = 0.5;
+		const leftAtWall = left.x <= minLeftX + wallThreshold;
+		const rightAtWall = right.x >= maxRightX - wallThreshold;
 
 
 		
@@ -653,8 +633,9 @@ export class Game {
 
 		// Charge perfect meter and spawn visual feedback when applicable
 		if (isPerfect) {
-			if (blossom.golden) player.perfectMeter.add(PERFECT_METER_GOLDEN_BONUS);
-			else player.perfectMeter.add();
+			const perfect_meter_golden_bonus = 2;
+			if (blossom.golden) player.perfectMeter.add(perfect_meter_golden_bonus);
+			else player.perfectMeter.add(1);
 			this.perfectCatchEffects.push({
 				x: player.getX(),
 				y: player.getY() - 40,
@@ -678,12 +659,16 @@ export class Game {
 	 */
 	handleMiss(blossom) {
 		// Add a new miss effect instance near the bottom of the canvas
+		const missEffectYOffset = 50;
+		const missEffectSizeMax = 50;
+		const missEffectSizeMin = 30;
+		const missEffectAlpha = 0.6;
 		this.missEffects.push({
 			x: blossom.x,
-			y: this.canvas.height - MISS_EFFECT_Y_OFFSET,
+			y: this.canvas.height - missEffectYOffset,
 			timer: MISS_EFFECT_DURATION,
-			alpha: MISS_EFFECT_ALPHA,
-			size: MISS_EFFECT_SIZE_MIN + Math.random() * (MISS_EFFECT_SIZE_MAX - MISS_EFFECT_SIZE_MIN)
+			alpha: missEffectAlpha,
+			size: missEffectSizeMin + Math.random() * (missEffectSizeMax - missEffectSizeMin)
 		});
 	}
 
@@ -761,12 +746,13 @@ export class Game {
 		} else {
 			// Reset state and schedule the following round after a short pause
 			this.resetRound();
+			const roundResetDelay = 2000;
 			setTimeout(() => {
 				this.roundSystem.startRound();
 				// Show round indicator
 				this.showRoundIndicator = true;
 				this.roundIndicatorTimer = ROUND_INDICATOR_DURATION;
-			}, ROUND_RESET_DELAY);
+			}, roundResetDelay);
 		}
 	}
 
@@ -834,10 +820,15 @@ export class Game {
 		this.blossomSystem.reset();
 		this.windSystem.reset();
 		// Decide if we are about to enter the special second round layout
-		const isRound2 = this.roundSystem.getCurrentRound() === 1;
+		const isRound1 = this.roundSystem.getCurrentRound() === 0;
 
-		if (isRound2) {
-			// Rebuild lane ownership from scratch for round two
+		if (isRound1) {
+			this.laneSystem.reset();
+			if (this.laneTint) {
+				this.laneTint.reset();
+			}
+		} else {
+			// Rebuild lane ownership from scratch for round one
 			this.laneSystem.reset();
 
 			// Assign left/right lanes to players and keep middle neutral
@@ -854,13 +845,7 @@ export class Game {
 			if (this.laneTint) {
 				this.laneTint.reset();
 				this.setupInitialLaneTints();
-			}
-		} else {
-			// For other rounds, simply reset lanes and tint helpers
-			this.laneSystem.reset();
-			if (this.laneTint) {
-				this.laneTint.reset();
-			}
+			} 
 		}
 
 		this.perfectCatchEffects = [];
@@ -927,17 +912,20 @@ export class Game {
 			const barY = this.canvas.height * 0.1;
 			
 			// Pause button (red circle) - store position for click detection
-			const pauseButtonX = centerX - PAUSE_BUTTON_X_OFFSET;
-			const pauseButtonY = barY - PAUSE_BUTTON_Y_OFFSET;
+			const pauseButtonOffset = 40
+			const pauseButtonX = centerX - pauseButtonOffset;
+			const pauseButtonY = barY - pauseButtonOffset;
+			const pauseButtonSize = 80;
 			this.pauseButtonBounds = {
 				x: pauseButtonX,
 				y: pauseButtonY,
-				width: PAUSE_BUTTON_SIZE,
-				height: PAUSE_BUTTON_SIZE
+				width: pauseButtonSize,
+				height: pauseButtonSize
 			};
 			
 			// Draw pause button first (red circle)
-			this.renderer.drawCapsule(ctx, pauseButtonX, pauseButtonY, PAUSE_BUTTON_SIZE, PAUSE_BUTTON_SIZE, 100, PAUSE_BUTTON_COLOR);
+			const pauseButtonColor = RED;
+			this.renderer.drawCapsule(ctx, pauseButtonX, pauseButtonY, pauseButtonSize, pauseButtonSize, 100, pauseButtonColor);
 			
 			// Render timer INSIDE the pause button (centered, always visible during gameplay)
 			if (this.roundSystem && this.roundSystem.roundActive) {
@@ -949,7 +937,8 @@ export class Game {
 				ctx.textBaseline = 'middle';
 				
 				// Draw black text on top
-				ctx.fillStyle = PAUSE_BUTTON_TEXT_COLOR;
+				const pauseButtonTextColor = '#000000';
+				ctx.fillStyle = pauseButtonTextColor;
 				ctx.fillText(`${timeRemaining}s`, centerX, pauseButtonY + 45);
 				ctx.restore();
 			}
@@ -1014,14 +1003,14 @@ export class Game {
 		const radius = 287;
 
 		if (!useBlurLayer) {
-			ctx.fillStyle = `rgba(0, 0, 0, ${ROUND_INDICATOR_BG_ALPHA})`;
+			ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
 			ctx.fillRect(0, 0, w, h);
 		}
 
 		// Red circle (indicator style)
 		ctx.beginPath();
 		ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-		ctx.fillStyle = ROUND_INDICATOR_CIRCLE_COLOR;
+		ctx.fillStyle = RED;
 		ctx.fill();
 
 		// All content inside the circle, centered
@@ -1029,18 +1018,17 @@ export class Game {
 		ctx.textBaseline = 'middle';
 		const currentRound = this.roundSystem.getCurrentRound();
 		const timeRemaining = Math.ceil(this.roundIndicatorTimer);
-
+		const Yoffset = -150;
 		// Title: "Round 1" / "Round 2"
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 		ctx.font = ROUND_INDICATOR_TITLE_FONT;
-		ctx.fillText(`ROUND ${currentRound}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET);
-
+		ctx.fillText(`ROUND ${currentRound}`, centerX, centerY + Yoffset);
 		// Subtitle: "1 / 2"
 		ctx.font = ROUND_INDICATOR_SUBTITLE_FONT;
-		ctx.fillText(`${currentRound} / ${this.totalRoundsOverride}`, centerX, centerY + ROUND_INDICATOR_Y_OFFSET + 42);
+		ctx.fillText(`${currentRound} / ${this.totalRoundsOverride}`, centerX, centerY + Yoffset + 42);
 
 		// Countdown (large, subtle)
-		ctx.fillStyle = `rgba(255, 255, 255, ${ROUND_INDICATOR_TIMER_ALPHA})`;
+		ctx.fillStyle = `rgba(255, 255, 255, 0.35)`;
 		ctx.font = ROUND_INDICATOR_TIMER_FONT;
 		ctx.fillText(String(timeRemaining), centerX, centerY + 200);
 
@@ -1129,24 +1117,26 @@ export class Game {
 	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
 	 */
 	renderPauseOverlay(ctx) {
+		const YOffset = -60;
+		const timerYOffset = 40;
 		ctx.save();
-		ctx.fillStyle = `rgba(0, 0, 0, ${PAUSE_OVERLAY_ALPHA})`;
+		ctx.fillStyle = `rgba(0, 0, 0, 0.7)`;
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		
 		// Display "PAUSED" text
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
-		ctx.fillStyle = PAUSE_TIMER_COLOR;
+		ctx.fillStyle = RED;
 		ctx.font = PAUSE_TEXT_FONT;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-		ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 + PAUSE_TEXT_Y_OFFSET);
+		ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 + YOffset);
 		
 		// Display remaining time
 		if (this.roundSystem && this.roundSystem.roundActive) {
 			const timeRemaining = this.roundSystem.getTimeRemaining();
 			ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 			ctx.font = PAUSE_TIMER_FONT;
-			ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + PAUSE_TIMER_Y_OFFSET);
+			ctx.fillText(`Time Remaining: ${timeRemaining}s`, this.canvas.width / 2, this.canvas.height / 2 + timerYOffset);
 		}
 		
 		ctx.restore();

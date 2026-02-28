@@ -62,11 +62,8 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   const { username } = useAuth()
   const [player1Name, setPlayer1Name] = useState("")
   
-  useEffect(() => {
-    if (username) {
-      setPlayer1Name(username)
-    }
-  }, [username])
+  
+
   const [player2Name, setPlayer2Name] = useState("")
   const [vsAI, setVsAI] = useState(true)
   const [difficulty, setDifficulty] = useState("easy")
@@ -77,7 +74,31 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   const [player1Color, setPlayer1Color] = useState("#e8b0a3")
   const [player2Color, setPlayer2Color] = useState("#fdd28b")
   const [theme, setTheme] = useState("classic")
-
+  const themeColorPresets = {
+    classic: {
+      p1: "#e8b0a3",
+      p2: "#fdd28b"
+    },
+    fishbowl: {
+      p1: "#4ecdc4",
+      p2: "#1a535c"
+    },
+    sushiland: {
+      p1: "#ff6b6b",
+      p2: "#ffe66d"
+    }
+  }
+  
+  useEffect(() => {
+    if (username) {
+      setPlayer1Name(username)
+    }
+    const preset = themeColorPresets[theme]
+    if (preset) {
+      setPlayer1Color(preset.p1)
+      setPlayer2Color(preset.p2)
+    }
+  }, [username, theme])
   const _p1 = Boolean(player1Name.trim())
   const _p2 = vsAI || Boolean(player2Name.trim())
   const canPlay = _p1 && _p2 && !!game

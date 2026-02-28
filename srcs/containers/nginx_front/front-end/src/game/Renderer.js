@@ -5,7 +5,6 @@ import {
 	BLOSSOM_SPRITE_SIZE_GOLDEN,
 	BLOSSOM_PETAL_COUNT,
 	BLOSSOM_PETAL_SIZE_NORMAL,
-	BLOSSOM_PETAL_SIZE_GOLDEN,
 	BLOSSOM_CENTER_SIZE_NORMAL,
 	BLOSSOM_CENTER_SIZE_GOLDEN,
 	BLOSSOM_PINK_FILL,
@@ -23,7 +22,6 @@ import {
 	PAPER_TEXTURE_SIZE_MAX,
 	PAPER_TEXTURE_COLOR,
 	PAPER_BACKGROUND_COLOR,
-	BAMBOO_SEPARATOR_WIDTH,
 	BAMBOO_SEPARATOR_STROKE_WIDTH,
 	BAMBOO_SEPARATOR_COLOR,
 	BAMBOO_SEPARATOR_INK_BLEED,
@@ -36,89 +34,23 @@ import {
 	BAMBOO_SEPARATOR_STEP,
 	BAMBOO_SEPARATOR_VARIATION_FACTOR,
 	BAMBOO_SEPARATOR_WASH_STEP,
-	PERFECT_METER_CAPSULE_COUNT,
-	PERFECT_METER_CAPSULE_WIDTH,
-	PERFECT_METER_CAPSULE_HEIGHT,
-	PERFECT_METER_CAPSULE_GAP,
-	PERFECT_METER_CAPSULE_RADIUS,
-	PERFECT_METER_CAPSULE_COLORS,
-	PERFECT_METER_INACTIVE_COLOR,
-	PERFECT_METER_BAR_Y_FACTOR,
-	ABILITY_INDICATOR_RADIUS,
-	ABILITY_INDICATOR_SPACING,
-	ABILITY_INDICATOR_OFFSET,
-	ABILITY_INDICATOR_AVAILABLE_COLOR,
-	ABILITY_INDICATOR_UNAVAILABLE_COLOR,
-	ABILITY_INDICATOR_STROKE_COLOR,
-	ABILITY_SPRITE_SIZE,
-	ABILITY_SPRITE_Y_OFFSET,
 	TABLE_WIDTH_FACTOR,
 	TABLE_HEIGHT_FACTOR,
 	TABLE_INSET_FACTOR,
 	TABLE_BOTTOM_OFFSET,
 	TABLE_MIN_INSET,
-	TABLE_LEG_COUNT,
-	TABLE_LEG_WIDTH_FACTOR,
-	TABLE_LEG_HEIGHT_FACTOR,
-	TABLE_LEG_POSITION_LEFT,
-	TABLE_LEG_POSITION_CENTER,
-	TABLE_LEG_POSITION_RIGHT,
-	TABLE_LEG_MIN_WIDTH,
-	TABLE_LEG_RADIUS_FACTOR,
-	TABLE_LEG_MIN_RADIUS,
 	TABLE_LEG_COLOR,
-	TABLE_OUTLINE_WIDTH_FACTOR,
-	TABLE_OUTLINE_MIN_WIDTH,
 	TABLE_OUTLINE_COLOR,
-	TABLE_GRAIN_LINES,
 	TABLE_GRAIN_COLOR,
-	TABLE_GRAIN_LINE_WIDTH,
-	TABLE_GRAIN_PADDING,
 	TABLE_INK_WASHES,
-	TABLE_INK_WASH_COLOR,
-	BOWL_SHADOW_Y_OFFSET_FACTOR,
-	BOWL_SHADOW_RADIUS_X_OFFSET,
-	BOWL_SHADOW_RADIUS_Y_FACTOR,
-	BOWL_LINE_WIDTH_FACTOR,
-	BOWL_LABEL_Y_OFFSET,
-	BOWL_FONT_SIZE_FACTOR,
-	BOWL_INK_BLOOM_SIZE_FACTOR,
-	BOWL_PERFECT_WINDOW_Y_FACTOR,
-	BOWL_PERFECT_WINDOW_HEIGHT_FACTOR,
-	BOWL_PERFECT_WINDOW_ALPHA,
-	BOWL_PERFECT_WINDOW_COLOR,
-	BOWL_PERFECT_WINDOW_LINE_WIDTH,
 	BOWL_COLOR_DEFAULT_1,
 	BOWL_COLOR_DEFAULT_2,
-	BOWL_COLOR_FROZEN,
-	BOWL_COLOR_MOMENTUM,
 	BOWL_COLOR_DASHING,
 	BOWL_RIM_COLOR_DEFAULT,
-	BOWL_RIM_COLOR_FROZEN,
-	BOWL_RIM_COLOR_MOMENTUM,
 	BOWL_RIM_COLOR_DASHING,
 	BOWL_SHADOW_COLOR,
 	BOWL_STROKE_COLOR,
-	BOWL_LABEL_COLOR,
 	BOWL_LABEL_FONT,
-	INK_BLOOM_RINGS,
-	INK_BLOOM_ALPHA_BASE,
-	INK_BLOOM_COLOR,
-	PERFECT_CATCH_SPLASH_RADIUS,
-	PERFECT_CATCH_SPLASH_COLOR,
-	PERFECT_CATCH_TEXT_FONT,
-	PERFECT_CATCH_TEXT_LETTER_SPACING,
-	PERFECT_CATCH_TEXT_STROKE_COLOR,
-	PERFECT_CATCH_TEXT_COLOR_NORMAL,
-	PERFECT_CATCH_TEXT_COLOR_GOLDEN,
-	PERFECT_CATCH_TEXT_Y_OFFSET,
-	WIND_STREAK_SPAWN_CHANCE,
-	WIND_STREAK_SPEED,
-	WIND_STREAK_LENGTH_MIN,
-	WIND_STREAK_LENGTH_MAX,
-	WIND_STREAK_LINE_WIDTH,
-	WIND_STREAK_COLOR,
-	WIND_STREAK_BOUNDS_OFFSET,
 	PERFECT_CATCH_FACTOR
 } from './Constants.js';
 
@@ -133,7 +65,7 @@ export class Renderer {
 	 * @param {SpriteLibrary|null} spriteLibrary - Optional sprite provider.
 	 * @param {LaneTint|null} laneTint - Optional lane tint helper.
 	 */
-	constructor(ctx, canvasWidth, canvasHeight, spriteLibrary = null, laneTint = null) {
+	constructor(ctx, canvasWidth, canvasHeight, spriteLibrary = null, laneTint = null, theme = "classic") {
 		// Core drawing context and geometry
 		this.ctx = ctx;
 		this.canvasWidth = canvasWidth;
@@ -143,11 +75,32 @@ export class Renderer {
 		this.paperTextureGenerated = false;
 		this.spriteLibrary = spriteLibrary;
 		this.laneTint = laneTint;
-
+		this.theme = theme;
+		console.log("theme render constructor", this.theme);
 		// Build in-memory fallback blossom sprites for when none are loaded
 		this.createBlossomSprites();
 	}
 
+	setTheme(theme) {
+		this.theme = theme;
+	
+		// Si laneTint depende del theme
+		if (this.laneTint?.updateForTheme) {
+			this.laneTint.updateForTheme(theme);
+		}
+	
+		// Si tus sprites dependen del theme
+		if (this.spriteLibrary?.updateForTheme) {
+			this.spriteLibrary.updateForTheme(theme);
+		}
+	
+		// Redibuja el canvas si es necesario
+		if (typeof this.render === "function") {
+			this.render();
+		}
+	
+		console.log("Renderer theme updated to:", this.theme);
+	}
 	/**
 	 * Creates simple canvas-based sprites for normal and golden blossoms for
 	 * use when texture images are not available.
@@ -207,8 +160,8 @@ export class Renderer {
 		goldenCtx.beginPath();
 		for (let i = 0; i < petals; i++) {
 			const angle = i * angleStep;
-			const x = goldenCenter + Math.cos(angle) * BLOSSOM_PETAL_SIZE_GOLDEN;
-			const y = goldenCenter + Math.sin(angle) * BLOSSOM_PETAL_SIZE_GOLDEN;
+			const x = goldenCenter + Math.cos(angle);
+			const y = goldenCenter + Math.sin(angle);
 
 			if (i === 0) {
 				goldenCtx.moveTo(x, y);
@@ -286,11 +239,12 @@ export class Renderer {
 		const bambooSprite = this.spriteLibrary && this.spriteLibrary.getBambooSprite(index);
 
 		if (bambooSprite) {
-			const spriteWidth = BAMBOO_SEPARATOR_WIDTH;
+			const spriteWidth = 30;
 			const spriteHeight = this.canvasHeight;
 			ctx.translate(x, 0);
 			ctx.drawImage(bambooSprite, -spriteWidth / 2, 0, spriteWidth, spriteHeight);
 		} else {
+			//CHANGE
 			// Fallback: vertical, slightly irregular stroke with ink specks
 			ctx.strokeStyle = BAMBOO_SEPARATOR_COLOR;
 			ctx.lineWidth = BAMBOO_SEPARATOR_STROKE_WIDTH;
@@ -405,12 +359,13 @@ export class Renderer {
 
 		// Position dots below the score (which is at y + 18)
 		const dotY = y + 18;
-		
+		const abilityIndicatorSpacing = 30;
+		const abilityIndicatorOffset = 4;
 		// For left player (right-aligned text), dots start from nameX and go left
 		// For right player (left-aligned text), dots start from nameX and go right
 		const dotStartX = isLeft 
-			? nameX + (ABILITY_INDICATOR_SPACING * ABILITY_INDICATOR_OFFSET) // Right-align: start from nameX, go left
-			: nameX - (ABILITY_INDICATOR_SPACING * ABILITY_INDICATOR_OFFSET); // Left-align: start from nameX, go right
+			? nameX + (abilityIndicatorSpacing * abilityIndicatorOffset) // Right-align: start from nameX, go left
+			: nameX - (abilityIndicatorSpacing * abilityIndicatorOffset); // Left-align: start from nameX, go right
 
 		ctx.save();
 
@@ -421,41 +376,43 @@ export class Renderer {
 			const ability = player.abilities[abilityName];
 			// For left player, subtract to go left; for right player, add to go right
 			const dotX = isLeft 
-				? dotStartX - (index * ABILITY_INDICATOR_SPACING)
-				: dotStartX + (index * ABILITY_INDICATOR_SPACING);
+				? dotStartX - (index * abilityIndicatorSpacing)
+				: dotStartX + (index * abilityIndicatorSpacing);
 
 			const hasAbility = !!ability;
 			const onCooldown = hasAbility && ability.cooldown > 0;
 			const hasMeter = hasAbility && player.perfectMeter.value >= ability.cost;
 			// Ability is available only if not on cooldown and player has enough perfect meter
 			const isAvailable = hasAbility && !onCooldown && hasMeter && !player.frozen;
-
+			const indicatorRadius = 9;
+			const indicatorStrokeColor = '#999999';
 			// Draw dot - lit if available, red with timer if on cooldown,
 			// solid red when the player is frozen, dim otherwise.
 			ctx.beginPath();
-			ctx.arc(dotX, dotY, ABILITY_INDICATOR_RADIUS, 0, Math.PI * 2);
+			ctx.arc(dotX, dotY, indicatorRadius, 0, Math.PI * 2);
 			
 			if (player.frozen) {
 				// While frozen, all abilities are visually blocked in solid red
 				ctx.fillStyle = '#ff3333';
 				ctx.fill();
-				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
+				ctx.strokeStyle = indicatorStrokeColor;
 				ctx.lineWidth = 1;
 				ctx.stroke();
 			} else if (isAvailable) {
+				const indicatorColor = '#00ff11';
 				// Lit: glowing/filled circle
-				ctx.fillStyle = ABILITY_INDICATOR_AVAILABLE_COLOR;
+				ctx.fillStyle = indicatorColor;
 				ctx.fill();
 				// Add a subtle glow effect
 				ctx.shadowBlur = 10;
-				ctx.shadowColor = ABILITY_INDICATOR_AVAILABLE_COLOR;
+				ctx.shadowColor = indicatorColor;
 				ctx.fill();
 				ctx.shadowBlur = 0;
 			} else if (onCooldown) {
 				// Cooldown: red indicator with remaining seconds
 				ctx.fillStyle = '#ff3333';
 				ctx.fill();
-				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
+				ctx.strokeStyle = indicatorStrokeColor;
 				ctx.lineWidth = 1;
 				ctx.stroke();
 
@@ -469,16 +426,18 @@ export class Renderer {
 				ctx.fillText(`${remaining}`, dotX, dotY + 2);
 				ctx.restore();
 			} else {
+				const indicatorColor = '#CCCCCC';
 				// Dim: outline only
-				ctx.fillStyle = ABILITY_INDICATOR_UNAVAILABLE_COLOR;
+				ctx.fillStyle = indicatorColor;
 				ctx.fill();
-				ctx.strokeStyle = ABILITY_INDICATOR_STROKE_COLOR;
+				ctx.strokeStyle = indicatorStrokeColor;
 				ctx.lineWidth = 1;
 				ctx.stroke();
 			}
 
 			// Draw ability sprite below the dot
-			const spriteY = dotY + ABILITY_INDICATOR_RADIUS + ABILITY_SPRITE_Y_OFFSET;
+			const spriteYOffset = 12;
+			const spriteY = dotY + indicatorRadius + spriteYOffset;
 			this.drawAbilitySprite(ctx, abilityName, dotX, spriteY, isAvailable);
 		});
 
@@ -495,7 +454,7 @@ export class Renderer {
 	 * @param {boolean} isAvailable - Whether the ability is available.
 	 */
 	drawAbilitySprite(ctx, abilityName, x, y, isAvailable) {
-		const spriteSize = ABILITY_SPRITE_SIZE;
+		const spriteSize = 16;
 		const alpha = isAvailable ? 1.0 : 0.4;
 
 		ctx.save();
@@ -563,6 +522,21 @@ export class Renderer {
 	}
 
 	renderPerfectMeter(ctx, player, centerX, y) {
+		const perfectMeterCapsuleCount = 6;
+		const perfectMeterCapsuleWidth = 40;
+		const perfectMeterCapsuleHeight = 75;
+		const perfectMeterCapsuleGap = 10;
+		const perfectMeterCapsuleRadius = 100;
+		const perfectMeterCapsuleColors = [
+			'#FEEBEB', // First two
+			'#FEEBEB',
+			'#F9BEBE', // Middle two
+			'#F9BEBE',
+			'#FDD28B', // Last two
+			'#FDD28B'
+		];
+		const perfectMeterInactiveColor = '#D9D9D9';
+
 
 		const meter = player.perfectMeter;
 		if (!meter) return;
@@ -571,35 +545,35 @@ export class Renderer {
 		const filled = meter.value;
 	
 		const totalWidth =
-			PERFECT_METER_CAPSULE_COUNT * PERFECT_METER_CAPSULE_WIDTH +
-			(PERFECT_METER_CAPSULE_COUNT - 1) * PERFECT_METER_CAPSULE_GAP;
+			perfectMeterCapsuleCount * perfectMeterCapsuleWidth +
+			(perfectMeterCapsuleCount - 1) * perfectMeterCapsuleGap;
 	
 			// Capsules grow outward from center
 			const startX = isLeft
 			? (centerX - 50) - totalWidth
 			: (centerX + 50);
 			
-			const yTop = y - PERFECT_METER_CAPSULE_HEIGHT / 2;
+			const yTop = y - perfectMeterCapsuleHeight / 2;
 	
-		for (let i = 0; i < PERFECT_METER_CAPSULE_COUNT; i++) {
+		for (let i = 0; i < perfectMeterCapsuleCount; i++) {
 			const index = isLeft
-				? PERFECT_METER_CAPSULE_COUNT - 1 - i // fill from center outward
+				? perfectMeterCapsuleCount - 1 - i // fill from center outward
 				: i;
 	
 			const active = index < filled;
 	
 			const x =
 				startX +
-				i * (PERFECT_METER_CAPSULE_WIDTH + PERFECT_METER_CAPSULE_GAP);
+				i * (perfectMeterCapsuleWidth + perfectMeterCapsuleGap);
 	
 			this.drawCapsule(
 				ctx,
 				x,
 				yTop,
-				PERFECT_METER_CAPSULE_WIDTH,
-				PERFECT_METER_CAPSULE_HEIGHT,
-				PERFECT_METER_CAPSULE_RADIUS,
-				active ? PERFECT_METER_CAPSULE_COLORS[index] : PERFECT_METER_INACTIVE_COLOR
+				perfectMeterCapsuleWidth,
+				perfectMeterCapsuleHeight,
+				perfectMeterCapsuleRadius,
+				active ? perfectMeterCapsuleColors[index] : perfectMeterInactiveColor
 			);
 		}
 	}
@@ -676,7 +650,7 @@ export class Renderer {
 			}
 
 			// The bowl is the avatar representation; draw it in place
-			this.drawBowl(drawX, drawY, player.id, player);
+			this.drawBowl(drawX, drawY, player.id, player, this.theme);
 		});
 	}
 
@@ -723,6 +697,7 @@ export class Renderer {
 		ctx.lineTo(tableX, bottomY);
 		ctx.closePath();
 
+		//CHANGE
 		// Layer multiple ink washes for a richer, sumi-e-style top
 		for (let i = 0; i < TABLE_INK_WASHES.length; i++) {
 			ctx.save();
@@ -732,29 +707,40 @@ export class Renderer {
 			ctx.restore();
 		}
 
+		const outlineWidthFactor = 0.18;
+		const outlineMinWidth = 4;
 		// Bold brush-like outline around the tabletop
-		ctx.lineWidth = Math.max(TABLE_OUTLINE_MIN_WIDTH, Math.round(PLAYER_RADIUS * TABLE_OUTLINE_WIDTH_FACTOR));
+		ctx.lineWidth = Math.max(outlineMinWidth, Math.round(PLAYER_RADIUS * outlineWidthFactor));
 		ctx.strokeStyle = TABLE_OUTLINE_COLOR;
 		ctx.stroke();
 
 
 		// Add gentle horizontal grain lines across tabletop
 		ctx.strokeStyle = TABLE_GRAIN_COLOR;
-		ctx.lineWidth = TABLE_GRAIN_LINE_WIDTH;
-		for (let g = 0; g < TABLE_GRAIN_LINES; g++) {
-			const gy = topY + TABLE_GRAIN_PADDING + (g / (TABLE_GRAIN_LINES - 1)) * (tableHeight - TABLE_GRAIN_PADDING * 2);
+		ctx.lineWidth = 1;
+		const grainPadding = 4;
+		const grainLines = 4;
+		for (let g = 0; g < grainLines; g++) {
+			const gy = topY + grainPadding + (g / (grainLines - 1)) * (tableHeight - grainPadding * 2);
 			ctx.beginPath();
-			ctx.moveTo(topLeftX + TABLE_GRAIN_PADDING, gy);
-			ctx.lineTo(topRightX - TABLE_GRAIN_PADDING, gy);
+			ctx.moveTo(topLeftX + grainPadding, gy);
+			ctx.lineTo(topRightX - grainPadding, gy);
 			ctx.stroke();
 		}
 
+		const widthFactor = 0.32;
+		const minWidth = 10;
+		const heightFactor = 1.25;
+		const posLeft = 0.08;
+		const posCenter = 0.5;
+		const posRight = 0.92;
+
 		// Draw three sturdy legs as ink silhouettes
-		const legWidth = Math.max(TABLE_LEG_MIN_WIDTH, Math.round(PLAYER_RADIUS * TABLE_LEG_WIDTH_FACTOR));
-		const legHeight = Math.round(tableHeight * TABLE_LEG_HEIGHT_FACTOR);
-		const leftLegX = topLeftX + Math.round(tableWidth * TABLE_LEG_POSITION_LEFT);
-		const centerLegX = tableX + Math.round(tableWidth * TABLE_LEG_POSITION_CENTER);
-		const rightLegX = topRightX - Math.round(tableWidth * (1 - TABLE_LEG_POSITION_RIGHT));
+		const legWidth = Math.max(minWidth, Math.round(PLAYER_RADIUS * widthFactor));
+		const legHeight = Math.round(tableHeight * heightFactor);
+		const leftLegX = topLeftX + Math.round(tableWidth * posLeft);
+		const centerLegX = tableX + Math.round(tableWidth * posCenter);
+		const rightLegX = topRightX - Math.round(tableWidth * (1 - posRight));
 		ctx.fillStyle = TABLE_LEG_COLOR;
 
 		// Helper: build a rounded-rectangle path for leg silhouettes
@@ -776,7 +762,9 @@ export class Renderer {
 		[ leftLegX, centerLegX, rightLegX ].forEach(lx => {
 			const lx0 = Math.round(lx - legWidth / 2);
 			const ly0 = Math.round(bottomY);
-			roundedRectPath(ctx, lx0, ly0, legWidth, legHeight, Math.max(TABLE_LEG_MIN_RADIUS, Math.round(legWidth * TABLE_LEG_RADIUS_FACTOR)));
+			const minRadius = 6;
+			const radiusFactor = 0.4;
+			roundedRectPath(ctx, lx0, ly0, legWidth, legHeight, Math.max(minRadius, Math.round(legWidth * radiusFactor)));
 			ctx.fill();
 			// Small shadow to visually connect leg to the underside of the table
 			
@@ -786,7 +774,7 @@ export class Renderer {
 		ctx.restore();
 	}
 
-	drawBowl(x, y, playerId, player) {
+	drawBowl(x, y, playerId, player, theme) {
 		const ctx = this.ctx;
 		// Bowl design matching reference image; the bowl is the player avatar
 		ctx.save();
@@ -795,13 +783,12 @@ export class Renderer {
 		// Scale and layout configuration for the bowl and surrounding FX
 		const bowlRadius = PLAYER_RADIUS;
 		const scale = bowlRadius / 25;
-		const shadowYOffset = bowlRadius * BOWL_SHADOW_Y_OFFSET_FACTOR;
-		const shadowRadiusX = bowlRadius - BOWL_SHADOW_RADIUS_X_OFFSET;
-		const shadowRadiusY = bowlRadius * BOWL_SHADOW_RADIUS_Y_FACTOR;
-		const lineWidth = Math.max(2, bowlRadius * BOWL_LINE_WIDTH_FACTOR);
+		const shadowYOffset = bowlRadius * 0.5;
+		const shadowRadiusX = bowlRadius - 6;
+		const shadowRadiusY = bowlRadius * 0.22;
+		const lineWidth = Math.max(2, bowlRadius * 0.08);
 		const labelYOffset = 45;
-		const fontSize = Math.round(bowlRadius * BOWL_FONT_SIZE_FACTOR);
-		const inkBloomSize = bowlRadius * BOWL_INK_BLOOM_SIZE_FACTOR;
+		const fontSize = Math.round(bowlRadius * 0.3);
 
 		// Pick colours based on player state and ID
 		let bowlColor = BOWL_COLOR_DEFAULT_1;
@@ -855,13 +842,21 @@ export class Renderer {
 		// Visualise the horizontal "perfect" catch window as a subtle band
 		// centred over the bowl. This mirrors the logic in Game.isPerfectCatch.
 		const perfectHalfWidth = bowlRadius * PERFECT_CATCH_FACTOR;
-		const center_Y = -bowlRadius * BOWL_PERFECT_WINDOW_Y_FACTOR;
-
-		const perfectHalfHeight = perfectHalfWidth * BOWL_PERFECT_WINDOW_HEIGHT_FACTOR;
-
+		const windowCenterYFactor = theme === "classic" ? 0.45 : 0.45 + 20;
+		const center_Y = -bowlRadius * windowCenterYFactor;
+		// if(theme === "classic"){
+		// 	center_Y = -bowlRadius * BOWL_PERFECT_WINDOW_Y_FACTOR;
+		// } else if(theme === "fishbowl"){
+		// 	center_Y = -bowlRadius * BOWL_PERFECT_WINDOW_Y_FACTOR + 20;
+		// } else if(theme === "sushiland"){
+		// 	center_Y = -bowlRadius * BOWL_PERFECT_WINDOW_Y_FACTOR + 20;
+		// }
+		const perfectHalfHeight = perfectHalfWidth * 0.2;
+		const perfectWindowColor = 'rgba(255, 196, 0, 0.65)';
+		const perfectWindowLineWidth = 3;
 		ctx.save();
-		ctx.strokeStyle = BOWL_PERFECT_WINDOW_COLOR;
-		ctx.lineWidth = BOWL_PERFECT_WINDOW_LINE_WIDTH;
+		ctx.strokeStyle = perfectWindowColor;
+		ctx.lineWidth = perfectWindowLineWidth;
 
 		ctx.beginPath();
 		ctx.ellipse(
@@ -894,11 +889,12 @@ export class Renderer {
 	 * @param {number} size - Overall size of the largest ring.
 	 */
 	drawInkBloom(x, y, size) {
+		const inkBloomRings = 3;
+		const inkBloomAlphaBase = 0.3;
 		const ctx = this.ctx;
-		for (let i = INK_BLOOM_RINGS; i > 0; i--) {
-			const radius = size * (i / INK_BLOOM_RINGS);
-			const alpha = INK_BLOOM_ALPHA_BASE * (i / INK_BLOOM_RINGS);
-
+		for (let i = inkBloomRings; i > 0; i--) {
+			const radius = size * (i / inkBloomRings);
+			const alpha = inkBloomAlphaBase * (i / inkBloomRings);
 			ctx.fillStyle = `rgba(212, 175, 55, ${alpha})`;
 			ctx.beginPath();
 			ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -967,35 +963,41 @@ export class Renderer {
 			this.windStreaks = [];
 		}
 
+		const windStreakSpeed = 20;
 		// Update existing streaks
 		this.windStreaks.forEach(streak => {
 			// Move streaks regardless of wind state
-			streak.x += direction * WIND_STREAK_SPEED;
+			streak.x += direction * windStreakSpeed;
 			// Initialize fade timer if not set
 			if (streak.fadeTimer === undefined) {
 				streak.fadeTimer = 1.0; // Full opacity
 			}
 		});
 
+		const boundsOffset = 50;
 		// Remove streaks that have scrolled outside the view or fully faded
 		this.windStreaks = this.windStreaks.filter(streak => {
-			const inBounds = streak.x < this.canvasWidth + WIND_STREAK_BOUNDS_OFFSET && streak.x > -WIND_STREAK_BOUNDS_OFFSET;
+			const inBounds = streak.x < this.canvasWidth + boundsOffset && streak.x > -boundsOffset;
 			const visible = streak.fadeTimer === undefined || streak.fadeTimer > 0;
 			return inBounds && visible;
 		});
 
+		const spawnChance = 0.2;
+		const lengthMin = 30;
+		const lengthMax = 70;
 		// Spawn new streaks only when wind is active
-		if (windActive && Math.random() < WIND_STREAK_SPAWN_CHANCE) {
+		if (windActive && Math.random() < spawnChance) {
 			this.windStreaks.push({
 				x: direction > 0 ? -30 : this.canvasWidth + 30,
 				y: Math.random() * this.canvasHeight,
-				length: WIND_STREAK_LENGTH_MIN + Math.random() * (WIND_STREAK_LENGTH_MAX - WIND_STREAK_LENGTH_MIN),
+				length: lengthMin + Math.random() * (lengthMax - lengthMin),
 				fadeTimer: 1.0 // Start at full opacity
 			});
 		}
 
+		const streakLineWidth = 2;
 		// Draw all visible streaks as short horizontal lines with fade
-		ctx.lineWidth = WIND_STREAK_LINE_WIDTH;
+		ctx.lineWidth = streakLineWidth;
 
 		this.windStreaks.forEach(streak => {
 			const alpha = streak.fadeTimer !== undefined ? streak.fadeTimer : 1.0;

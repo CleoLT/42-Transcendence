@@ -1,13 +1,5 @@
 import {
-	LANE_CENTER_RADIUS_MIN,
-	LANE_CENTER_RADIUS_FACTOR,
 	LANE_OWNERSHIP_STREAK_THRESHOLD,
-	LANE_SPAWN_EDGE_LEFT,
-	LANE_SPAWN_EDGE_RIGHT,
-	LANE_LEFT_CENTER,
-	LANE_MIDDLE_CENTER,
-	LANE_RIGHT_CENTER,
-	LANE_WIDTH
 } from './Constants.js';
 
 export class LaneSystem {
@@ -23,40 +15,46 @@ export class LaneSystem {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 
+		const laneCenterRadiusMin = 40;
+		const laneCenterRadiusFactor = 0.06;
 		// Radius (in px) around lane center that counts as a perfect catch
-		this.centerRadius = Math.max(LANE_CENTER_RADIUS_MIN, Math.round(this.canvasWidth * LANE_CENTER_RADIUS_FACTOR));
+		this.centerRadius = Math.max(laneCenterRadiusMin, Math.round(this.canvasWidth * laneCenterRadiusFactor));
 
+		const laneLeftCenter = 0.166;
+		const laneMiddleCenter = 0.5;
+		const laneRightCenter = 0.833;
+		const laneWidth = 0.333;
 		// Create three visually-equal zones separated by two bamboo stalks
 		this.lanes = [
 			{
 				index: 0,
-				x: canvasWidth * LANE_LEFT_CENTER,
-				width: canvasWidth * LANE_WIDTH,
+				x: canvasWidth * laneLeftCenter,
+				width: canvasWidth * laneWidth,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
 				leftEdge: 0,
-				rightEdge: canvasWidth * LANE_WIDTH,
-				centerX: canvasWidth * LANE_LEFT_CENTER
+				rightEdge: canvasWidth * laneWidth,
+				centerX: canvasWidth * laneLeftCenter
 			},
 			{
 				index: 1,
-				x: canvasWidth * LANE_MIDDLE_CENTER,
-				width: canvasWidth * LANE_WIDTH,
+				x: canvasWidth * laneMiddleCenter,
+				width: canvasWidth * laneWidth,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
-				leftEdge: canvasWidth * LANE_WIDTH,
-				rightEdge: canvasWidth * (LANE_WIDTH * 2),
-				centerX: canvasWidth * LANE_MIDDLE_CENTER
+				leftEdge: canvasWidth * laneWidth,
+				rightEdge: canvasWidth * (laneWidth * 2),
+				centerX: canvasWidth * laneMiddleCenter
 			},
 			{
 				index: 2,
-				x: canvasWidth * LANE_RIGHT_CENTER,
-				width: canvasWidth * LANE_WIDTH,
+				x: canvasWidth * laneRightCenter,
+				width: canvasWidth * laneWidth,
 				owner: null,
 				catchStreak: { player1: 0, player2: 0 },
-				leftEdge: canvasWidth * (LANE_WIDTH * 2),
+				leftEdge: canvasWidth * (laneWidth * 2),
 				rightEdge: canvasWidth,
-				centerX: canvasWidth * LANE_RIGHT_CENTER
+				centerX: canvasWidth * laneRightCenter
 			}
 		];
 	}
@@ -80,13 +78,15 @@ export class LaneSystem {
 		const lane = this.lanes[laneIndex];
 		var leftEdge = lane.leftEdge;
 		var rightEdge = lane.rightEdge;
+		const laneSpawnEdgeLeft = 133;
+		const laneSpawnEdgeRight = 1668;
 		switch(laneIndex)
 		{
 			case 0:
-				leftEdge = LANE_SPAWN_EDGE_LEFT;
+				leftEdge = laneSpawnEdgeLeft;
 				break;
 			case 2:
-				rightEdge = LANE_SPAWN_EDGE_RIGHT;		
+				rightEdge = laneSpawnEdgeRight;		
 				break;
 		}
 		const x = leftEdge + Math.random() * (rightEdge - leftEdge);
