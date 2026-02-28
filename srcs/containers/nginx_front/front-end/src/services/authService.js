@@ -157,7 +157,7 @@ export async function cancelFriendship(id1, id2) {
   })
 
   if (!res.ok) {
-    throw new Error(respond.message)
+    throw new Error(respond.message) //CLEO no respond here
   }
 }
 

@@ -2,6 +2,7 @@ import {createContext, useContext, useEffect, useState} from "react"
 import {Login, Login2FA, Logout, Register, Register2FA } from "./authService"
 import { AlertMessage } from "./alertMessage"
 
+
 const baseUrl = import.meta.env.VITE_BASE_URL
 const AuthContext = createContext()
 
@@ -76,7 +77,7 @@ export function AuthProvider({children}){
         if (!code) throw new Error("A code is required")
     
         await Login2FA(username, code)
-        await checkCookie(username, setLog)
+        await checkCookie()
     }
 
     // --> if register    
@@ -96,13 +97,13 @@ export function AuthProvider({children}){
         if (!code) throw new Error("A code is required")
     
         await Register2FA(username, code)
-        await checkCookie(username,setLog)
+        await checkCookie()
     }
 
     // --> if logout (erase cookie)
     const logout = async (setScreen) => {
         await Logout(username)
-        await checkCookie(username, setLog)
+        await checkCookie()
         AlertMessage.fire({
             icon: "success",
             text: "Disconnected! See you soon 🌸!",
