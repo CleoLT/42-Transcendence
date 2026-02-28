@@ -197,15 +197,9 @@ We used MariaDB as our relational database.
 > Key fields and data types
 <br>
 
-## 8. Features List
-> Complete list of implemented features
 
-> Which team member(s) worked on each feature
 
-> Brief description of each feature’s functionality
-<br>
-
-## 9. Modules
+## 8. Modules
 
 ###  MAJOR | Use a framework for both the frontend and backend (2p)
 We felt that chosing frameworks would help a lot in the frontend and the backend taking into account the architecture of microservices that we wanted to buildand the use of frameworks is strictly necessary in a company environment, so even though they were new to most of us, we felt that it was a good investment.
@@ -296,13 +290,12 @@ Given that we chose the frontend framework module, and Emilie learned how React 
 <br>
 
 ### :green_book: Total point count - 16 points
-With these modules we have the 14 mandatory points and one extra, just in case we fail one of them during evaluation.
+With these modules we have the 14 mandatory points and 2 extra, just in case we fail any of them during evaluation.
 
 <br>
 
 ### BONUS modules / yet to decide
 
-####  MINOR | Health check and status page system with automated backups and disaster recovery procedures (1p) - MARTA
 ####  MINOR | User activity analytics and insights dashboard (1p) - EMILIE + CLÉO
 ####  MINOR | Support for additional browsers (1p) - EMILIE
 
@@ -320,8 +313,14 @@ choice"
 > Which team member(s) worked on each module
 <br>
 
+## 9. Features List & Individual contributions
+> Complete list of implemented features
 
-## 10. Individual Contributions
+> Which team member(s) worked on each feature
+
+> Brief description of each feature’s functionality
+<br>
+
 > Detailed breakdown of what each team member contributed
 
 > Specific features, modules, or components implemented by each person
@@ -329,7 +328,8 @@ choice"
 > Any challenges faced and how they were overcome
 
 <br>
-Cleo
+
+### Cleo
 I started implementing the backend using Fastify, organizing the project with a clean and modular architecture by separating routes, schemas, handlers, and database queries into different files. I set up global error handling with custom responses and used schemas both for validation and as a security layer to control request and response formats.
 
 I seeded the database with realistic test data using Faker.js and implemented avatar uploads with Fastify Multipart. I also integrated Swagger UI to document and manually test all API routes.
@@ -338,7 +338,7 @@ The main challenge was the integration with the frontend, which required constan
 
 <br>
 
-## 11. The game (EXTRA)
+## 10. The game (EXTRA)
 ### **How to Play**
 Each player controls a brush-like character in a shared falling zone with three lanes:
 
