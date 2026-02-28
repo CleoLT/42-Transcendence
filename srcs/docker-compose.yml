@@ -1,53 +1,67 @@
 name: transcendence
 
 services:
-  nginx_front:
-    container_name: nginx_front
-    build: ./containers/nginx_front
-#    image: nginx_front:v1
-    ports:
-      - "8080:443"
-    depends_on:
-      - api_gateway
-    networks:
-      - main
-    restart: always
-
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
-    ports:
-      - "3000:3000"
-    #expose:
-     # - "3000"
     networks:
       - main
     depends_on:
       - user-service
       - auth-service
-    #  - game_history-service
     restart: always
 
 # USER MICROSERVICE
   user-service:
     container_name: user-service
-    build: ./containers/user/user-service
-    env_file:
-      - .user_env
+    build: 
+      context: ./containers/user/user-service
+      dockerfile: Dockerfile.prod
+    volumes:
+      - user_uploads_volume:/uploads/avatars
+    secrets:
+      - db_host
+      - db_username
+      - db_user_password
+      - db_name
+      - jwt_secret
+      - api_key
+    environment: 
+      DB_HOST_FILE: /run/secrets/db_host
+      DB_PORT: 3306
+      DB_USER_FILE: /run/secrets/db_username
+      DB_PASSWORD_FILE: /run/secrets/db_user_password
+      DB_NAME_FILE: /run/secrets/db_name
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      API_KEY: /run/secrets/api_key
     networks:
       - main
     restart: always
     depends_on:
-      - user-db
-    #TEMPORAL, solo para ver swagger!!
-    #ports:
-    #  - "3001:3000"
+      user-db:
+        condition: service_healthy
 
   user-db:
     container_name: user-db
     build: ./containers/user/user-db
-    env_file:
-      - .userdb_env
+    secrets:
+      - db_root_password
+      - db_username
+      - db_user_password
+      - db_name
+    environment: 
+     MYSQL_DATABASE_FILE: /run/secrets/db_name
+     MYSQL_USER_FILE: /run/secrets/db_username
+     MYSQL_PASSWORD_FILE: /run/secrets/db_user_password
+     MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    volumes:
+    - db_volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
     networks:
       - main
     restart: always
@@ -55,27 +69,61 @@ services:
 # AUTH MICROSERVICE
   auth-service:
     container_name: auth-service
-    build: ./containers/auth/auth-service
+    build: 
+      context: ./containers/auth/auth-service
+      dockerfile: Dockerfile.prod
+    environment:
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      MAILFROM_FILE: /run/secrets/mailfrom
+      MAILER_EMAIL: /run/secrets/mailer_email
+      MAILER_PASSWORD: /run/secrets/mailer_password
+      API_KEY: /run/secrets/api_key
+    secrets:
+      - jwt_secret
+      - mailfrom
+      - mailer_email
+      - mailer_password
+      - api_key
     networks:
       - main
     restart: always
 
-## GAME HISTORY MICROSERVICE
-#  game_history-service:
-#    container_name: game_history-service
-#    build: ./containers/game_history/game_history-service
-#    networks:
-#      - main
-#    restart: always
-#    depends_on:
-#      - game_history-service-db
-#
-#  game_history-db:
-#    container_name: game_history-db
-#    build: ./containers/game_history/game_history-db
-#    networks:
-#      - main
-#    restart: always
+volumes:
+  db_volume:
+    driver: local
+  # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
+
+  user_uploads_volume:
+    driver: local
+    #  driver_opts:
+    #    type: none
+    #    o: bind
+    #    device: ./containers/user/user-service/user_uploads/avatars
+  # esto seria para hacer named volumes stored as bind mounts, como en inception
+
+secrets:
+  db_host:
+    file: ../secrets/db_host.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_username:
+    file: ../secrets/db_username.txt
+  db_user_password:
+    file: ../secrets/db_user_password.txt
+  db_name:
+    file: ../secrets/db_name.txt
+  db_port:
+    file: ../secrets/db_port.txt
+  jwt_secret:
+    file: ../secrets/jwt_secret.txt
+  mailer_email:
+    file: ../secrets/mailer_email.txt
+  mailer_password:
+    file: ../secrets/mailer_password.txt
+  mailfrom:
+    file: ../secrets/mailfrom.txt
+  api_key:
+    file: ../secrets/api_key.txt
 
 networks:
    main:

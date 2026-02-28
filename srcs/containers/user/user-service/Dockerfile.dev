@@ -1,0 +1,20 @@
+FROM node:20.19.6-alpine
+
+WORKDIR /app
+
+# Needed for bcrypt
+RUN apk add --no-cache python3 make g++
+
+# Install deps first (better cache)
+COPY package*.json ./
+
+
+RUN npm ci
+
+# Nodemon needs file system events
+# this one makes sure nodemon uses polls, which is necessary with alpine
+ENV CHOKIDAR_USEPOLLING=true
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

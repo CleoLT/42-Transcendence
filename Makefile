@@ -1,47 +1,104 @@
+
+# Default mode
+MODE ?= dev
+
+#echo "Active mode: $(MODE)"
+
+# Compose command selector
+ifeq ($(MODE),prod)
+DC = docker compose -f srcs/docker-compose.yml -f srcs/docker-compose.prod.yml
+else
+DC = docker compose -f srcs/docker-compose.yml -f srcs/docker-compose.dev.yml
+endif
+
 all: build up
 
 build:
-	docker-compose -f srcs/docker-compose.yml build
-
-# -f especifica el path del compose file
+	$(DC) build
 
 up:
-	docker-compose -f srcs/docker-compose.yml up -d
+	$(DC) up -d
 
-# stops AND removes containers
 down:
-	docker-compose -f srcs/docker-compose.yml down || true
+	$(DC) down || true
 
-# down + removes volumes
-clean: down
-	docker-compose -f srcs/docker-compose.yml down -v || true
-#	-sudo rm -rf /home/martalc/data/wordpress/* || true
-#	-sudo rm -rf /home/martalc/data/database/* || true
-# quita los host files, si no los quitamos volverian a aparecer en los nuevos contenedores porque realmente estos volumes son bind mounts (nosotros escogemos la ruta donde guarda el host los archivos)
+restart: down up
 
-# stops, removes & cleans in depth, including images and cached docker processes
+clean:
+	$(DC) down -v || true
+	find ./srcs/containers -type d -name node_modules -prune -exec rm -rf {} +
+	# anonymous volumes like /app/node_modules are removed here
+
 deep-clean: clean
-	docker rmi -f transcendence-nginx_front:latest transcendence-api_gateway:latest transcendence-user-service:latest transcendence-user-db:latest >/dev/null || true
+	$(DC) down -v --rmi all || true
 	docker system prune -a -f || true
+	docker builder prune -a -f || true
 	docker volume prune -f || true
-	
+
+remake:
+	$(DC) down --rmi all || true
+	$(DC) up -d
+
 rebuild: deep-clean build up
 
-# Show logs for all services
-logs:
-	docker-compose -f srcs/docker-compose.yml logs -f || true
+# Mode shortcuts
+dev:
+	$(MAKE) MODE=dev all
 
-# -f del final es 'force', para que no te pregunte
+prod:
+	$(MAKE) MODE=prod all
+
+dev-up:
+	$(MAKE) MODE=dev up
+
+prod-up:
+	$(MAKE) MODE=prod up
+
+dev-down:
+	$(MAKE) MODE=dev down
+
+prod-down:
+	$(MAKE) MODE=prod down
+
+dev-clean:
+	$(MAKE) MODE=dev clean
+
+prod-clean:
+	$(MAKE) MODE=prod clean
+
+dev-deep-clean:
+	$(MAKE) MODE=dev deep-clean
+
+prod-deep-clean:
+	$(MAKE) MODE=prod deep-clean
+
+logs:
+	$(DC) logs -f || true
+
+mode:
+	@echo "Active mode: $(MODE)"
 
 help:
 	@echo "Makefile rules:"
-	@echo "  all           : build and start containers"
-	@echo "  build         : build images"
-	@echo "  up            : start containers in detached mode"
-	@echo "  down          : stop and remove containers"
-	@echo "  clean         : stop and remove containers + remove volumes"
-	@echo "  deep-clean    : stop and remove containers + remove volumes + remove images + prune"
-	@echo "  rebuild       : deep-clean, build and start containers"
-	@echo "  logs          : show live logs of all services"
+	@echo "  make dev            : build + up (DEV mode)"
+	@echo "  make prod           : build + up (PROD mode)"
+	@echo "  make up             : up using current mode (default: dev)"
+	@echo "  make build          : build images"
+	@echo "  make down           : stop + remove containers"
+	@echo "  make clean          : stop + remove containers & volumes"
+	@echo "  make deep-clean     : clean + remove images + prune"
+	@echo "  make dev-down       : stop + remove containers for DEV"
+	@echo "  make prod-down      : stop + remove containers for PROD"
+	@echo "  make dev-deep-clean : clean + remove images + prune for DEV mode"
+	@echo "  make prod-deep-clean: clean + remove images + prune for PROD mode"
+	@echo "  make restart        : remove + restart containers"
+	@echo "  make remake         : remove containers + remove images + restart"
+	@echo "  make rebuild        : deep-clean and start containers"
+	@echo "  make logs           : follow logs"
+	@echo "  make mode           : show active mode"
+	@echo ""
+	@echo "Override mode manually:"
+	@echo "  make MODE=prod up"
 
-.PHONY: all build up down clean logs help
+.PHONY: all build up down restart clean deep-clean remake rebuild \
+	dev prod dev-up prod-up dev-clean prod-clean logs mode help

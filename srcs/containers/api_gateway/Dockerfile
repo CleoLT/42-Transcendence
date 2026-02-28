@@ -1,8 +1,9 @@
-FROM node:20-alpine
+FROM node:20.19.6-alpine
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+#RUN npm cache clean --force
+RUN npm ci
 
 COPY . .
 EXPOSE 3000
