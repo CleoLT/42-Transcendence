@@ -294,7 +294,12 @@ export async function DeleteUserId(userId) {
       errMsg = errorData.message || errMsg;
     } catch(e) {}
     throw new Error(errMsg);
-  } 
+  }
+  await fetch(`${baseUrl}/api/auth/deletecookie`, {
+    method: "POST",
+    credentials: "include"
+  })
+
   return 
 }
 

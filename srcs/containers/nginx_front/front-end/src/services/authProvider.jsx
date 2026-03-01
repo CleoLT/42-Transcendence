@@ -119,7 +119,8 @@ export function AuthProvider({children}){
                 login,
                 register,
                 logout,
-                setUsername
+                setUsername,
+                setUserId
             }} >
             {children}
         </AuthContext.Provider>

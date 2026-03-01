@@ -302,6 +302,18 @@ export function ChangeAvatar({setData, setScreenProfile}){
 
 
 export function UserData({data, setScreenProfile}){
+    const {setUserId, userId, setUsername} = useAuth()
+
+    useEffect(() => {
+        if (!userId) return; // si pas connecté, on ne fetch pas
+        
+        // (async () => {
+        //   const response = await getUserInfo(userId);
+        //   setData(response);
+        // })();
+      }, [userId]);
+      //checker si un UserId sinon profil deconnecte, faire sur chaque page ce check!!!
+    
     if(!data)
         return <div>Loading...</div>
 
@@ -321,13 +333,8 @@ export function UserData({data, setScreenProfile}){
                 await AlertMessage.fire({
                     icon: "success",
                     text: "Account deleted!"})
-
-            //     const res = await fetch('/api/auth/logout', {
-            //         method: 'POST',
-            //         credentials: 'include'
-            //     })
-            // if (!res.ok)
-            //     throw new Error('Logout failed')
+            setUserId(null)
+            setUsername(null)
             setScreenProfile("playNC")
 
             } else if (result.isDismissed) {
