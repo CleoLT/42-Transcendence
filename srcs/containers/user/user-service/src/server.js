@@ -2,10 +2,17 @@ import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
-import cookie from '@fastify/cookie';
+import cookie from '@fastify/cookie'
+//import path from 'node:path'
+//import staticDir from '@fastify/static'
 import routes from './routes.js'
 import seed from './seedUsers.js'
-import db from './db.js'
+//import { fileURLToPath } from 'url'
+
+//const __filename = fileURLToPath(import.meta.url)
+//const __dirname = path.dirname(__filename)
+
+//import db from './db.js'
 
 const fastify = Fastify({
   logger: true,
@@ -53,9 +60,9 @@ fastify.register(swaggerUI, {
   uiConfig: { docExpansion: 'list' }
 })
 
-// fastify.register(require('@fastify/static'), {
+// fastify.register(staticDir, {
 //   root: path.join(__dirname, '/uploads', 'avatar'),
-//   prefix: '/uploads/',
+//   //prefix: '/uploads/',
 // })
 
 fastify.register(routes)
