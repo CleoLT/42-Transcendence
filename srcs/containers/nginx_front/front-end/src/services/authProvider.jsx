@@ -3,9 +3,8 @@ import {Login, Login2FA, Logout, Register, Register2FA } from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
-
-
 const AuthContext = createContext()
+
 
 export function AuthProvider({children}){
     const [log, setLog] = useState(false)
@@ -32,7 +31,8 @@ export function AuthProvider({children}){
               setUsername(data.username ?? null);
               setUserId(data.userId ?? null);
           
-              //console.log("/validate:", data);
+            //   console.log("/validate:", data);
+
               if (!data.valid)
                 localStorage.removeItem("lastUserId");
             } catch {
@@ -52,11 +52,11 @@ export function AuthProvider({children}){
     useEffect(() => {
         checkCookie();
 
-        const interval = setInterval(() => {
-            checkCookie();
-        }, 1500);
+        // const interval = setInterval(() => {
+        //     checkCookie();
+        // }, 1500);
 
-        return () => clearInterval(interval);
+        // return () => clearInterval(interval);
     }, [])
 
     // --> if login    
@@ -118,7 +118,8 @@ export function AuthProvider({children}){
                 userId,
                 login,
                 register,
-                logout
+                logout,
+                setUsername
             }} >
             {children}
         </AuthContext.Provider>
@@ -132,9 +133,3 @@ export function useAuth() {
 
 
 // credentials: "include" = send cookie's token
-
-// loading --> wait few mm secondes still we don't know if the
-// player is log in or out to avoid ugly fast visual change
-
-// finally --> to go out from the loading state, we said to do
-// something in everycase to avoid white screen

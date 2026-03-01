@@ -159,16 +159,16 @@ const addAuthorizationToPlay = {
 }
 
 const cancelFriendship = {
-    description: 'Cancel a friendship, always initiate by id1 ---> to id2',
+    description: 'delete a friendship, always initiate by id1 ---> to id2',
     tags: ['Friendships'],
-    summary: 'Cancel friendship',
+    summary: 'delete friendship',
 
     body: twoIdBody,
 
     response: {
       201: {
         description: 'Friendship actualized',
-        ...friendshipResponse
+        type: 'null'
       },
       400: errorResponse,
       404: errorResponse

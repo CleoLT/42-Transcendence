@@ -1,20 +1,58 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../services/authProvider.jsx"
-import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond } from "../services/authService.js"
+import { getFriends, getUserInfo, getFriendsPending, getFriendsToRespond, cancelFriendship, acceptFriendship, newFriendship } from "../services/authService.js"
+import { ProfilePicture, IconText } from "./iconUtils.jsx"
+import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
-function Card({ title, friends, children }) {
-  const { userId } = useAuth()
-  //console.log("Friends in Card: ", friends)
+
+
+ function Button({text, onClick, src}){
+    return(
+        <button className="group relative flex items-center" onClick={onClick}>
+            <img src={src} alt="chopstick button icon" className="w-4 h-auto" />
+            <div className="absolute z-20 left-2/3 top-1/2 transform -translate-y-1/2 ml-2">
+                <IconText text={text} />
+            </div>
+        </button>
+    )
+}
+
+
+
+function Card({ friends, buttonText, onDelete, onAccept, children }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+    
       <p className="text-gray-600">{children}</p>
+      {(children === "Friends list") ? <Button
+              text="Add friend"
+              onClick={() => onAccept(1)}
+              src="/validation_icons/+_bold_cut_yellow.svg"
+             /> : <div/>} 
+            {/*no se si es correcto poner un if else con un div en caso de nada */}
       {friends && friends.map((friendship) => {
-        const myFriend = (friendship.user1_id === userId) ?  friendship.user2_id : friendship.user1_id
         return (
-        <div key={friendship.id}>
-         {friendship.online_status} {friendship.username} {friendship.avatar}
+          <div key={friendship.id} className="flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <ProfilePicture
+                src={friendship.avatar}
+                className="w-8 h-8"
+              />
+              <p>{friendship.username}</p>
+            </div>
+           {(children === "Request confirmation") ? <Button
+              text="Accept invitation"
+              onClick={() => onAccept(friendship.id)}
+              src="/validation_icons/V_bold_cut.svg"
+             /> : <div/>} 
+            {/*no se si es correcto poner un if else con un div en caso de nada */}
+            
+            <Button
+              text={buttonText}
+              onClick={() => onDelete(friendship.id)}
+              src="/validation_icons/X_bold_cut.svg"
+            />
         </div>
         )
       })}
@@ -24,10 +62,10 @@ function Card({ title, friends, children }) {
 
 export function Friends({setScreen}) {
   const { userId } = useAuth()
-  console.log("userId ", userId)
-   const [friends, setFriends] = useState([])
-   const [pending, setPending] = useState([])
-   const [requests, setRequests] = useState([])
+  //console.log("userId ", userId)
+  const [friends, setFriends] = useState([])
+  const [pending, setPending] = useState([])
+  const [requests, setRequests] = useState([])
 
   useEffect(() => {
     if (!userId) return;
@@ -48,16 +86,91 @@ export function Friends({setScreen}) {
     fetchFriendships(getFriends, setFriends)
     fetchFriendships(getFriendsPending, setPending)
     fetchFriendships(getFriendsToRespond, setRequests)
-  }, [userId]);
+  }, [userId])
+
+  async function deleteFriendship(friendId) {
+    try {
+      const result = await OptionAlert.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      })
+      
+      if (!result.isConfirmed) return
+    
+      await cancelFriendship(userId, friendId)
+     
+      setFriends(prev => prev.filter(friend => friend.id !== friendId))
+      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))   
+      
+      await AlertMessage.fire({
+      title: "Deleted!",
+      text: "Friendship removed successfully.",
+      icon: "success"
+    })
+      
+    } catch (error) {
+      AlertMessage.fire({
+        icon: "error",
+        text: error.message,
+      })
+    }
+  }
+
+  async function acceptFriend(friendId) {
+    try {
+      const data = await acceptFriendship(userId, friendId)
+      const acceptedUser = requests.find(friend => friend.id === friendId)
+      if (acceptedUser) setFriends(prev => [...prev, acceptedUser])
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))
+      
+      AlertMessage.fire({
+        icon: "success",
+        text: "You have a new friend!",
+      })
+    } catch (error) {
+      AlertMessage.fire({
+        icon: "error",
+        text: error.message,
+      })
+    }
+  }
+
+  async function newFriend(friendId) {
+    try {
+      const data = await newFriendship(userId, friendId)
+      //const acceptedUser = requests.find(friend => friend.id === friendId)
+      //if (acceptedUser) setFriends(prev => [...prev, acceptedUser])
+     // setRequests(prev => prev.filter(friend => friend.id !== friendId))
+      setFriends(prev => prev.filter(friend => friend.id !== friendId))
+      setPending(prev => prev.filter(friend => friend.id !== friendId))
+      setRequests(prev => prev.filter(friend => friend.id !== friendId))   
+
+
+      AlertMessage.fire({
+        icon: "success",
+        text: "You send a new friend request!",
+      })
+    } catch (error) {
+      AlertMessage.fire({
+        icon: "error",
+        text: error.message,
+      })
+    }
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="flex flex-col relative w-full h-full justify-center items-center">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-        <Card title="Friends" friends={ friends }>Content for the first section.</Card>
-        <Card title="Pending" friends={ pending }>Content for the second section.</Card>
-        <Card title="Requests to respond" friends={ requests }>Content for the third section.</Card>
+        <Card friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship} onAccept={newFriend}>Friends list</Card>
+        <Card friends={ pending } buttonText="Cancel invitation" onDelete={deleteFriendship}>Pending</Card>
+        <Card friends={ requests } buttonText="Decline invitation" onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</Card>
       </div>
     </div>
-  );
-
+  )
 }

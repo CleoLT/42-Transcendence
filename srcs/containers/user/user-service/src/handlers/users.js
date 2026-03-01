@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 import { fileTypeFromBuffer } from 'file-type'
-
+import schema from '../schemas/users.js'
 
 export function readSecret(path) {
     return fs.readFileSync(path, 'utf8').trim()
@@ -42,6 +42,7 @@ async function deleteAvatarFile(userId) {
         const oldAvatar = await query.getAvatarByUserId(userId)
 
         if (oldAvatar === null) return
+        if (schema.avatarImages.includes(oldAvatar)) return
 
         await access(oldAvatar.avatar, constants.F_OK)
         await unlink(oldAvatar.avatar)
@@ -133,6 +134,26 @@ async function tryLogin(req, reply) {
     }
 }
 
+async function tryPassword(req, reply) {
+    try {
+        const { username, password } = req.body;
+
+        const match = await query.tryLogin(username, password)
+        if (!match) invalidCredentialsError()
+
+        const user = await query.getUserByName(username);
+        if (!user || !user.id) userNotFoundError()
+
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id,
+            email: user.email
+        });        
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
 async function logOut(req, reply) {
     try {
         const { username } = req.body;
@@ -147,10 +168,6 @@ async function logOut(req, reply) {
     } catch (error) {
         reply.send(error)
     }
-}
-
-async function validate(req, reply) {
-    return reply.code(200).send({ valid: true });
 }
 
 async function updateUserById(req, reply) {
@@ -178,8 +195,7 @@ async function deleteUserById(req, reply) {
     
     try {
         await checkIfUserExists(userId)
-        
-        //poner anonymous los partidos en la database de games de este user ????
+
         await deleteAvatarFile(userId)
         await query.deleteUserById(userId)
         reply.code(204).send('user deleted')
@@ -205,7 +221,7 @@ async function uploadAvatar(req, reply) {
         const type = await fileTypeFromBuffer(buffer)
         if (!type || !['image/png','image/jpeg'].includes(type.mime)) noFileUploadedError('only .jpg and .png images are allowed')
     
-        const uploadDir = path.join('/app', 'uploads', 'avatars');
+        const uploadDir = path.join('/uploads', 'avatars');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -297,8 +313,8 @@ export default {
     postUser, 
     getUserByName,
     tryLogin,
+    tryPassword,
     logOut,
-    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,
