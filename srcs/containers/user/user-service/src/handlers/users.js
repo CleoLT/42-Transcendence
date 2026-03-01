@@ -141,8 +141,8 @@ async function tryPassword(req, reply) {
         const match = await query.tryLogin(username, password)
         if (!match) invalidCredentialsError()
 
-        // const user = await query.getUserByName(username);
-        // if (!user || !user.id) userNotFoundError()
+        const user = await query.getUserByName(username);
+        if (!user || !user.id) userNotFoundError()
 
         return reply.code(200).send({
             valid: true,

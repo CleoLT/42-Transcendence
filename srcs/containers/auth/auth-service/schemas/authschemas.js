@@ -17,7 +17,7 @@ const statusSchema = {
     }
   };
   
-  const loginSchema = {
+  /*const loginSchema = {
     description: 'User login',
     tags: ['Auth'],
     summary: 'Authenticate user credentials',
@@ -31,6 +31,32 @@ const statusSchema = {
     },
     response: {
       200: { type: 'object' },
+      400: { type: 'object' },
+      403: { type: 'object' },
+      500: { type: 'object' }
+    }
+  };*/
+
+  const loginSchema = {
+    description: 'User login',
+    tags: ['Auth'],
+    summary: 'Authenticate user credentials',
+    body: {
+      type: 'object',
+      required: ['username', 'password'],
+      properties: {
+        username: { type: 'string' },
+        password: { type: 'string' }
+      }
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          userId: { type: 'number' },
+          email: { type: 'string', nullable: true }
+        }
+      },
       400: { type: 'object' },
       403: { type: 'object' },
       500: { type: 'object' }

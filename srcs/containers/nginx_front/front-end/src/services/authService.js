@@ -8,7 +8,6 @@ export async function Login(username, password) {
     body: JSON.stringify({ username, password }),
     credentials: "include"
   })
-
   const respond = await res.json()
 
   if (!res.ok) {
@@ -280,11 +279,6 @@ export async function loginUser(username, password) {
   })
 
   const respond = await res.json()
-  console.log("respond loginUser", respond.valid)
-
-  if (!res.ok) {
-    throw new Error("Actual password is not correct!")
-  }
   return respond.valid
 }
 

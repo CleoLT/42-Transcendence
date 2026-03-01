@@ -26,8 +26,8 @@ restart: down up
 
 clean:
 	$(DC) down -v || true
-	rm -rf ./srcs/containers/user/user-service/uploads/avatars
 	find ./srcs/containers -type d -name node_modules -prune -exec rm -rf {} +
+	rm -rf ./srcs/containers/nginx_front/front-end/public/uploads/avatars/*
 	# anonymous volumes like /app/node_modules are removed here
 
 deep-clean: clean
