@@ -21,6 +21,11 @@ const pool = mariadb.createPool({
   user: readSecret(process.env.DB_USER_FILE),
   password: readSecret(process.env.DB_PASSWORD_FILE),
   database: readSecret(process.env.DB_NAME_FILE),
+ /* ssl: {
+    ca: fs.readFileSync('/certs/ca.crt'),
+    key: fs.readFileSync('/certs/user-service.key'),
+    cert: fs.readFileSync('/certs/user-service.crt'),
+  },*/
   connectTimeout: 5000
 })
 

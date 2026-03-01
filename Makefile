@@ -22,7 +22,9 @@ up:
 down:
 	$(DC) down || true
 
-restart: down up
+restart: 
+	$(DC) down 
+	$(DC) up -d
 
 clean:
 	$(DC) down -v || true

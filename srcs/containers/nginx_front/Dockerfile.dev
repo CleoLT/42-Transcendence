@@ -16,5 +16,10 @@ ENV CHOKIDAR_INTERVAL=100
 
 EXPOSE 5173
 
+COPY ./tools/dev-start.sh /tools/dev-start.sh
+
+RUN chmod 700 /tools/dev-start.sh
+
+ENTRYPOINT ["/tools/dev-start.sh"]
+
 # Source code comes from bind mount
-CMD ["npm", "run", "dev", "--", "--host"]

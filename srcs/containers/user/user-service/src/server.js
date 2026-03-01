@@ -7,15 +7,15 @@ import cookie from '@fastify/cookie'
 //import staticDir from '@fastify/static'
 import routes from './routes.js'
 import seed from './seedUsers.js'
-//import { fileURLToPath } from 'url'
-
-//const __filename = fileURLToPath(import.meta.url)
-//const __dirname = path.dirname(__filename)
-
-//import db from './db.js'
+import db from './db.js'
+import fs from 'fs';
 
 const fastify = Fastify({
   logger: true,
+  https: {
+    key: fs.readFileSync('/certs/user-service.key'),
+    cert: fs.readFileSync('/certs/user-service.crt')
+  },
   ajv: {
     customOptions: {
       strict: true,
