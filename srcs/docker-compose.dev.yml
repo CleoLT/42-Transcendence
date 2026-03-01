@@ -5,7 +5,7 @@ services:
       context: ./containers/nginx_front
       dockerfile: Dockerfile.dev
       args:
-        VITE_BASE_URL: "http://localhost:5173"
+        VITE_BASE_URL: "https://localhost:5173"
     ports:
       - "5173:5173"
     depends_on:
@@ -16,6 +16,7 @@ services:
     volumes:
       - ./containers/nginx_front/front-end:/app # bind mount, no aparece  en "docker volume ls" a no ser que lo declaremos como en inception imagino
       - /app/node_modules # volumen anonimo
+      - certs_volume:/certs:ro
 
    user-service:
     build:

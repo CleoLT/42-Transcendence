@@ -197,6 +197,35 @@ const tryLogin = {
     }
 }
 
+const tryPassword = {
+  description: 'Validate password',
+  tags: ['Users'],
+  summary: 'Password validation',
+
+    body: {
+        type: 'object',
+        required: ['username', 'password'],
+        properties: {
+          username: { type: 'string' },
+          password: { type: 'string' }
+        }
+    },
+
+    response: {
+        200: {
+            description: 'Password valid',
+            type: 'object',
+            properties: {
+              valid: { type: 'boolean' },
+              userId: { type: 'number' },
+              email: { type: 'string' }
+            }
+        },
+        401: errorResponse,
+        404: errorResponse
+    }
+}
+
 const logOut = {
   description: 'Logs user out',
   tags: ['Users'],
@@ -342,6 +371,7 @@ export default {
     getAvatarById,
     getUserByName,
     tryLogin,
+    tryPassword,
     logOut,
     updateUserById,
     deleteUserById,

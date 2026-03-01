@@ -8,7 +8,6 @@ export async function Login(username, password) {
     body: JSON.stringify({ username, password }),
     credentials: "include"
   })
-
   const respond = await res.json()
 
   if (!res.ok) {
@@ -272,7 +271,7 @@ export async function patchChangePassword(id, password) {
 
 
 export async function loginUser(username, password) {
-  const res = await fetch(`${baseUrl}/api/users/login`, {
+  const res = await fetch(`${baseUrl}/api/users/user/password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -280,9 +279,23 @@ export async function loginUser(username, password) {
   })
 
   const respond = await res.json()
+  return respond.valid
+}
+
+
+export async function DeleteUserId(userId) {
+  const res = await fetch(`${baseUrl}/api/users/${userId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+  console.log("respond DeleteUser", respond)
 
   if (!res.ok) {
     throw new Error(respond.message)
   }
   return respond
 }
+

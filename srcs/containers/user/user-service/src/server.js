@@ -5,9 +5,15 @@ import multipart from '@fastify/multipart'
 import cookie from '@fastify/cookie'
 import routes from './routes.js'
 import seed from './seedUsers.js'
+import db from './db.js'
+import fs from 'fs';
 
 const fastify = Fastify({
   logger: true,
+  https: {
+    key: fs.readFileSync('/certs/user-service.key'),
+    cert: fs.readFileSync('/certs/user-service.crt')
+  },
   ajv: {
     customOptions: {
       strict: true,

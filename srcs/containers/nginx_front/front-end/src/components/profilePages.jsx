@@ -3,8 +3,8 @@ import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPag
 import {useRef, useState, useEffect} from "react"
 import {Circle, LogInInput } from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser} from "../services/authService"
-import { AlertMessage } from "../services/alertMessage"
+import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, loginUser, DeleteUserId} from "../services/authService"
+import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
 
 export function ChangeName({setData, setScreenProfile}){
@@ -48,6 +48,14 @@ export function ChangeName({setData, setScreenProfile}){
                             username: userName})
                         )
                         setUsername(userName)
+                        
+                        //--> cambia el nombre en la cookie
+                        await fetch(`/api/auth/update/${userName}`, {
+                            method: 'POST',
+                            credentials: 'include'
+                        })
+                        //--> end cambia el nombre en la cookie
+
                         setScreenProfile("profile")
                         }
                         catch(err) {
@@ -86,14 +94,12 @@ export function ChangeName({setData, setScreenProfile}){
     )
 }
 
-//checker si pas de pb avec useAuth et l'ancien nom/nouveau nom dans les autres pages 
-
 
 export function ChangePassword({setScreenProfile}){
     const [actualPassword, setActualPassword] = useState("")
     const [password, setPassword] = useState("")
     const [repeatPassword, setRepeatPassword] = useState("")
-    const {userId} = useAuth()
+    const {userId, username} = useAuth()
 
     const handleChangePassword = async () => {
         if (!actualPassword || !password || !repeatPassword)
@@ -110,13 +116,10 @@ export function ChangePassword({setScreenProfile}){
           if (!regexPw.test(repeatPassword))
             throw new Error("Password must contain uppercase, lowercase, number, and at least one special character @$!%*#?&")
         
-        try{
-            await loginUser(username, actualPassword)
-        }
-        catch{
+        const res = await loginUser(username, actualPassword)
+        if (!res)
             throw new Error("Actual password is not correct!")
-        }
-
+  
         await patchChangePassword(userId, password)
     }
 
@@ -133,10 +136,6 @@ export function ChangePassword({setScreenProfile}){
                                 icon: "success",
                                 text: "Password changed!",
                             })
-                        // setData(prev => ({
-                        //         ...prev,
-                        //         username: username})
-                        //     )
                         setScreenProfile("profile")
                         }
                         catch(err) {
@@ -181,6 +180,47 @@ export function ChangePassword({setScreenProfile}){
                 </div>
             </Circle>
         </div>
+    )
+}
+
+
+export function DeleteAccount({setScreenProfile}){
+    const {userId} = useAuth()
+
+    const handleDeleteAccount = async () => {
+        try {
+            await DeleteUserId(userId)
+            AlertMessage.fire({
+                icon: "success",
+                text: "Account deleted!",
+        })
+        // setData(prev => ({
+        //         ...prev,
+        //         username: username})
+        //     )
+
+        //--> borrar el cookie
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        })
+        //--> end borrar el cookie
+
+        setScreenProfile("playNC")
+        
+        } catch(err) {
+            AlertMessage.fire({
+            icon: "error",
+            text: err.message,
+            })
+        }
+    }
+
+    return(
+        OptionAlert.fire({
+            icon: "question",
+            text: "Are you sure you want to delete your account?"
+        })
     )
 }
 
@@ -232,7 +272,7 @@ export function ChangeAvatar({setData, setScreenProfile}){
                 
             AlertMessage.fire({
                 icon: "success",
-                text: "Avatar updated!"
+                text: "Avatar uploaded!"
         })
         setData(prev => ({
             ...prev,
@@ -382,6 +422,11 @@ export function Profile(){
             {screenProfile === "password" && (
                 <OverlayPage onClose={() => setScreenProfile("profile")}> 
                     <ChangePassword setScreenProfile={setScreenProfile}/>
+                </OverlayPage>    
+            )}
+            {screenProfile === "delete" && (
+                <OverlayPage onClose={() => setScreenProfile("profile")}> 
+                    <DeleteAccount setScreenProfile={setScreenProfile}/>
                 </OverlayPage>    
             )}
         </div>

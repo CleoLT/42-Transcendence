@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci 
+RUN npm ci --omit=dev
 
 RUN mkdir -p data
 
@@ -12,4 +12,18 @@ COPY ./ ./
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+COPY ./tools/start.sh /tools/start.sh
+
+RUN chmod 700 /tools/start.sh
+
+ENTRYPOINT ["/tools/start.sh"]
+
+# NO es recomandable usar
+# CMD ["npm", "start"] (aunque esté descrito en el package.json)
+# porque es convencion y ademas:
+    # PID 1 is npm, which then spawns node. This is not ideal.
+    # npm becomes an unnecessary wrapper
+    # Signal handling is cleaner
+    # SIGTERM/SIGINT propagate directly
+    # Fewer layers between Docker and your process
+    # Professional production images usually avoid npm run in CMD.
