@@ -1,17 +1,23 @@
 name: transcendence
 
 services:
+#GATEWAY
   api_gateway:
     container_name: api_gateway
     build: ./containers/api_gateway
     networks:
       - main
     depends_on:
-      - user-service
-      - auth-service
+     - auth-service
+     - user-service
+     - cert-generator
     restart: always
+    volumes:
+      - certs_volume:/certs:ro
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
 
-# USER MICROSERVICE
+# USER
   user-service:
     container_name: user-service
     build: 
@@ -19,6 +25,7 @@ services:
       dockerfile: Dockerfile.prod
     volumes:
       - user_uploads_volume:/uploads/avatars
+      - certs_volume:/certs:ro
     secrets:
       - db_host
       - db_username
@@ -34,13 +41,17 @@ services:
       DB_NAME_FILE: /run/secrets/db_name
       JWT_SECRET_FILE: /run/secrets/jwt_secret
       API_KEY: /run/secrets/api_key
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
     networks:
       - main
     restart: always
     depends_on:
       user-db:
         condition: service_healthy
-
+      cert-generator:
+        condition: service_started
+      
+# DB
   user-db:
     container_name: user-db
     build: ./containers/user/user-db
@@ -60,13 +71,13 @@ services:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
-      retries: 8
+      retries: 10
       start_period: 15s
     networks:
       - main
     restart: always
 
-# AUTH MICROSERVICE
+# AUTH 
   auth-service:
     container_name: auth-service
     build: 
@@ -78,21 +89,36 @@ services:
       MAILER_EMAIL: /run/secrets/mailer_email
       MAILER_PASSWORD: /run/secrets/mailer_password
       API_KEY: /run/secrets/api_key
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
     secrets:
       - jwt_secret
       - mailfrom
       - mailer_email
       - mailer_password
       - api_key
+    volumes:
+      - certs_volume:/certs:ro
     networks:
       - main
     restart: always
+    depends_on:
+     - cert-generator
+
+# CERTS
+  cert-generator:
+    container_name: cert-generator
+    build: 
+      context: ./cert_generator
+      dockerfile: Dockerfile
+    volumes:
+      - certs_volume:/certs
+    restart: "no"
+
 
 volumes:
   db_volume:
     driver: local
   # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
-
   user_uploads_volume:
     driver: local
     #  driver_opts:
@@ -100,6 +126,7 @@ volumes:
     #    o: bind
     #    device: ./containers/user/user-service/user_uploads/avatars
   # esto seria para hacer named volumes stored as bind mounts, como en inception
+  certs_volume:
 
 secrets:
   db_host:

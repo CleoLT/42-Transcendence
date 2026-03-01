@@ -5,7 +5,13 @@ import cookie from '@fastify/cookie';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({
+  logger: true,
+  https: {
+    key: fs.readFileSync('/certs/auth-service.key'),
+    cert: fs.readFileSync('/certs/auth-service.crt')
+  }
+});
 
 fastify.register(cookie);
 
@@ -39,7 +45,7 @@ fastify.post('/login', async (req, reply) => {
 
     if (!username || !password) return reply.code(400).send({ error: 'Invalid credentials' });
 
-    const coincidence = await fetch('http://user-service:3000/user/login',
+    const coincidence = await fetch('https://user-service:3000/user/login',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -121,7 +127,7 @@ fastify.post('/logout', async (req, reply) => {
     const username = req.body?.username || req.user?.username;
     //if (!username) return reply.code(200).send({ message: 'Logout unnecessary' });
 
-    const logoutRes = await fetch('http://user-service:3000/user/logout',
+    const logoutRes = await fetch('https://user-service:3000/user/logout',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -155,7 +161,7 @@ fastify.post('/register/2fa', async (req, reply) => {
 
     if (entry.code !== code) return reply.code(401).send({ error: 'Incorrect code' });
 
-    const coincidence = await fetch('http://user-service:3000/', {
+    const coincidence = await fetch('https://user-service:3000/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password, email })
@@ -230,7 +236,7 @@ fastify.post('/validate', async (req, reply) => {
 
     if (!token) {
       if (lastUserId) {
-        await fetch('http://user-service:3000/user/disconnect', {
+        await fetch('https://user-service:3000/user/disconnect', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -243,7 +249,7 @@ fastify.post('/validate', async (req, reply) => {
     }
 
     const decoded = jwt.verify(token, readSecret(process.env.JWT_SECRET_FILE));
-    await fetch('http://user-service:3000/user/connect', {
+    await fetch('https://user-service:3000/user/connect', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
