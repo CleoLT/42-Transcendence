@@ -20,7 +20,7 @@ import { Sixtyfour, P, H2, H3, LI, UL, CorbenRegular } from "./typography"
 function Card({ friends, buttonText, onDelete, onAccept, children, setScreenProfile }) {
 
   return (
-    <div className="rounded-2xl p-6 text-center border rounded-xl border-greyish overflow-y-auto overflow-x-hidden">
+    <div className="p-6 text-center border rounded-xl border-greyish overflow-y-auto overflow-x-hidden">
     
     <div className="flex items-center justify-center relative">
       <Sixtyfour>{children}</Sixtyfour>
