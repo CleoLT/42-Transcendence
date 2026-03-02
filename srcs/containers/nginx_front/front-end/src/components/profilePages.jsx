@@ -301,19 +301,12 @@ export function ChangeAvatar({setData, setScreenProfile}){
 }
 
 
-export function UserData({data, setScreenProfile}){
-    const {setUserId, userId, setUsername} = useAuth()
+export function UserData({data, setScreenProfile, setScreen}){
+    const {setUserId, userId, setUsername, deleteUser} = useAuth()
 
-    useEffect(() => {
-        if (!userId) return; // si pas connecté, on ne fetch pas
-        
-        // (async () => {
-        //   const response = await getUserInfo(userId);
-        //   setData(response);
-        // })();
-      }, [userId]);
+    if (!userId) return; // si pas connecté, on ne fetch pas
       //checker si un UserId sinon profil deconnecte, faire sur chaque page ce check!!!
-    
+
     if(!data)
         return <div>Loading...</div>
 
@@ -328,14 +321,8 @@ export function UserData({data, setScreenProfile}){
             })
 
             if (result.isConfirmed) {
-                await DeleteUserId(data.id)
-
-                await AlertMessage.fire({
-                    icon: "success",
-                    text: "Account deleted!"})
-            setUserId(null)
-            setUsername(null)
-            setScreenProfile("playNC")
+                await deleteUser(setScreen)
+                setScreen("playNC")
 
             } else if (result.isDismissed) {
                 await AlertMessage.fire({
@@ -439,7 +426,7 @@ export function ChangeInfo({setData, setScreenProfile}){
 }
 
 
-export function Profile(){
+export function Profile({setScreen}){
     const [screenProfile, setScreenProfile] = useState("profile");
     const {userId} = useAuth()
     const [data, setData] = useState(null)
@@ -469,7 +456,7 @@ export function Profile(){
                         <IconText text={"Change Avatar"} />
                     </div>
                 </button>
-                <UserData data={data} setScreenProfile={setScreenProfile} />
+                <UserData data={data} setScreen={setScreen} setScreenProfile={setScreenProfile} />
             </div>
             <div className="relative z-10 flex justify-center items-center mt-3 sm:mt-10">
                 <div className="flex border rounded-xl border-greyish px-5 py-3 sm:p-5 items-start mx-16" >

@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react"
-import {Login, Login2FA, Logout, Register, Register2FA } from "./authService"
+import {Login, Login2FA, Logout, Register, Register2FA, DeleteUserId } from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -51,12 +51,6 @@ export function AuthProvider({children}){
 
     useEffect(() => {
         checkCookie();
-
-        // const interval = setInterval(() => {
-        //     checkCookie();
-        // }, 1500);
-
-        // return () => clearInterval(interval);
     }, [])
 
     // --> if login    
@@ -109,6 +103,15 @@ export function AuthProvider({children}){
           })
     }
 
+    const deleteUser = async () => {
+        console.log("Inside deleteUser")
+        await DeleteUserId(userId)
+        await checkCookie()
+        await AlertMessage.fire({
+            icon: "success",
+            text: "Account deleted!"})
+    }
+
     // give the access to all child to this values
     return(
         <AuthContext.Provider
@@ -119,6 +122,7 @@ export function AuthProvider({children}){
                 login,
                 register,
                 logout,
+                deleteUser,
                 setUsername,
                 setUserId
             }} >
