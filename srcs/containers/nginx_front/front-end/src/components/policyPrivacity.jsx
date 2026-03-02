@@ -4,12 +4,12 @@ import { Sixtyfour, P, H2, H3, LI, UL } from "./typography"
 
 export function Privacy() {
     return (
-        <div className="flex flex-col relative w-full h-full justify-center items-center">
+        <div className="flex flex-col relative w-full h-full items-center">
             <div className="absolute inset-0">
                 <IconsOverlayFrame />
             </div>
-            <div className="relative w-full max-w-3xl rounded-2xl p-8 max-h-[80vh] overflow-y-auto">
-                <Sixtyfour className="text-2xl">Privacy Policy</Sixtyfour>
+            <div className="relative w-full max-w-3xl px-8 py-3 md:py-8 max-h-[80vh] overflow-y-auto">
+                <Sixtyfour className="text-xs md:text-2xl pb-2">Privacy Policy</Sixtyfour>
                 <P>Last updated: February 24, 2026</P>
                 <P>
                     Welcome to the Blossom Clash Family.

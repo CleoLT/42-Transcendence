@@ -126,7 +126,6 @@ export async function getFriendsToRespond(id) {
   return respond
 }
 
-
 export async function getUserInfo(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}`, {
     method: "GET",
@@ -140,6 +139,34 @@ export async function getUserInfo(id) {
   return respond
 }
 
+export async function getUserByUsername(username) {
+  const res = await fetch(`${baseUrl}/api/users/username/${username}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+
+  console.log(respond)
+  
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function getUsers() {
+  const res = await fetch(`${baseUrl}/api/users`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
 
 export async function cancelFriendship(id1, id2) {
   const res = await fetch(`${baseUrl}/api/users/friendships/cancel`, {

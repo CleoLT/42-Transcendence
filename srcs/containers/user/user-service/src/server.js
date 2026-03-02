@@ -3,8 +3,6 @@ import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
 import cookie from '@fastify/cookie'
-//import path from 'node:path'
-//import staticDir from '@fastify/static'
 import routes from './routes.js'
 import seed from './seedUsers.js'
 import db from './db.js'
@@ -59,11 +57,6 @@ fastify.register(swaggerUI, {
   routePrefix: '/docs',
   uiConfig: { docExpansion: 'list' }
 })
-
-// fastify.register(staticDir, {
-//   root: path.join(__dirname, '/uploads', 'avatar'),
-//   //prefix: '/uploads/',
-// })
 
 fastify.register(routes)
 

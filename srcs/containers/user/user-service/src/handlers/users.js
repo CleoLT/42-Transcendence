@@ -81,7 +81,7 @@ async function getUserByName(req, reply) {
 
     try {
         const result = await query.getUserByName(username)
-        if (user === null) userNotFoundError()
+        if (result === null) userNotFoundError()
         reply.code(200).send(result)
     } catch (error) {
         reply.send(error)
@@ -239,18 +239,6 @@ async function uploadAvatar(req, reply) {
     }
 }
 
-async function getAvatarById(req, reply) {
-    try {
-        const { userId } = req.params
-
-        await checkIfUserExists(userId)
-        const result = await query.getAvatarByUserId(userId)
-        reply.code(201).send({ id: userId, ...result });
-    } catch (error) {
-        reply.send(error)
-    }
-}
-
 async function deleteAvatar(req, reply) {
     try {
         const { userId } = req.params
@@ -318,7 +306,6 @@ export default {
     updateUserById,
     deleteUserById,
     uploadAvatar,
-    getAvatarById,
     deleteAvatar,
     disconnect,
     connect
