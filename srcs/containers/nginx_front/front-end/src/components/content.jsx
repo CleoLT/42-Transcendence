@@ -1,5 +1,5 @@
 import {IconsList} from "./iconUtils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig, GameReset} from "./circlePages.jsx"
 import {Project} from "./projectPage.jsx"
@@ -9,10 +9,17 @@ import {Privacy} from "./policyPrivacity.jsx"
 import { TermsOfServices } from "./termsOfService.jsx"
 import { Rules } from "./rulesPage.jsx"
 
-
 export default function Content({screen, setScreen}){
     const [game, setGame] = useState(null);
     const [hasStarted, setHasStarted] = useState(false);
+
+    // 🔧 Limpieza cuando sales del juego
+    useEffect(() => {
+        if (screen !== "game" && screen !== "gameReset") {
+            setGame(null);
+            setHasStarted(false);
+        }
+    }, [screen]);
 
     const onGameReady = (gameInstance) => {
         setGame(gameInstance);

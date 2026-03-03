@@ -48,7 +48,9 @@ export function initGame(container, onGameReady) {
 
   canvas.width = baseWidth;
   canvas.height = baseHeight;
-  
+
+
+
   console.log('✅ Canvas created and added to container', {
     containerWidth: container.offsetWidth,
     containerHeight: container.offsetHeight,
@@ -57,7 +59,7 @@ export function initGame(container, onGameReady) {
     canvasStyleWidth: canvas.style.width,
     canvasStyleHeight: canvas.style.height,
     canvasElement: canvas,
-    containerHasChildren: container.children.length
+    containerHasChildren: container.children.length,
   });
   
   // Immediate test render to verify canvas works
@@ -128,9 +130,14 @@ export function initGame(container, onGameReady) {
 
   const game = new Game(canvas, ctx);
   game.setRoundIndicatorLayer(blurOverlay, indicatorCanvas);
-  const inputManager = new InputManager();
+  const inputManager = new InputManager(canvas);
 
   let initialized = false;
+  let nav = navigator.userAgent || window.opera;
+  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(nav)) {
+    game.isTouchDevice = true;
+  }
+
 
   // Call onGameReady immediately so React can render the menu
   // The game state is already 'menu' by default
