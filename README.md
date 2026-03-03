@@ -182,23 +182,23 @@ We used MariaDB as our relational database.
 
 ### Justification for Key Technical Choices
 
-**Microservices Architecture**: Three distinct services (API Gateway, Auth, User) provide separation of concerns, independent scalability, and fault isolation.
+- **Microservices Architecture**: Three distinct services (API Gateway, Auth, User) provide separation of concerns, independent scalability, and fault isolation.
 
-**Fastify over Express**: Superior performance benchmarks, built-in validation, and modular plugin architecture makes it ideal for Microservices Architecture. Also, Schemas allowed us to implement the Swagger documentation system.
+- **Fastify over Express**: Superior performance benchmarks, built-in validation, and modular plugin architecture makes it ideal for Microservices Architecture. Also, Schemas allowed us to implement the Swagger documentation system.
 
-**React with Vite**: Near-instant hot module replacement during frontend development and optimized production builds.
+- **React with Vite**: Near-instant hot module replacement during frontend development and optimized production builds.
 
-**Nodemon**: Near-instant hot reloading during backend development and optimized production builds.
+- **Nodemon**: Near-instant hot reloading during backend development and optimized production builds.
 
-**Two-Factor Authentication**: Critical security enhancement requiring both password and email verification.
+- **Two-Factor Authentication**: Critical security enhancement requiring both password and email verification.
 
-**Docker Containerization**: Ensures environment consistency, simplifies deployment, and enables horizontal scaling.
+- **Docker Containerization**: Ensures environment consistency, simplifies deployment, and enables horizontal scaling.
 
-**JWT Authentication**: Stateless tokens eliminate server-side storage, enabling horizontal scaling and microservice compatibility.
+- **JWT Authentication**: Stateless tokens eliminate server-side storage, enabling horizontal scaling and microservice compatibility.
 
-**MariaDB over NoSQL**: Structured relational data, ACID compliance, and complex query capabilities made SQL the right choice.
+- **MariaDB over NoSQL**: Structured relational data, ACID compliance, and complex query capabilities made SQL the right choice.
 
-**Tailwind CSS**: Utility-first approach accelerates development, enforces design consistency, and produces minimal production CSS.
+- **Tailwind CSS**: Utility-first approach accelerates development, enforces design consistency, and produces minimal production CSS.
 
 
 <br>
