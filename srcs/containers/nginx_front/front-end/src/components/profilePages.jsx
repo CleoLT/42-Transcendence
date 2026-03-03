@@ -255,17 +255,17 @@ export function ChangeAvatar({setData, setScreenProfile}){
             <Circle className="bg-shell border-2 border-greyish px-10">
                 <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
                     <div className="flex gap-1 md:gap-2">
-                        <DisplayIcon children="/avatars/cat.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/cat.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                         <DisplayIcon children="/avatars/bird_04.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/butterfly_02.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/dragonfly.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/butterfly.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/dragonfly.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <div className="flex gap-1 md:gap-2 md:pb-4 lg:pb-1 xl:pb-4">
-                        <DisplayIcon children="/avatars/jellyfish_01.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/koi_carp_03.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/moonfish.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/sushi.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/swan.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/jellyfish_00.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/carp_koi_01.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/moonfish.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/sushi.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/swan.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <CorbenRegular children="or" className="text-greyish text-xs md:text-base pb-1 md:pb-4 lg:pb-1 xl:pb-4" />
                     <LargeButton children="Upload your Avatar" onClick={() => inputRef.current.click()} />
