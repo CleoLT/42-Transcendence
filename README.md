@@ -78,10 +78,10 @@ She worked closely with the technical lead and the backend team to make the best
 
 #### :palm_tree: Manu |  *Technical Lead*
 
-As TL, he was in charge of dciding which languages and technologies we used, as well as giving insight on how the architecture should be. He also made sure the code quality was high and consistent throughout the whole project.\
+As Tech Lead, he was in charge of deciding which languages and technologies we used, as well as giving insight on how the architecture should be. He also made sure the code quality was high and consistent throughout the whole project.\
 He established a pull authorization method in github and reviewed all the pull and merge requests before they were applied to the main branch.
 
-As a developer, he worked on the whole authentication system in the backend. He also made sure that the web was secure and protected against possible attacks.
+As a developer, he implemented the authentication microservice and the user management system using secure, session-based user authentication. Through the user request flow, he made sure the endpoints were available so the front end could remain consistent. He also implemented an API key to ensure that only valid requests could reach the data access service.
 
 #### :potted_plant: Cléo |  *Developer (back)*
 
