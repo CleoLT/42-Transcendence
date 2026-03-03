@@ -82,7 +82,7 @@ services:
   auth-service:
     container_name: auth-service
     build: 
-      context: ./containers/auth/auth-service
+      context: ./containers/auth
       dockerfile: Dockerfile.prod
     environment:
       JWT_SECRET_FILE: /run/secrets/jwt_secret

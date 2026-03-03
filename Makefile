@@ -1,8 +1,5 @@
-
 # Default mode
 MODE ?= dev
-
-#echo "Active mode: $(MODE)"
 
 # Compose command selector
 ifeq ($(MODE),prod)
@@ -20,23 +17,24 @@ up:
 	$(DC) up -d
 
 down:
-	$(DC) down || true
+	$(DC) down --remove-orphans || true
 
 restart: 
-	$(DC) down 
+	$(DC) down --remove-orphans
 	$(DC) up -d
 
 clean:
-	$(DC) down -v || true
+	$(DC) down -v --remove-orphans || true
 	find ./srcs/containers -type d -name node_modules -prune -exec rm -rf {} +
 	rm -rf ./srcs/containers/nginx_front/front-end/public/uploads/avatars/*
 	# anonymous volumes like /app/node_modules are removed here
 
 deep-clean: clean
-	$(DC) down -v --rmi all || true
+	$(DC) down -v --remove-orphans --rmi all || true
 	docker system prune -a -f || true
 	docker builder prune -a -f || true
 	docker volume prune -f || true
+	docker network prune -f 
 
 remake:
 	$(DC) down --rmi all || true
@@ -77,9 +75,6 @@ prod-deep-clean:
 
 logs:
 	$(DC) logs -f || true
-
-mode:
-	@echo "Active mode: $(MODE)"
 
 help:
 	@echo "Makefile rules:"

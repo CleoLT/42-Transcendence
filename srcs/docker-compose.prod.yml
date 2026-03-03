@@ -4,8 +4,6 @@ services:
     build:
       context: ./containers/nginx_front
       dockerfile: Dockerfile.prod
-      #args:
-      #  VITE_BASE_URL: "https://localhost:8080"
     ports:
       - "8080:443"
     depends_on:
