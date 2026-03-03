@@ -312,6 +312,13 @@ async function updateUsername(req, reply) {
   }
 }
 
+async function deletecookie(req, reply) {
+    reply.clearCookie('access_token', {
+      path: '/'
+    });
+    return reply.code(200).send();
+}
+
 export default {
     readSecret,
     status,
@@ -323,5 +330,6 @@ export default {
     register2FA,
     register,
     validate,
-    updateUsername
+    updateUsername,
+    deletecookie
 }

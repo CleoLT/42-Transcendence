@@ -23,13 +23,14 @@ export const AlertMessage = Swal.mixin({
 
 export const OptionAlert = Swal.mixin({
   // title: "Alert theme",
-  theme: "borderless",
+  // theme: "borderless",
   topLayer: true,
   timerProgressBar: true,
   //timer:2500,
   position: "top-end",
   buttonsStyling: true,
   showConfirmButton: true,
+  showCancelButton: true,
   customClass: {
     popup:`
       bg-shell text-black

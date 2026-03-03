@@ -11,6 +11,7 @@ fastify.post('/register', { schema: authSchema.registerSchema }, authHandler.reg
 fastify.post('/register/2fa', { schema: authSchema.register2FASchema }, authHandler.register2FA)
 fastify.post('/validate', { schema: authSchema.validateSchema }, authHandler.validate)
 fastify.post('/update/:username', { schema: authSchema.updateUsernameSchema }, authHandler.updateUsername)
+fastify.post('/deletecookie', { schema: authSchema.deletecookie }, authHandler.deletecookie)
 
 }
 

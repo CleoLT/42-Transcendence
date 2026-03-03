@@ -7,8 +7,8 @@ export function Rules() {
             <div className="absolute inset-0">
                 <IconsOverlayFrame />
             </div>
-            <div className="relative w-full max-w-3xl rounded-2xl p-8 max-h-[80vh] overflow-y-auto">
-                <Sixtyfour className="text-2xl">How to play</Sixtyfour>
+            <div className="relative w-full max-w-3xl px-8 py-3 md:py-5 max-h-[80vh] overflow-y-auto">
+                <Sixtyfour className="text-xs md:text-2xl pb-2">How to play</Sixtyfour>
                 <P>Last updated: February 24, 2026</P>
                 <P>
                     Each player controls a brush-like character in a shared falling zone with three lanes: Left | Middle | Right  </P>

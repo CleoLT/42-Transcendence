@@ -41,7 +41,7 @@ export function CenterText({text, onClick, className = "", interactive = true}){
 }
 
 
-export function LogInInput({placeholder, className = "", value, onChange, type}){
+export function PlaceholderInput({placeholder, className = "", value, onChange, type}){
   return(
     <input
       type={type}
@@ -64,3 +64,75 @@ export function LogInInput({placeholder, className = "", value, onChange, type})
         ${className}`} />
   )
 }
+
+
+// export function CirclePlaceholder({placeholder, className = "", value, onChange, type}){
+//   return(
+//     <textarea
+//       type={type}
+//       placeholder={placeholder}
+//       value={value}
+//       onChange={onChange}
+//       className={`
+//         absolute
+//         cursor-text
+//         font-Corben
+//         text-red-900
+//         text-center
+//         text-[10px] md:text-base
+//         placeholder:font-Corben
+//         placeholder:text-shell
+//         placeholder:text-center
+//         placeholder:text-[10px] md:placeholder:text-base
+//         bg-greyish
+//         rounded-full
+//         w-[330px] h-[330px]
+//         resize-none
+//         p-6
+//         maxLength={300} 
+//         overflow-y-auto
+//         box-border
+//         ${className}`}
+//         style={{
+//           paddingTop: "30%",
+//           lineHeight: "1.2em",
+//           paddingBottom: "60%",
+
+//       }}
+//     />
+//   )
+// }
+
+
+export function CirclePlaceholder({ placeholder, className = "", value, onChange, type }) {
+ 
+  return (
+    <div
+      className="relative w-[330px] h-[330px] rounded-full bg-greyish flex items-center justify-center overflow-hidden">
+      <textarea
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => {
+          if (e.target.value.length <= 300) onChange(e);
+        }}
+        maxLength={300}
+        className={`
+          w-[90%] h-[40%]
+          text-center
+          font-Corben
+          text-red-900
+          placeholder:text-shell 
+          text-[10px] md:text-base
+          resize-none overflow-auto
+          bg-transparent border-none outline-none
+        `}
+        style={{
+          lineHeight: "1.2em",
+          display: "block",
+        }}
+      />
+    </div>
+  );
+}
+

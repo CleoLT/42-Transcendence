@@ -201,6 +201,21 @@ const statusSchema = {
     }
   };
 
+  const deletecookie = {
+    description: 'Delete auth cookie',
+    tags: ['Auth'],
+    summary: 'Remove authentication cookie from client',
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: { type: 'object' }
+    }
+  };
+
   export default {
     statusSchema,
     loginSchema,
@@ -209,5 +224,6 @@ const statusSchema = {
     registerSchema,
     register2FASchema,
     validateSchema,
-    updateUsernameSchema
+    updateUsernameSchema,
+    deletecookie
   }

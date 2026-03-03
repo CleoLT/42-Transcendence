@@ -25,13 +25,7 @@ export async function Register(username, password, email) {
     credentials: "include"
   })
 
-  //DEBUG
-  // console.log("BASE URL =", baseUrl)
-  // console.log("FETCH TYPE:", typeof fetch)
-
   const respond = await res.json()
-
-  // console.log(respond)
 
   if (!res.ok) {
     throw new Error(respond.message)
@@ -132,7 +126,6 @@ export async function getFriendsToRespond(id) {
   return respond
 }
 
-
 export async function getUserInfo(id) {
   const res = await fetch(`${baseUrl}/api/users/${id}`, {
     method: "GET",
@@ -146,6 +139,34 @@ export async function getUserInfo(id) {
   return respond
 }
 
+export async function getUserByUsername(username) {
+  const res = await fetch(`${baseUrl}/api/users/username/${username}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+
+  console.log(respond)
+  
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+export async function getUsers() {
+  const res = await fetch(`${baseUrl}/api/users`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+  const respond = await res.json()
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
 
 export async function cancelFriendship(id1, id2) {
   const res = await fetch(`${baseUrl}/api/users/friendships/cancel`, {
@@ -242,8 +263,6 @@ export async function patchChangeUsername(id, username) {
 
   const respond = await res.json()
 
-  console.log("RESPONSE CHANGE USERNAME= ", respond)
-  
   if (!res.ok) {
     throw new Error(respond.message)
   }
@@ -261,8 +280,23 @@ export async function patchChangePassword(id, password) {
 
   const respond = await res.json()
 
-  console.log("RESPONSE CHANGE PASSWORD= ", respond)
-  
+  if (!res.ok) {
+    throw new Error(respond.message)
+  }
+  return respond
+}
+
+
+export async function patchChangeInfo(id, info) {
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bio: info }),
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+
   if (!res.ok) {
     throw new Error(respond.message)
   }
@@ -287,15 +321,22 @@ export async function DeleteUserId(userId) {
   const res = await fetch(`${baseUrl}/api/users/${userId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({})
+  })
+
+  if (!res.ok) {
+    let errMsg = "Delete failed";
+    try {
+      const errorData = await res.json();
+      errMsg = errorData.message || errMsg;
+    } catch(e) {}
+    throw new Error(errMsg);
+  }
+  await fetch(`${baseUrl}/api/auth/deletecookie`, {
+    method: "POST",
     credentials: "include"
   })
 
-  const respond = await res.json()
-  console.log("respond DeleteUser", respond)
-
-  if (!res.ok) {
-    throw new Error(respond.message)
-  }
-  return respond
+  return 
 }
-

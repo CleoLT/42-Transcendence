@@ -24,8 +24,8 @@ services:
       context: ./containers/user/user-service
       dockerfile: Dockerfile.prod
     volumes:
-      - certs_volume:/certs:ro
       - ./containers/nginx_front/front-end/public/uploads/avatars:/uploads/avatars
+      - certs_volume:/certs:ro
     secrets:
       - db_host
       - db_username

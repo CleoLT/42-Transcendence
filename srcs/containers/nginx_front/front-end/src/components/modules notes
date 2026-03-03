@@ -15,7 +15,7 @@
 06.Circle({children, className=""})
 07.SmallCircle()
 08.CenterText({text, onClick, className = "", interactive = true})
-09.LogInInput({placeholder, className = "", value, onChange, type})
+09.PlaceholderInput({placeholder, className = "", value, onChange, type})
 
 #iconUtils.jsx
 10.IconText({text, className=""})

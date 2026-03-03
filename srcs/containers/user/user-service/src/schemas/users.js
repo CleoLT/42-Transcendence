@@ -123,7 +123,7 @@ const getUserById = {
         401: errorResponse,
         404: errorResponse
     }
-};
+}
 
 const getAvatarById = {
     description: 'Get avatar by id',
@@ -268,7 +268,7 @@ const updateUserById = {
               type: "string",
               enum: avatarImages
             },
-            bio: { type: 'string', minLength: 3, maxLength: 200 }
+            bio: { type: 'string', minLength: 3, maxLength:300 }
         },
         additionalProperties: false
       },

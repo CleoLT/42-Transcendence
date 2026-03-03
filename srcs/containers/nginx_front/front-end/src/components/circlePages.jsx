@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react"
-import {Circle, CenterText, LogInInput} from "./circleUtils.jsx"
+import {Circle, CenterText, PlaceholderInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
 import { Login, Register, Logout, getUserInfo } from "../services/authService"
 // import { useAuth } from "../services/authProvider"
@@ -129,7 +129,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
             {/* ================= NORMAL CONFIG ================= */}
             {!advancedConfigOpen && (
               <>
-                <LogInInput
+                <PlaceholderInput
                   placeholder="Player 1 name"
                   value={username ? username : player1Name}
                   onChange={(e) => setPlayer1Name(e.target.value.slice(0, 10))}
@@ -213,7 +213,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                 )}
   
                 {!vsAI && (
-                  <LogInInput
+                  <PlaceholderInput
                     placeholder="Player 2 name"
                     value={player2Name}
                     onChange={(e) => setPlayer2Name(e.target.value.slice(0, 10))}
@@ -409,13 +409,13 @@ export function SignIn({setScreen}){
         h-full w-full"
     >
     <Circle>
-      <LogInInput
+      <PlaceholderInput
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         className="top-1/4"
       />
-      <LogInInput
+      <PlaceholderInput
         type="password"
         placeholder="Password"
         value={password}
@@ -505,27 +505,27 @@ export function CreateAccount({setScreen}){
         h-full w-full"
     >
     <Circle >
-      <LogInInput
+      <PlaceholderInput
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         className="top-[16%]  md:top-[14%]"
       />
-      <LogInInput
+      <PlaceholderInput
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="top-1/4"
       />
-      <LogInInput
+      <PlaceholderInput
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="bottom-1/4"
       />
-      <LogInInput
+      <PlaceholderInput
         type="password"
         placeholder="Repeat password"
         value={repeatPassword}
