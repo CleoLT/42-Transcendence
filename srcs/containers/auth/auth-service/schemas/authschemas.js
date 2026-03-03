@@ -146,9 +146,9 @@ const statusSchema = {
         type: 'object',
         properties: { message: { type: 'string' } }
       },
-      400: { type: 'object' },
-      401: { type: 'object' },
-      500: { type: 'object' }
+      400: { type: 'object', properties: { error: { type: 'string' } } },
+      401: { type: 'object', properties: { error: { type: 'string' } } },
+      500: { type: 'object', properties: { error: { type: 'string' } } }
     }
   };
   
