@@ -28,6 +28,23 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
  > ◦ Brief description of their responsibilities.
 <br>
 
+Emilie:
+As a product owner, my principal objective was to define a precise vision of the project, especially focusing on the design part. As the front-designer developer of the project, it was quite natural for me to commit myself to the PO role.
+
+With my professional experience, I had already developed a palette of organisational skills useful for the position:
+→ define project vision and objectives
+→ prioritize tasks between team members
+→ manage the backlog
+→ express users’ & clients’ needs (here the 42 subject)
+→ validate the website and all its options to make sure that it adds maximum value to the project
+→ ensure a good customer experience
+
+To help me in that task, I began the project with different models I created in Figma. We chose, with all team members, our favorite visual, and I created all the different related pages based on this model.
+
+During the whole project development, we met every week to ensure good progress and consistency between our different parts. Since the beginning, we worked on the same website, with different GitHub branches of course, to avoid any final connection troubles.
+
+I was especially involved in the design part. As an ex-fashion designer, it was amazing and really important for me to propose a project with a true design vision. All the team enjoyed working on this Vintage Japanese Botanical theme and enriched the project with their ideas!
+
 ## 5. Project Management
 > How the team organized the work (task distribution, meetings, etc.).
 
@@ -38,6 +55,8 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
 
 ## 6. Technical Stack
 > Frontend technologies and frameworks used.
+	Tailwind css
+	React
 
 > Backend technologies and frameworks used.
 
