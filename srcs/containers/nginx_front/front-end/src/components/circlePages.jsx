@@ -17,7 +17,8 @@ export function PlayConnected({setScreen}){
 			className="
 			  text-5xl
 			  md:text-7xl
-			  xl:text-8xl"
+			  xl:text-8xl
+			  mobile-landscape:text-5xl"
 		  />
 		</button>
 	  </Circle>
@@ -28,7 +29,7 @@ export function PlayConnected({setScreen}){
 function ConfigSection({ title, children }) {
   return (
 	<div className="flex flex-col items-center gap-1 lg:gap-2 xl:gap-3">
-	  <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">{title}</span>
+	  <span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px] mobile-landscape:text-[0.5rem]">{title}</span>
 	  <div className="flex gap-2 flex-wrap justify-center ">
 		{children}
 	  </div>
@@ -41,8 +42,8 @@ function ToggleOption({ active, onClick, label }) {
     <Sixtyfour
       onClick={onClick}
       className={`
-        cursor-pointer px-1 py-1 rounded-full border transition-colors
-        text-[0.3rem] md:text-sm lg:text-[0.6rem] xl:text-sm
+        cursor-pointer px-1  rounded-full border transition-colors
+        text-[0.3rem] md:text-sm lg:text-[0.6rem] xl:text-sm mobile-landscape:text-[0.3rem]
         ${
           active
             ? "bg-red-700 text-shell border-red-700"
@@ -145,7 +146,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
             onClick={() => setAdvancedConfigOpen((open) => !open)}
             className="
               absolute top-[5%]
-              text-shell text-2xl md:text-4xl
+              text-shell text-2xl md:text-4xl mobile-landscape:text-2xl mobile-landscape:top-[2%]
               hover:text-darkRed transition-colors
             "
           >
@@ -177,15 +178,15 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 					interactive={canPlay}
 					
 					className={`
-					  text-5xl md:text-7xl xl:text-8xl
+					  text-5xl md:text-7xl xl:text-8xl mobile-landscape:text-5xl
 					  ${canPlay ? "" : "text-shell/50 cursor-not-allowed"}
 					`}
 				  />
 				</button>
  
 				{/* Mode selector */}
-				<div className="absolute flex flex-col items-center gap-1 text-[10px] md:text-xs bottom-[8%]">
-				  <span className="font-corben text-shell">Mode</span>
+				<div className="absolute flex flex-col items-center gap-1 mobile-landscape:gap-0 text-[10px] md:text-xs bottom-[8%]">
+				  <span className="font-corben text-shell mobile-landscape:text-[0.5rem]">Mode</span>
   
 				  <div className="flex gap-2">
 					{[
@@ -204,7 +205,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                           }}
                           className={`
                             cursor-pointer px-2 py-1 rounded-full border
-                            transition-colors text-[0.3rem] md:text-xs
+                            transition-colors text-[0.3rem] md:text-xs mobile-landscape:text-[0.3rem]
                             ${
                               active
                                 ? "bg-red-700 text-shell border-red-700"
@@ -221,16 +222,16 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   
 				{/* Difficulty */}
 				{vsAI && (
-				  <div className="absolute bottom-[25%] flex flex-col gap-1 items-center text-[10px] md:text-xs">
-					<span className="font-corben text-shell">Difficulty</span>
+				  <div className="absolute bottom-[25%] flex flex-col gap-1 mobile-landscape:gap-0 items-center text-[10px] md:text-xs">
+					<span className="font-corben text-shell mobile-landscape:text-[0.5rem]">Difficulty</span>
   
                     <div className="flex gap-2">
-                      {["easy", "normal", "hard"].map((lvl) => (
+                      {["normal", "hard", "impossible"].map((lvl) => (
                         <Sixtyfour
                           key={lvl}
                           onClick={() => setDifficulty(lvl)}
                           className={`
-                            cursor-pointer px-2 py-1 rounded-full border text-[0.3rem] md:text-xs
+                            cursor-pointer px-2 py-1 rounded-full border text-[0.3rem] md:text-xs mobile-landscape:text-[0.3rem]
                             transition-colors
                             ${
                               difficulty === lvl
@@ -261,13 +262,13 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 			{/* ================= ADVANCED CONFIG ================= */}
 			{/* <div className="flex flex-col gap-2 items-center w-full" > */}
 				{advancedConfigOpen && (
-				<div className="absolute flex flex-col items-center justify-center px-6 gap-1 md:gap-5 lg:gap-3 xl:gap-8 text-[10px] md:text-xs top-[18%]">
-				  <Sixtyfour className="text-shell text-xl md:text-3xl xl:text-4xl">
+				<div className="absolute flex flex-col items-center justify-center px-3 gap-1 md:gap-5 lg:gap-3 xl:gap-8 mobile-landscape:gap-0 text-[10px] md:text-xs top-[18%]">
+				  <Sixtyfour className="text-shell text-xl md:text-3xl xl:text-4xl mobile-landscape:text-2xl">
 					SETTINGS
 				  </Sixtyfour>
 
-				  <div className="flex items-center justify-center gap-5 md:gap-9 xl:gap-12">
-					<div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7" >
+				  <div className="flex items-center justify-center gap-5 md:gap-9 xl:gap-12 mobile-landscape:gap-3">
+					<div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7 mobile-landscape:gap-0" >
 					  {/* Total rounds */}
 					  <ConfigSection title="Total rounds">
 						{[2, 3].map((r) => (
@@ -293,7 +294,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 					  </ConfigSection>
 					</div>
 
-					<div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7">
+					<div className="flex flex-col gap-2 md:gap-5 lg:gap-3 xl:gap-7 mobile-landscape:gap-0">
 					  {/* Abilities */}
 					  <ConfigSection title="Abilities">
 						<ToggleOption
@@ -310,26 +311,26 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 				   
 					  {/* Player colors */}
 					  <div className="flex flex-col items-center gap-0.5">
-						<span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px]">Player colors</span>
+						<span className="font-corben text-shell text-[10px] md:text-[13px] xl:text-[18px] mobile-landscape:text-[0.5rem]">Player colors</span>
 
 						<div className="flex gap-1 items-center">
-							<span className="font-corben text-shell text-[8px] md:text-[15px]">P1</span>
+							<span className="font-corben text-shell text-[8px] md:text-[15px] mobile-landscape:text-[0.5rem]">P1</span>
 						  <div className="flex flex-col items-center gap-1">
 							<input
 							  type="color"
 							  value={player1Color}
 							  onChange={(e) => setPlayer1Color(e.target.value)}
-							  className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+							  className="w-5 h-5 md:w-8 md:h-8 mobile-landscape:w-5 mobile-landscape:h-5 cursor-pointer bg-transparent"
 							/>
 						  </div>
 	  
-							<span className="font-corben text-shell text-[8px]  md:text-[15px]">P2</span>
+							<span className="font-corben text-shell text-[8px]  md:text-[15px] mobile-landscape:text-[0.5rem]">P2</span>
 						  <div className="flex flex-col items-center gap-1">
 							<input
 							  type="color"
 							  value={player2Color}
 							  onChange={(e) => setPlayer2Color(e.target.value)}
-							  className="w-5 h-5 md:w-8 md:h-8 cursor-pointer bg-transparent"
+							  className="w-5 h-5 md:w-8 md:h-8 mobile-landscape:w-5 mobile-landscape:h-5 cursor-pointer bg-transparent"
 							/>
 						  </div>
 						</div>
@@ -348,7 +349,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 					  />
 					))}
 				  </ConfigSection>
-				<div className="pt-0">
+				<div className="pt-1">
 				  <ToggleOption
 					active={true}
 					onClick={() => setAdvancedConfigOpen(false)}
@@ -375,6 +376,7 @@ export function PlayNotConnected({setScreen}){
             className="
             absolute top-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
+			mobile-landscape:text-xl
             text-shell
             hover:text-darkRed"
           >
@@ -382,18 +384,18 @@ export function PlayNotConnected({setScreen}){
         </Sixtyfour>
         <CenterText
           text ="PLAY"
-          // onClick={null}
-          // interactive={false}
           className="
             text-5xl
             md:text-7xl
-            xl:text-8xl"
+            xl:text-8xl
+			mobile-landscape:text-5xl"
         />
         <Sixtyfour
           onClick={() => setScreen("signIn")}
           className="
             absolute bottom-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
+			mobile-landscape:text-xl
            text-shell
            hover:text-darkRed"
         >
@@ -464,6 +466,7 @@ export function SignIn({setScreen}){
         className="
           absolute bottom-[8%]
           text-[10px] md:text-base
+		  mobile-landscape:text-xs
           text-shell
           hover:text-darkRed
           cursor-pointer"
@@ -473,7 +476,7 @@ export function SignIn({setScreen}){
       <button type="submit" className="flex items-center justify-center">
         <CenterText
             text ="CONNECT"
-            className="text-4xl md:text-6xl xl:text-7xl"
+		className="text-4xl md:text-6xl xl:text-7xl mobile-landscape:text-4xl "
         />
       </button>
     </Circle>

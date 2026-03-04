@@ -62,6 +62,8 @@ export function PlaceholderInput({placeholder, className = "", value, onChange, 
         bg-greyish
         rounded-3xl 
         w-[150px] h-[17px] md:w-[250px] md:h-[35px] xl:w-[300px] xl:h-[40px]
+        mobile-landscape:placeholder:text-[0.8rem]
+        mobile-landscape:w-[180px] mobile-landscape:h-[25px] 
         ${className}`} />
   )
 }

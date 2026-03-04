@@ -30,9 +30,10 @@ export function IconText({text, className=""}){
 
 export function Icon(props){
     return(
-        <div className="flex flex-col items-center mx-0.5 md:mx-1 group" onClick={props.onClick} >
+        <div className="flex flex-col items-center justify-center flex-1 min-h-0 group" onClick={props.onClick} >
+            <div className="max-h-16 mobile-landscape:max-h-8 flex items-center justify-center "></div>
             <img
-                className="w-10 sm:w-12 lg:w-13 xl:w-14 h-auto cursor-pointer mobile-landscape:w-7"
+                className="h-full w-auto cursor-pointer object-contain"
                 src={props.image}
                 alt={props.text + "icon"}
             />
@@ -45,7 +46,7 @@ export function Icon(props){
 export function IconsList({setScreen}){
     const {log} = useAuth()
     return(
-        <div className= "flex flex-col h-full justify-between items-center py-1 sm:border-r-4 border-r-2 border-black mobile-landscape:border">
+        <div className= "flex flex-col h-full justify-between items-center py-1 px-1 sm:border-r-4 border-r-2 border-black mobile-landscape:border">
             <Icon 
                 image={homeIcon} 
                 onClick={() =>setScreen(log ? "homePlay" : "playNC")}

@@ -27,7 +27,7 @@ export default {
       // },
       screens: {
         'mobile-landscape': {
-          raw: '(max-width: 767px) and (orientation: landscape)',
+          raw: '(max-width: 900px) and (orientation: landscape)',
         },
       },
     }
