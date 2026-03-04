@@ -4,29 +4,38 @@
 01.SixtyFour({children, className = "", onClick})
 02.CorbenBold({children, className = ""})
 03.CorbenRegular({children, className = "", onClick})
+04.P({children})
+05.H4({children})
+06.H3({children})
+07.H2({children})
+08.LI({children})
+09.UL({children})
 
 #icon.jsx
-04.Icon(props)
+10.Icon(props)
 
 #footer.jsx
-05.FooterButton({text, onClick})
+11.FooterButton({text, onClick})
 
 #circleUtils.jsx
-06.Circle({children, className=""})
-07.SmallCircle()
-08.CenterText({text, onClick, className = "", interactive = true})
-09.PlaceholderInput({placeholder, className = "", value, onChange, type, autoComplete})
+12.Circle({children, className=""})
+13.SmallCircle()
+14.CenterText({text, onClick, className = "", interactive = true})
+15.PlaceholderInput({placeholder, className = "", value, onChange, type, autoComplete})
 
 #iconUtils.jsx
-10.IconText({text, className=""})
-11.Icon(props)
-12.IconsOverlayFrame()
-13.ProfilePicture({src, className=""})
-14.ChopstickButton({text, onClick})
-15.OverlayPage({children, onClose})
-16.DisplayDate(string)
-17.DisplayIcon({children, avatar, setAvatar})
-18.LargeButton({children, onClick})
+16.IconText({text, className=""})
+17.Icon(props)
+18.IconsOverlayFrame()
+19.ProfilePicture({src, className=""})
+20.ChopstickButton({text, onClick})
+21.OverlayPage({children, onClose})
+22.DisplayDate(string)
+23.DisplayIcon({children, avatar, setAvatar})
+24.LargeButton({children, onClick})
+
+#friends.jsx
+25.Button({text, onClick, src})
 
 -->footer
 -->header

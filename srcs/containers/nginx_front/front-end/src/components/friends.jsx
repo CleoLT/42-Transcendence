@@ -19,7 +19,7 @@ function Button({text, onClick, src}){
 
 function RequestCard({request, onDelete, children, onAccept}) {
   return (
-      <div className="p-6 text-center h-1/2 border rounded-xl border-greyish relative ">
+      <div className="p-6 text-center h-1/2 border rounded-xl border-greyish relative mobile-landscape:pt-2">
        
         <div className="flex items-center relative w-full justify-center">
             <Sixtyfour className="text-[0.6rem] md:text-base">{children}</Sixtyfour>
@@ -66,7 +66,7 @@ function RequestCard({request, onDelete, children, onAccept}) {
 
 function PendingCard({pending, onDelete, children}) {
   return (
-    <div className="p-6 text-center h-1/2 border rounded-xl border-greyish relative ">
+    <div className="p-6 text-center h-1/2 border rounded-xl border-greyish relative mobile-landscape:pt-2">
         <div className="flex items-center relative w-full justify-center">
             <Sixtyfour className="text-[0.6rem] md:text-base">{children}</Sixtyfour>
         </div>
@@ -111,7 +111,7 @@ function PendingCard({pending, onDelete, children}) {
 function FriendsCard({ friends, onDelete, children, setScreenProfile }) {
 
   return (
-    <div className="p-6 text-center h-full border rounded-xl overflow-hidden border-greyish relative ">
+    <div className="p-6 text-center h-full border rounded-xl overflow-hidden border-greyish relative  mobile-landscape:pt-2">
         <div className="flex justify-center w-full">
             <Sixtyfour className="text-[0.6rem] md:text-base">{children}</Sixtyfour>
             <Button
@@ -314,7 +314,7 @@ function AddFriend({setScreenProfile, setPending}) {
           <IconsOverlayFrame />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 h-full w-full px-3 py-5 lg:px-8 lg:py-12">
+      <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 h-full w-full px-3 py-5 lg:px-8 lg:py-12 mobile-landscape:py-2">
         <div className="flex flex-col h-1/2 lg:h-full gap-2 lg:pb-2 flex-1">
           <RequestCard request={ requests } onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</RequestCard>
           <PendingCard pending={ pending } onDelete={deleteFriendship}>Pending</PendingCard>

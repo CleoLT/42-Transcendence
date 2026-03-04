@@ -22,7 +22,15 @@ export default {
         brightRed: colors.red[600],
         darkRed: colors.red[900],
       },
-    },
+      // screens: {
+      //   'landscape': {'raw': '(orientation: landscape)'},
+      // },
+      screens: {
+        'mobile-landscape': {
+          raw: '(max-width: 900px) and (orientation: landscape)',
+        },
+      },
+    }
   },
   plugins: []
 }

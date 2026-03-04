@@ -303,9 +303,6 @@ export function UserData({data, setScreenProfile, setScreen}){
 
     if (!userId) return
 
-    // if(!data)
-    //     return <div>Loading...</div>
-
     const handleDeleteAccount = async () => {
         try {
             const result = await OptionAlert.fire({
@@ -339,7 +336,7 @@ export function UserData({data, setScreenProfile, setScreen}){
         <div className="
             flex flex-col border rounded-xl border-greyish
             px-5 py-3 sm:px-10 justify-between items-center
-            gap-x-2 text-[0.5rem] sm:text-[0.6rem]" >
+            gap-x-2 text-[0.5rem] sm:text-[0.6rem] mobile-landscape:text-[0.4rem]" >
             <div className="flex gap-x-2 items-center pb-3">
                 <Sixtyfour children={data.username} onClick={null} />
                 <ChopstickButton text="Change name" onClick={() =>setScreenProfile("name")}/>
@@ -450,7 +447,7 @@ export function Profile({setScreen}){
                 <button className="group relative" onClick={() =>setScreenProfile("avatar")} >
                     <ProfilePicture
                         src={data.avatar}
-                        className="w-24 h-24 sm:w-40 sm:h-40" />
+                        className="w-24 h-24 sm:w-40 sm:h-40 mobile-landscape:w-24 mobile-landscape:h-24" />
                     <div className="absolute top-1/4 left-3/4">
                         <IconText text={"Change Avatar"} />
                     </div>
@@ -460,7 +457,7 @@ export function Profile({setScreen}){
             <div className="relative z-10 flex justify-center items-center mt-3 sm:mt-10">
                 <div className="flex border rounded-xl border-greyish px-5 py-3 sm:p-5 items-start mx-16" >
                     <Sixtyfour children={data.bio}  onClick={null}
-                        className="flex-1 min-w-0 text-[0.5rem] sm:text-[0.6rem] whitespace-pre-wrap break-word [word-break:break-word]" />
+                        className="flex-1 min-w-0 text-[0.5rem] sm:text-[0.6rem] mobile-landscape:text-[0.4rem] whitespace-pre-wrap break-word [word-break:break-word]" />
                     <ChopstickButton text="Change bio" onClick={() =>setScreenProfile("info")}/>
                 </div>
             </div>

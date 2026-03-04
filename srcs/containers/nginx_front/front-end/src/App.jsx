@@ -1,7 +1,6 @@
 import Content from "./components/content.jsx"
 import Header from "./components/header.jsx"
 import {Footer} from "./components/footer.jsx"
-import {Sixtyfour, CorbenBold, CorbenRegular} from "./components/typography.jsx"
 import {useState, useEffect} from "react"
 import {useAuth} from "./services/authProvider"
 
@@ -26,7 +25,7 @@ export default function App() {
         style={{backgroundImage: "url("+ background + ")"}}>
       </div>
       <img src={flowerGround} alt="flower"
-           className="absolute bottom-0 right-0 opacity-50 w-[100vw] md:w-[75vw] lg:w-[50vw]" />
+           className="absolute bottom-0 right-0 opacity-50 w-[100vw] md:w-[75vw] lg:w-[50vw] mobile-landscape:w-[50vw]" />
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
         <Header screen={screen} setScreen={setScreen} />
         <Content screen={screen} setScreen={setScreen} />

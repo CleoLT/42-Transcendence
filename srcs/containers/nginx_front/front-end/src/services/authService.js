@@ -79,7 +79,7 @@ export async function Register2FA(username, code) {
   const respond = await res.json()
 
   if (!res.ok) {
-    throw new Error(respond.error)
+    throw new Error(respond.message)
   }
   return respond
 }

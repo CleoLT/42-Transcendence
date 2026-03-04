@@ -46,7 +46,7 @@ function Card({ name, avatar, email, role, socialMedia }) {
 
 export function Project() {
     return (
-         <div className="flex flex-col relative w-full h-full pt-8 items-center">
+         <div className="flex flex-col relative w-full h-full py-8 items-center">
             <div className="absolute inset-0">
                 <IconsOverlayFrame />
             </div>
