@@ -131,6 +131,11 @@ export function initGame(container, onGameReady) {
   const game = new Game(canvas, ctx);
   game.setRoundIndicatorLayer(blurOverlay, indicatorCanvas);
   const inputManager = new InputManager(canvas);
+  // Link game <-> input so touch controller can react to
+  // single-player vs multi-player mode changes.
+  if (typeof game.attachInputManager === "function") {
+    game.attachInputManager(inputManager);
+  }
 
   let initialized = false;
   let nav = navigator.userAgent || window.opera;

@@ -1,5 +1,5 @@
 import {IconsList} from "./iconUtils"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import GameContainer from "./gameContainer"
 import {PlayConnected, PlayNotConnected, SignIn, CreateAccount, GameConfig, GameReset} from "./circlePages.jsx"
 import {Project} from "./projectPage.jsx"
@@ -21,11 +21,11 @@ export default function Content({screen, setScreen}){
         }
     }, [screen]);
 
-    const onGameReady = (gameInstance) => {
+    const onGameReady = useCallback((gameInstance) => {
         setGame(gameInstance);
         gameInstance?.setOnBackToMenu?.(() => setHasStarted(false));
         gameInstance?.setOnGameEnd?.(() => setScreen("gameReset"));
-    };
+    }, [setScreen, setHasStarted]);
 
     const handlePlayAgain = () => {
         game?.resetGame?.();
