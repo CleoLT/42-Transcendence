@@ -25,6 +25,7 @@ function RequestCard({request, onDelete, children, onAccept}) {
             <Sixtyfour>{children}</Sixtyfour>
         </div>
 
+      {(request.length === 0) && <div><P>No request to confirm</P></div>}
       {request && request.map((friendship) => {
         return (
           <div key={friendship.id} className="flex items-center justify-between py-2">
@@ -61,6 +62,7 @@ function PendingCard({pending, onDelete, children}) {
             <Sixtyfour>{children}</Sixtyfour>
         </div>
 
+      {(pending.length === 0) && <div><P>No pending confirmation</P></div>}
       {pending && pending.map((friendship) => {
         return (
           <div key={friendship.id} className="flex items-center justify-between py-2">
@@ -88,7 +90,7 @@ function PendingCard({pending, onDelete, children}) {
   )
 }
 
-function FriendsCard({ friends, buttonText, onDelete, children, setScreenProfile }) {
+function FriendsCard({ friends, onDelete, children, setScreenProfile }) {
 
   return (
     <div className="p-6 text-center border rounded-xl border-greyish relative ">
@@ -102,6 +104,7 @@ function FriendsCard({ friends, buttonText, onDelete, children, setScreenProfile
               />
           </div>
         </div>
+      {(friends.length === 0) && <div><P>No friends to display, add your first one..!</P></div>}
       {friends && friends.map((friendship) => {
         return (
           <div key={friendship.id} className="flex items-center justify-between py-2">
@@ -278,12 +281,12 @@ export function Friends() {
           <IconsOverlayFrame />
       </div>
 
-      <div className="flex gap-6">
-        <div className="">
+      <div className="flex gap-6 h-full">
+        <div className="flex flex-col gap-2 flex-1">
           <RequestCard request={ requests } onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</RequestCard>
           <PendingCard pending={ pending } onDelete={deleteFriendship}>Pending</PendingCard>
         </div>
-        <div className="">
+        <div className="flex-1">
           <FriendsCard friends={ friends } onDelete={deleteFriendship} setScreenProfile={setScreenProfile}>Friends list</FriendsCard>
         </div>
         {screenProfile === "addFriend" && (
