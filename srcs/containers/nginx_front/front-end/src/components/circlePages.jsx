@@ -555,7 +555,7 @@ export function CreateAccount({setScreen}){
 		value={username}
 		onChange={(e) => setUsername(e.target.value)}
 		autoComplete="username"
-		className="top-[16%]  md:top-[14%]"
+		className="top-[16%]  md:top-[14%] mobile-landscape:w-[150px] mobile-landscape:h-[23px]"
 	  />
 	  <PlaceholderInput
 		type="email"
@@ -563,7 +563,7 @@ export function CreateAccount({setScreen}){
 		value={email}
 		onChange={(e) => setEmail(e.target.value)}
 		autoComplete="email"
-		className="top-1/4"
+		className="top-1/4 mobile-landscape:w-[150px] mobile-landscape:h-[23px]"
 	  />
 	  <PlaceholderInput
 		type="password"
@@ -571,7 +571,7 @@ export function CreateAccount({setScreen}){
 		value={password}
 		onChange={(e) => setPassword(e.target.value)}
 		autoComplete="off"
-		className="bottom-1/4"
+		className="bottom-1/4 mobile-landscape:w-[150px] mobile-landscape:h-[23px]"
 	  />
 	  <PlaceholderInput
 		type="password"
@@ -579,12 +579,12 @@ export function CreateAccount({setScreen}){
 		value={repeatPassword}
 		onChange={(e) => setRepeatPassword(e.target.value)}
 		autoComplete="off"
-		className=" bottom-[16%] md:bottom-[14%]"
+		className=" bottom-[16%] md:bottom-[14%] mobile-landscape:w-[150px] mobile-landscape:h-[23px]"
 	  />
 	  <button type="submit" className="flex justify-center items-center">
 		<CenterText
 		  text ="CREATE"
-		  className="text-4xl md:text-6xl xl:text-7xl"
+		  className="text-4xl md:text-6xl xl:text-7xl mobile-landscape:text-4xl"
 		/>
 	  </button>
 	</Circle>

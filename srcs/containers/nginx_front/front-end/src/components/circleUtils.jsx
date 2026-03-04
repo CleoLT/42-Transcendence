@@ -54,7 +54,7 @@ export function PlaceholderInput({placeholder, className = "", value, onChange, 
         font-Corben
         text-darkRed
         text-center
-        text-[10px] md:text-base
+        text-[10px] md:text-base mobile-landscape:text-[0.7rem]
         placeholder:font-Corben
         placeholder:text-shell
         placeholder:text-center
@@ -62,7 +62,7 @@ export function PlaceholderInput({placeholder, className = "", value, onChange, 
         bg-greyish
         rounded-3xl 
         w-[150px] h-[17px] md:w-[250px] md:h-[35px] xl:w-[300px] xl:h-[40px]
-        mobile-landscape:placeholder:text-[0.8rem]
+        mobile-landscape:placeholder:text-[0.7rem]
         mobile-landscape:w-[180px] mobile-landscape:h-[25px] 
         ${className}`} />
   )
