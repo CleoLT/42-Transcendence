@@ -3,7 +3,7 @@ import {IconText, IconsOverlayFrame, ProfilePicture, ChopstickButton, OverlayPag
 import {useRef, useState, useEffect} from "react"
 import {Circle, PlaceholderInput, CirclePlaceholder} from "./circleUtils"
 import {useAuth} from "../services/authProvider"
-import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, patchChangeInfo, loginUser} from "../services/authService"
+import {getUserInfo, uploadAvatarFile, uploadAvatar, patchChangeUsername, patchChangePassword, patchChangeInfo, loginUser, checkActiveCookie} from "../services/authService"
 import { AlertMessage, OptionAlert } from "../services/alertMessage"
 
 
@@ -74,12 +74,14 @@ export function ChangeName({setData, setScreenProfile}){
                             placeholder="New Username"
                             value={userName}
                             onChange={(e) => setUserName(e.target.value)}
+                            autoComplete="off"
                             className="!static"
                         />
                         <PlaceholderInput
                             placeholder="New Username confirmation"
                             value={repeatUsername}
                             onChange={(e) => setRepeatUsername(e.target.value)}
+                            autoComplete="off"
                             className="!static"
                         />
                         <button type="submit" className="pt-4 md:pt-10">
@@ -155,6 +157,7 @@ export function ChangePassword({setScreenProfile}){
                             placeholder="Actual Password"
                             value={actualPassword}
                             onChange={(e) => setActualPassword(e.target.value)}
+                            autoComplete="current-password"
                             className="!static"
                         />
                         <PlaceholderInput
@@ -162,6 +165,7 @@ export function ChangePassword({setScreenProfile}){
                             placeholder="New Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="off"
                             className="!static"
                         />
                         <PlaceholderInput
@@ -169,6 +173,7 @@ export function ChangePassword({setScreenProfile}){
                             placeholder="New Password confirmation"
                             value={repeatPassword}
                             onChange={(e) => setRepeatPassword(e.target.value)}
+                            autoComplete="off"
                             className="!static"
                         />
                         <button type="submit" className="pt-4 md:pt-10">
@@ -255,17 +260,17 @@ export function ChangeAvatar({setData, setScreenProfile}){
             <Circle className="bg-shell border-2 border-greyish px-10">
                 <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
                     <div className="flex gap-1 md:gap-2">
-                        <DisplayIcon children="/avatars/cat.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/cat.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                         <DisplayIcon children="/avatars/bird_04.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/butterfly_02.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/dragonfly.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/butterfly.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/dragonfly.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <div className="flex gap-1 md:gap-2 md:pb-4 lg:pb-1 xl:pb-4">
-                        <DisplayIcon children="/avatars/jellyfish_01.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/koi_carp_03.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/moonfish.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/sushi.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
-                        <DisplayIcon children="/avatars/swan.jpg" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/jellyfish_00.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/carp_koi_01.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/moonfish.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/sushi.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
+                        <DisplayIcon children="/avatars/swan.png" avatar={avatar} setAvatar={setAvatar} setAvatarFile={setAvatarFile}/>
                     </div>
                     <CorbenRegular children="or" className="text-greyish text-xs md:text-base pb-1 md:pb-4 lg:pb-1 xl:pb-4" />
                     <LargeButton children="Upload your Avatar" onClick={() => inputRef.current.click()} />
@@ -297,10 +302,9 @@ export function UserData({data, setScreenProfile, setScreen}){
     const {setUserId, userId, setUsername, deleteUser} = useAuth()
 
     if (!userId) return
-      //TO DO checker si un UserId sinon profil deconnecte, faire sur chaque page ce check!!!
 
-    if(!data)
-        return <div>Loading...</div>
+    // if(!data)
+    //     return <div>Loading...</div>
 
     const handleDeleteAccount = async () => {
         try {
@@ -313,7 +317,7 @@ export function UserData({data, setScreenProfile, setScreen}){
             })
 
             if (result.isConfirmed) {
-                await deleteUser(setScreen)
+                await deleteUser()
                 setScreen("playNC")
 
             } else if (result.isDismissed) {
@@ -345,10 +349,10 @@ export function UserData({data, setScreenProfile, setScreen}){
             </div>
             <Sixtyfour children={`Player since ${date}`} onClick={null} />
             <button className="pt-3" >
-                <Sixtyfour children="Change password" onClick={() =>setScreenProfile("password")} className="hover:text-red-900" />
+                <Sixtyfour children="Change password" onClick={() =>setScreenProfile("password")} className="hover:text-darkRed" />
             </button>
             <button >
-                <Sixtyfour children="Delete account" onClick={handleDeleteAccount} className="hover:text-red-900" />
+                <Sixtyfour children="Delete account" onClick={handleDeleteAccount} className="hover:text-darkRed" />
             </button>
         </div>
     )
@@ -371,47 +375,45 @@ export function ChangeInfo({setData, setScreenProfile}){
 
     return(
         <div className="flex flex-col relative w-full h-full justify-center items-center">
-            <Circle className="bg-shell border-2 border-greyish px-10">
-                <div className="flex flex-col pt-4 md:pt-0 lg:pt-6 xl:gap-2 justify-center items-center">
-                    <form
-                        onSubmit={async (e) => {
-                        e.preventDefault()
-                        try {
-                            await handleChangeInfo()
-                            AlertMessage.fire({
-                                icon: "success",
-                                text: "Info changed!",
-                            })
-                        setData(prev => ({
-                            ...prev,
-                            bio: info})
-                        )
-                        setScreenProfile("profile")
-                        }
-                        catch(err) {
-                            AlertMessage.fire({
-                            icon: "error",
-                            text: err.message,
-                            })
-                        }
-                        }}
-                        className="
-                            relative flex flex-col
-                            justify-center
-                            items-center
-                            h-full w-full"
-                    >
-                        <CirclePlaceholder
-                            placeholder="Please express yourself here.."
-                            value={info}
-                            onChange={(e) => setInfo(e.target.value.slice(0,300))}
-                            className="!static"
-                        />
-                        <button type="submit" className="absolute bottom-[8%] z-20">
-                            <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
-                        </button>
-                    </form>
-                </div>
+            <Circle className="bg-shell border-2 border-greyish">
+                <form
+                    onSubmit={async (e) => {
+                    e.preventDefault()
+                    try {
+                        await handleChangeInfo()
+                        AlertMessage.fire({
+                            icon: "success",
+                            text: "Info changed!",
+                        })
+                    setData(prev => ({
+                        ...prev,
+                        bio: info})
+                    )
+                    setScreenProfile("profile")
+                    }
+                    catch(err) {
+                        AlertMessage.fire({
+                        icon: "error",
+                        text: err.message,
+                        })
+                    }
+                    }}
+                    className="
+                        relative flex flex-col
+                        justify-center
+                        items-center
+                        h-full w-full"
+                >
+                    <CirclePlaceholder
+                        placeholder="Please express yourself here.."
+                        value={info}
+                        onChange={(e) => setInfo(e.target.value.slice(0,300))}
+                        className="!static"
+                    />
+                    <button type="submit" className="absolute bottom-[12%] z-20">
+                        <IconText text="Confirm change" className="opacity-100 cursor-pointer" />
+                    </button>
+                </form>
             </Circle>
         </div>
     )
@@ -420,13 +422,18 @@ export function ChangeInfo({setData, setScreenProfile}){
 
 export function Profile({setScreen}){
     const [screenProfile, setScreenProfile] = useState("profile");
-    const {userId} = useAuth()
+    const {userId, disconnectCookie} = useAuth()
     const [data, setData] = useState(null)
 
     useEffect(() => {
-        if (!userId) return
-      
         (async () => {
+            const res = await disconnectCookie()
+            if (res)
+                return
+
+            if (!userId)
+                return
+            
             const response = await getUserInfo(userId)
             setData(response)
         }) ()
@@ -481,9 +488,6 @@ export function Profile({setScreen}){
     )
 }
 
-{/*test max char de username/email/infos*/}
-
-//faire en sorte que la bio ne soit jamais vide
 
 //useRef -->
 //hook react who keep a reference to a DOM element

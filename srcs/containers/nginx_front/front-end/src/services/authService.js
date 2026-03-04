@@ -317,7 +317,7 @@ export async function loginUser(username, password) {
 }
 
 
-export async function DeleteUserId(userId) {
+export async function deleteUserId(userId) {
   const res = await fetch(`${baseUrl}/api/users/${userId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
@@ -339,4 +339,16 @@ export async function DeleteUserId(userId) {
   })
 
   return 
+}
+
+
+export async function checkActiveCookie() {
+  const res = await fetch(`${baseUrl}/api/auth/activesession`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  })
+
+  const respond = await res.json()
+  return respond
 }

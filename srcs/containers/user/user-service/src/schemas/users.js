@@ -51,14 +51,14 @@ const email = {
 
 const avatarImages = [
     "/avatars/bird_04.jpg",
-    "/avatars/cat.jpg",
-    "/avatars/butterfly_02.png",
-    "/avatars/dragonfly.jpg",
-    "/avatars/jellyfish_01.jpg",
-    "/avatars/koi_carp_03.jpg",
-    "/avatars/moonfish.jpg",
-    "/avatars/sushi.jpg",
-    "/avatars/swan.jpg"
+    "/avatars/cat.png",
+    "/avatars/butterfly.png",
+    "/avatars/dragonfly.png",
+    "/avatars/jellyfish.png",
+    "/avatars/carp_koi_01.png",
+    "/avatars/moonfish.png",
+    "/avatars/sushi.png",
+    "/avatars/swan.png"
 ]
 
 /*-----------------------SCHEMAS--------------------*/

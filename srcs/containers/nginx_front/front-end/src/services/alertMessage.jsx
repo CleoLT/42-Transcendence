@@ -1,7 +1,6 @@
 import Swal from "sweetalert2"
 
 export const AlertMessage = Swal.mixin({
-  // title: "Alert theme",
   theme: "borderless",
   topLayer: true,
   timerProgressBar: true,
@@ -22,7 +21,6 @@ export const AlertMessage = Swal.mixin({
 })
 
 export const OptionAlert = Swal.mixin({
-  // title: "Alert theme",
   // theme: "borderless",
   topLayer: true,
   timerProgressBar: true,

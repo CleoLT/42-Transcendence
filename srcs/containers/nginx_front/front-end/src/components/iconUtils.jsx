@@ -11,9 +11,9 @@ export function IconText({text, className=""}){
     return(
         <span className={`
             flex
-            bg-red-900 rounded-lg
+            bg-darkRed rounded-lg
             my-1 px-2 py-0.5
-            cursor-default
+            cursor-pointer
             opacity-0
             group-hover:opacity-100
             transition-opacity duration-500
@@ -53,12 +53,12 @@ export function IconsList({setScreen}){
             />
             <Icon
                 image={profileIcon}
-                onClick={() =>setScreen(log ? "profile" : "playNC")}
+                onClick={() =>setScreen(log ? "profile" : "signIn")}
                 text="Profile"
             />
             <Icon
                 image={friendsIcon}
-                onClick={() =>setScreen(log ? "friends" : "playNC")}
+                onClick={() =>setScreen(log ? "friends" : "signIn")}
                 text="Friends"
             />
             <Icon

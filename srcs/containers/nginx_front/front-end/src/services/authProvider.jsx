@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react"
-import {Login, Login2FA, Logout, Register, Register2FA, DeleteUserId } from "./authService"
+import {Login, Login2FA, Logout, Register, Register2FA, deleteUserId, checkActiveCookie} from "./authService"
 import { AlertMessage } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -104,12 +104,24 @@ export function AuthProvider({children}){
     }
 
     const deleteUser = async () => {
-        console.log("Inside deleteUser")
-        await DeleteUserId(userId)
+        await deleteUserId(userId)
         await checkCookie()
         await AlertMessage.fire({
             icon: "success",
             text: "Account deleted!"})
+    }
+
+    const disconnectCookie = async () => {
+        const res= await checkActiveCookie()
+            
+        if(!res.valid){
+            await checkCookie()
+            await AlertMessage.fire({
+                icon: "info",
+                text: "Disconnected!!"})
+            return true
+        }
+        return false
     }
 
     // give the access to all child to this values
@@ -123,6 +135,7 @@ export function AuthProvider({children}){
                 register,
                 logout,
                 deleteUser,
+                disconnectCookie,
                 setUsername,
                 setUserId
             }} >

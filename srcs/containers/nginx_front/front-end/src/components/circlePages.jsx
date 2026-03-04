@@ -1,8 +1,7 @@
 import {useState, useEffect} from "react"
 import {Circle, CenterText, PlaceholderInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
-import { Login, Register, Logout, getUserInfo } from "../services/authService"
-// import { useAuth } from "../services/authProvider"
+// import { Login, Register, Logout, getUserInfo } from "../services/authService"
 import {AlertMessage} from "../services/alertMessage"
 import {useAuth} from "../services/authProvider"
 
@@ -40,30 +39,43 @@ function ConfigSection({ title, children }) {
 
 function ToggleOption({ active, onClick, label }) {
   return (
-	<Sixtyfour
-	  onClick={onClick}
-	  className={`
-		cursor-pointer px-1 py-1 rounded-full border transition-colors
-		text-[0.3rem] md:text-sm lg:text-[0.6rem] xl:text-sm
-		${
-		  active
-			? "bg-red-700 text-shell border-red-700"
-			: "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
-		}
-	  `}
-	>
-	  {label}
-	</Sixtyfour>
+    <Sixtyfour
+      onClick={onClick}
+      className={`
+        cursor-pointer px-1 py-1 rounded-full border transition-colors
+        text-[0.3rem] md:text-sm lg:text-[0.6rem] xl:text-sm
+        ${
+          active
+            ? "bg-red-700 text-shell border-red-700"
+            : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
+        }
+      `}
+    >
+      {label}
+    </Sixtyfour>
   )
 }
 
 export function GameConfig({ game, hasStarted, setHasStarted }) {
   const [advancedConfigOpen, setAdvancedConfigOpen] = useState(false)
-  const { username } = useAuth()
+  const { username, userId, disconnectCookie } = useAuth()
   const [player1Name, setPlayer1Name] = useState("")
   
-  
+  useEffect(() => {
+    (async () => {
+      if (username){
+        const res = await disconnectCookie()
+        if (res)
+            return
+      }
+    }) ()
+  },)
 
+  useEffect(() => {
+    if (username) {
+      setPlayer1Name(username)
+    }
+  }, [username])
   const [player2Name, setPlayer2Name] = useState("")
   const [vsAI, setVsAI] = useState(true)
   const [difficulty, setDifficulty] = useState("easy")
@@ -128,19 +140,19 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 	<div className="pointer-events-auto flex flex-col justify-center items-center h-full w-full">
 	  <Circle>
   
-		{game && (
-		  <button
-			type="button"
-			onClick={() => setAdvancedConfigOpen((open) => !open)}
-			className="
-			  absolute top-[5%]
-			  text-shell text-2xl md:text-4xl
-			  hover:text-red-900 transition-colors
-			"
-		  >
-			⚙
-		  </button>
-		)}
+        {game && (
+          <button
+            type="button"
+            onClick={() => setAdvancedConfigOpen((open) => !open)}
+            className="
+              absolute top-[5%]
+              text-shell text-2xl md:text-4xl
+              hover:text-darkRed transition-colors
+            "
+          >
+            ⚙
+          </button>
+        )}
   
 		{!game ? (
 		  <Sixtyfour className="text-shell text-center text-xl md:text-3xl">
@@ -155,7 +167,8 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 					placeholder="Player 1 name"
 					value={player1Name}
 					onChange={(e) => setPlayer1Name(e.target.value.slice(0, 10))}
-				  className="flex justify-center items-center top-[23%]"
+					autoComplete="off"
+				    className="flex justify-center items-center top-[23%]"
 				/>
 				<button className="flex justify-center items-center">
 				  <CenterText
@@ -182,63 +195,64 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 					].map((mode) => {
 					  const active = (mode.id === "ai" && vsAI) || (mode.id === "human" && !vsAI)
   
-					  return (
-						<Sixtyfour
-						  key={mode.id}
-						  onClick={() => {
-							const ai = mode.id === "ai"
-							setVsAI(ai)
-							game?.setAIMode(ai, difficulty)
-						  }}
-						  className={`
-							cursor-pointer px-2 py-1 rounded-full border
-							transition-colors text-[0.3rem] md:text-xs
-							${
-							  active
-								? "bg-red-700 text-shell border-red-700"
-								: "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
-							}
-						  `}
-						>
-						  {mode.label}
-						</Sixtyfour>
-					  )
-					})}
-				  </div>
-				</div>
+                      return (
+                        <Sixtyfour
+                          key={mode.id}
+                          onClick={() => {
+                            const ai = mode.id === "ai"
+                            setVsAI(ai)
+                            game?.setAIMode(ai, difficulty)
+                          }}
+                          className={`
+                            cursor-pointer px-2 py-1 rounded-full border
+                            transition-colors text-[0.3rem] md:text-xs
+                            ${
+                              active
+                                ? "bg-red-700 text-shell border-red-700"
+                                : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
+                            }
+                          `}
+                        >
+                          {mode.label}
+                        </Sixtyfour>
+                      )
+                    })}
+                  </div>
+                </div>
   
 				{/* Difficulty */}
 				{vsAI && (
 				  <div className="absolute bottom-[25%] flex flex-col gap-1 items-center text-[10px] md:text-xs">
 					<span className="font-corben text-shell">Difficulty</span>
   
-					<div className="flex gap-2">
-					  {["easy", "normal", "hard"].map((lvl) => (
-						<Sixtyfour
-						  key={lvl}
-						  onClick={() => setDifficulty(lvl)}
-						  className={`
-							cursor-pointer px-2 py-1 rounded-full border text-[0.3rem] md:text-xs
-							transition-colors
-							${
-							  difficulty === lvl
-								? "bg-red-700 text-shell border-red-700"
-								: "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
-							}
-						  `}
-						>
-						  {lvl}
-						</Sixtyfour>
-					  ))}
-					</div>
-				  </div>
-				)}
+                    <div className="flex gap-2">
+                      {["easy", "normal", "hard"].map((lvl) => (
+                        <Sixtyfour
+                          key={lvl}
+                          onClick={() => setDifficulty(lvl)}
+                          className={`
+                            cursor-pointer px-2 py-1 rounded-full border text-[0.3rem] md:text-xs
+                            transition-colors
+                            ${
+                              difficulty === lvl
+                                ? "bg-red-700 text-shell border-red-700"
+                                : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
+                            }
+                          `}
+                        >
+                          {lvl}
+                        </Sixtyfour>
+                      ))}
+                    </div>
+                  </div>
+                )}
   
 				{!vsAI && (
 				  <PlaceholderInput
 					placeholder="Player 2 name"
 					value={player2Name}
 					onChange={(e) => setPlayer2Name(e.target.value.slice(0, 10))}
+					autoComplete="off"
 					className="bottom-[25%] truncate"
 				  />
 				)}
@@ -355,39 +369,39 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 
 export function PlayNotConnected({setScreen}){
   return(
-	<div className="flex flex-col justify-center items-center h-full w-full">
-	  <Circle>
-		<Sixtyfour
-		  onClick={() =>setScreen("game")}
-			className="
-			absolute top-1/4 cursor-pointer
-			text-l md:text-2xl xl:text-4xl
-			text-shell
-			hover:text-red-900"
-		  >
-			Guest
-		</Sixtyfour>
-		<CenterText
-		  text ="PLAY"
-		  // onClick={null}
-		  // interactive={false}
-		  className="
-			text-5xl
-			md:text-7xl
-			xl:text-8xl"
-		/>
-		<Sixtyfour
-		  onClick={() => setScreen("signIn")}
-		  className="
-			absolute bottom-1/4 cursor-pointer
-			text-l md:text-2xl xl:text-4xl
-		   text-shell
-		   hover:text-red-900"
-		>
-			Sign in
-		</Sixtyfour>
-	  </Circle>
-	</div>
+    <div className="flex flex-col justify-center items-center h-full w-full">
+      <Circle>
+        <Sixtyfour
+          onClick={() =>setScreen("game")}
+            className="
+            absolute top-1/4 cursor-pointer
+            text-l md:text-2xl xl:text-4xl
+            text-shell
+            hover:text-darkRed"
+          >
+            Guest
+        </Sixtyfour>
+        <CenterText
+          text ="PLAY"
+          // onClick={null}
+          // interactive={false}
+          className="
+            text-5xl
+            md:text-7xl
+            xl:text-8xl"
+        />
+        <Sixtyfour
+          onClick={() => setScreen("signIn")}
+          className="
+            absolute bottom-1/4 cursor-pointer
+            text-l md:text-2xl xl:text-4xl
+           text-shell
+           hover:text-darkRed"
+        >
+            Sign in
+        </Sixtyfour>
+      </Circle>
+    </div>
   )
 }
 
@@ -408,60 +422,62 @@ export function SignIn({setScreen}){
   }
 
   return(
-	<form 
-	  onSubmit={async (e) => {
-		e.preventDefault()
-	  try {
-		await handleLogin()
-		AlertMessage.fire({
-		  icon: "success",
-		  text: "Connected! Welcome back 🌸!",
-		}) }
-		catch(err) {
-		  AlertMessage.fire({
-			icon: "error",
-			text: err.message,
-		  })
-		}
-	  }}
-	  className="
-		relative flex
-		justify-center
-		items-center
-		h-full w-full"
-	>
-	<Circle>
-	  <PlaceholderInput
-		placeholder="Username"
-		value={username}
-		onChange={(e) => setUsername(e.target.value)}
-		className="top-1/4"
-	  />
-	  <PlaceholderInput
-		type="password"
-		placeholder="Password"
-		value={password}
-		onChange={(e) => setPassword(e.target.value)}
-		className="bottom-1/4"
-	  />
-	  <CorbenRegular
-		onClick={() => setScreen("createAccount")}
-		className="
-		  absolute bottom-[8%]
-		  text-[10px] md:text-base
-		  text-shell
-		  hover:text-red-900
-		  cursor-pointer"
-	  >
-		Create an account
-	  </CorbenRegular>
-	  <button type="submit" className="flex items-center justify-center">
-		<CenterText
-			text ="CONNECT"
-			className="text-4xl md:text-6xl xl:text-7xl"
-		/>
-	  </button>
-	</Circle>
+    <form 
+      onSubmit={async (e) => {
+        e.preventDefault()
+      try {
+        await handleLogin()
+        AlertMessage.fire({
+          icon: "success",
+          text: "Connected! Welcome back 🌸!",
+        }) }
+        catch(err) {
+          AlertMessage.fire({
+            icon: "error",
+            text: err.message,
+          })
+        }
+      }}
+      className="
+        relative flex
+        justify-center
+        items-center
+        h-full w-full"
+    >
+    <Circle>
+      <PlaceholderInput
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+		autoComplete="username"
+        className="top-1/4"
+      />
+      <PlaceholderInput
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+		autoComplete="current-password"
+        className="bottom-1/4"
+      />
+      <CorbenRegular
+        onClick={() => setScreen("createAccount")}
+        className="
+          absolute bottom-[8%]
+          text-[10px] md:text-base
+          text-shell
+          hover:text-darkRed
+          cursor-pointer"
+      >
+        Create an account
+      </CorbenRegular>
+      <button type="submit" className="flex items-center justify-center">
+        <CenterText
+            text ="CONNECT"
+            className="text-4xl md:text-6xl xl:text-7xl"
+        />
+      </button>
+    </Circle>
   </form>
   )
 }
@@ -531,6 +547,7 @@ export function CreateAccount({setScreen}){
 		placeholder="Username"
 		value={username}
 		onChange={(e) => setUsername(e.target.value)}
+		autoComplete="username"
 		className="top-[16%]  md:top-[14%]"
 	  />
 	  <PlaceholderInput
@@ -538,6 +555,7 @@ export function CreateAccount({setScreen}){
 		placeholder="Email"
 		value={email}
 		onChange={(e) => setEmail(e.target.value)}
+		autoComplete="email"
 		className="top-1/4"
 	  />
 	  <PlaceholderInput
@@ -545,6 +563,7 @@ export function CreateAccount({setScreen}){
 		placeholder="Password"
 		value={password}
 		onChange={(e) => setPassword(e.target.value)}
+		autoComplete="off"
 		className="bottom-1/4"
 	  />
 	  <PlaceholderInput
@@ -552,6 +571,7 @@ export function CreateAccount({setScreen}){
 		placeholder="Repeat password"
 		value={repeatPassword}
 		onChange={(e) => setRepeatPassword(e.target.value)}
+		autoComplete="off"
 		className=" bottom-[16%] md:bottom-[14%]"
 	  />
 	  <button type="submit" className="flex justify-center items-center">
@@ -598,15 +618,15 @@ export function GameReset({ game, onPlayAgain }) {
 		  THE END
 		</Sixtyfour>
 
-		<CorbenBold
-		  className="
-			absolute top-[22%]
-			text-red-900
-			text-lg md:text-2xl
-		  "
-		>
-		  {winnerText}
-		</CorbenBold>
+        <CorbenBold
+          className="
+            absolute top-[22%]
+            text-darkRed
+            text-lg md:text-2xl
+          "
+        >
+          {winnerText}
+        </CorbenBold>
 
 		<button className="flex justify-center items-center">
 		  <CenterText

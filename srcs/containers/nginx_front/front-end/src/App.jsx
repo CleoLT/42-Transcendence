@@ -6,11 +6,10 @@ import {useState, useEffect} from "react"
 import {useAuth} from "./services/authProvider"
 
 export default function App() {
-  const background = "/images_png/ground_00.png"
+  const background = "/images_png/shell_ground_06.jpg"
   const flowerGround = "/images_png/flower_ground.png"
   const {log} = useAuth()
   const [screen, setScreen] = useState("playNC")
-  // const [initialized, setInitialized] = useState(false)
 
   useEffect(() =>
   {
@@ -20,13 +19,6 @@ export default function App() {
       {setScreen("playNC")}
   }, [log])
 
-  // useEffect(() => {
-  //   if (!initialized) {
-  //     setScreen(log ? "homePlay" : "playNC")
-  //     setInitialized(true)
-  //   }
-  // }, [log, initialized])
-  
   return (
     <div
       className="relative flex flex-col h-screen items-center justify-center">
