@@ -65,7 +65,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   useEffect(() => {
     (async () => {
         const res = await disconnectCookie()
-        if (res)
+        if (res && username)
             return
     }) ()
   },)
