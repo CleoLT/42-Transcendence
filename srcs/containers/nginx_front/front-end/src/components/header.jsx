@@ -14,7 +14,7 @@ export default function Header({screen, setScreen}){
                     }}
                     className="bg-transparent p-0 m-0 cursor-pointer">
                     <Sixtyfour
-                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-red-900">
+                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-darkRed">
                             Log out
                     </Sixtyfour>
                 </button>
@@ -23,7 +23,7 @@ export default function Header({screen, setScreen}){
                     onClick={() => setScreen("signIn")}
                     className="bg-transparent p-0 m-0 cursor-pointer">
                     <Sixtyfour
-                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-red-900">
+                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-darkRed">
                             Sign in
                     </Sixtyfour>
                 </button>

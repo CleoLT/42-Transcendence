@@ -1,8 +1,7 @@
 import {useState, useEffect} from "react"
 import {Circle, CenterText, PlaceholderInput} from "./circleUtils.jsx"
 import {Sixtyfour, CorbenBold, CorbenRegular} from "./typography.jsx"
-import { Login, Register, Logout, getUserInfo } from "../services/authService"
-// import { useAuth } from "../services/authProvider"
+// import { Login, Register, Logout, getUserInfo } from "../services/authService"
 import {AlertMessage} from "../services/alertMessage"
 import {useAuth} from "../services/authProvider"
 
@@ -48,7 +47,7 @@ function ToggleOption({ active, onClick, label }) {
         ${
           active
             ? "bg-red-700 text-shell border-red-700"
-            : "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
+            : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
         }
       `}
     >
@@ -64,9 +63,11 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
   
   useEffect(() => {
     (async () => {
+      if (username){
         const res = await disconnectCookie()
-        if (res && username)
+        if (res)
             return
+      }
     }) ()
   },)
 
@@ -121,7 +122,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
             className="
               absolute top-[5%]
               text-shell text-2xl md:text-4xl
-              hover:text-red-900 transition-colors
+              hover:text-darkRed transition-colors
             "
           >
             ⚙
@@ -182,7 +183,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                             ${
                               active
                                 ? "bg-red-700 text-shell border-red-700"
-                                : "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
+                                : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
                             }
                           `}
                         >
@@ -209,7 +210,7 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
                             ${
                               difficulty === lvl
                                 ? "bg-red-700 text-shell border-red-700"
-                                : "bg-transparent text-shell border-shell/40 hover:bg-red-900 hover:border-red-900"
+                                : "bg-transparent text-shell border-shell/40 hover:bg-darkRed hover:border-darkRed"
                             }
                           `}
                         >
@@ -349,7 +350,7 @@ export function PlayNotConnected({setScreen}){
             absolute top-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
             text-shell
-            hover:text-red-900"
+            hover:text-darkRed"
           >
             Guest
         </Sixtyfour>
@@ -368,7 +369,7 @@ export function PlayNotConnected({setScreen}){
             absolute bottom-1/4 cursor-pointer
             text-l md:text-2xl xl:text-4xl
            text-shell
-           hover:text-red-900"
+           hover:text-darkRed"
         >
             Sign in
         </Sixtyfour>
@@ -436,7 +437,7 @@ export function SignIn({setScreen}){
           absolute bottom-[8%]
           text-[10px] md:text-base
           text-shell
-          hover:text-red-900
+          hover:text-darkRed
           cursor-pointer"
       >
         Create an account
@@ -587,7 +588,7 @@ export function GameReset({ game, onPlayAgain }) {
         <CorbenBold
           className="
             absolute top-[22%]
-            text-red-900
+            text-darkRed
             text-lg md:text-2xl
           "
         >

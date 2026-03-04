@@ -40,7 +40,7 @@ function Card({ friends, buttonText, onDelete, onAccept, children, setScreenProf
             <div className="flex items-center gap-3">
               {(children === "Friends list") && (<span
                 className={`w-2 h-2 rounded-full ${
-                friendship.online_status ? 'bg-green-700' : 'bg-red-600'
+                friendship.online_status ? 'bg-greenish' : 'bg-brightRed'
                }`}
               ></span>)}
               <ProfilePicture

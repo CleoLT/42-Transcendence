@@ -53,10 +53,10 @@ export function Project() {
             <div className="relative w-full max-w-3xl px-2 md:px-10 max-h-[80vh] overflow-y-auto">
                 {/* <Sixtyfour className="text-2xl text-center pb-5">PROJECT</Sixtyfour> */}
                 <a href="https://github.com/CleoLT/42-Transcendence" target="_blank" rel="noopener noreferrer">
-                    <Sixtyfour className="hover:text-red-900 pb-2 text-right text-[0.5rem] md:text-sm">Github Transcendence</Sixtyfour>
+                    <Sixtyfour className="hover:text-darkRed pb-2 text-right text-[0.5rem] md:text-sm">Github Transcendence</Sixtyfour>
                 </a>
                 <a href="https://www.figma.com/site/eAmGTsUXKVOWK3iayg7CO8/Transcendance?node-id=0-1&t=J4EEjSWtxps4yZBf-1" target="_blank" rel="noopener noreferrer">
-                    <Sixtyfour className="hover:text-red-900 pb-2 text-right text-[0.5rem] md:text-sm">Figma models</Sixtyfour>
+                    <Sixtyfour className="hover:text-darkRed pb-2 text-right text-[0.5rem] md:text-sm">Figma models</Sixtyfour>
                 </a>
                 <div className="flex flex-col gap-2">
                     <Card name="Emilie Sellier" avatar="/avatars/jellyfish_transparent.png" email="esellier@student.42barcelona.com" role="Product Owner - Frontend Developer" socialMedia="https://github.com/EmilieInData"></Card>

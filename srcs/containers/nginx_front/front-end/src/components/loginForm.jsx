@@ -25,11 +25,11 @@ export default function LoginForm({ center = false }) {
         setMessageColor("text-green-600");
         setMessage(data.message || "Login successful");
       } else {
-        setMessageColor("text-red-600");
+        setMessageColor("text-brightRed");
         setMessage(data.error || "Login failed");
       }
     } catch (err) {
-      setMessageColor("text-red-600");
+      setMessageColor("text-brightRed");
       setMessage("Error connecting to server");
     } finally {
       setLoading(false);

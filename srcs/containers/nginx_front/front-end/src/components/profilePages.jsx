@@ -344,10 +344,10 @@ export function UserData({data, setScreenProfile, setScreen}){
             </div>
             <Sixtyfour children={`Player since ${date}`} onClick={null} />
             <button className="pt-3" >
-                <Sixtyfour children="Change password" onClick={() =>setScreenProfile("password")} className="hover:text-red-900" />
+                <Sixtyfour children="Change password" onClick={() =>setScreenProfile("password")} className="hover:text-darkRed" />
             </button>
             <button >
-                <Sixtyfour children="Delete account" onClick={handleDeleteAccount} className="hover:text-red-900" />
+                <Sixtyfour children="Delete account" onClick={handleDeleteAccount} className="hover:text-darkRed" />
             </button>
         </div>
     )

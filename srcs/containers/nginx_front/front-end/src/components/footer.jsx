@@ -22,7 +22,7 @@ export function FooterButton({text, onClick}){
             className="
                 ml-[-0.6rem] md:ml-[-0.9rem] lg:ml-[-1rem]
                 text-[0.40rem] sm:text-[0.55rem] lg:text-sm
-                text-black hover:text-red-900"
+                text-black hover:text-darkRed"
         >
             {text}
         </Sixtyfour>

@@ -8,7 +8,7 @@ export function Circle({children, className=""}){
         w-[60vmin] max-w-[270px] md:max-w-[400px]
         lg:min-w-[350px] xl:max-w-[80vmin]
         aspect-square rounded-full
-        bg-red-600
+        bg-brightRed
         ${className}`}>
         {children}
       </div>
@@ -22,7 +22,7 @@ export function SmallCircle(){
         w-[4vmin] max-w-[20px] md:max-w-[30px]
         lg:min-w-[30px] xl:max-w-[6vmin]
         aspect-square rounded-full
-        bg-red-600">
+        bg-brightRed">
       </div>
   )
 }
@@ -33,7 +33,7 @@ export function CenterText({text, onClick, className = "", interactive = true}){
       <div
         onClick={() => onClick?.()} //call onClick only if onClick exist (no null)
         className={"absolute flex items-center justify-center " + (interactive ? "cursor-pointer" : "cursor-default")}>
-        <Sixtyfour className={"text-center text-shell " + (interactive ? "hover:text-red-900 " : "") + className}>
+        <Sixtyfour className={"text-center text-shell " + (interactive ? "hover:text-darkRed " : "") + className}>
           {text}
         </Sixtyfour>
       </div>
@@ -51,7 +51,7 @@ export function PlaceholderInput({placeholder, className = "", value, onChange, 
       className={`
         absolute cursor-text
         font-Corben
-        text-red-900
+        text-darkRed
         text-center
         text-[10px] md:text-base
         placeholder:font-Corben
@@ -83,7 +83,7 @@ export function CirclePlaceholder({ placeholder, className = "", value, onChange
           w-[90%] h-[40%]
           text-center
           font-Corben
-          text-red-900
+          text-darkRed
           placeholder:text-shell 
           text-[10px] md:text-base
           resize-none overflow-auto
