@@ -44,7 +44,6 @@ function Card({ name, avatar, email, role, socialMedia }) {
 }
 
 
-
 export function Project() {
     return (
          <div className="flex flex-col relative w-full h-full pt-8 items-center">
@@ -72,4 +71,3 @@ export function Project() {
         </div>
     )
 }
-
