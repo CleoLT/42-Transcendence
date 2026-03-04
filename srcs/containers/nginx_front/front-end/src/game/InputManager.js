@@ -44,17 +44,36 @@ export class InputManager {
 			typeof window !== "undefined" &&
 			("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
-		if (supportsTouch && this.target) {
-			this.mobileInput = new MobileInputController({
-				targetElement: this.target,
-				isSinglePlayer: this.isSinglePlayer,
-				simulateKeyPress: (code) => this.simulateKeyPress(code),
-				simulateKeyRelease: (code) => this.simulateKeyRelease(code),
-			});
-		} else {
+		// if (supportsTouch && this.target) {
+		// 	this.mobileInput = new MobileInputController({
+		// 		targetElement: this.target,
+		// 		isSinglePlayer: this.isSinglePlayer,
+		// 		simulateKeyPress: (code) => this.simulateKeyPress(code),
+		// 		simulateKeyRelease: (code) => this.simulateKeyRelease(code),
+		// 	});
+		// } else {
 			this.mobileInput = null;
+		// }
+	}
+
+	enableMobileControls() {
+		if (!this.mobileInput && this.target) {
+		this.mobileInput = new MobileInputController({
+			targetElement: this.target,
+			isSinglePlayer: this.isSinglePlayer,
+			simulateKeyPress: (code) => this.simulateKeyPress(code),
+			simulateKeyRelease: (code) => this.simulateKeyRelease(code),
+		});
 		}
 	}
+
+	disableMobileControls() {
+		if (this.mobileInput) {
+		this.mobileInput.destroy();
+		this.mobileInput = null;
+		}
+	}
+	
 
 	_isBlockedInSinglePlayer(code) {
 		if (!this.isSinglePlayer) return false;

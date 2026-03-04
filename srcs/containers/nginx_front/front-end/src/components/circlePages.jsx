@@ -131,7 +131,6 @@ export function GameConfig({ game, hasStarted, setHasStarted }) {
 	game.setAIMode(vsAI, difficulty)
 	game.startGame(p1, p2)
 	setHasStarted?.(true)
-	console.log("Game touch device: ", game.isTouchDevice)
 }
 
   if (hasStarted) return null

@@ -384,7 +384,11 @@ export class Game {
 
 		// Switch state - React will handle UI visibility based on state
 		this.state = 'playing';
-		console.log('🎮 Game state changed to:', this.state);
+		if (this.state === 'playing') {
+			this.inputManager.enableMobileControls();
+		} else {
+			this.inputManager.disableMobileControls();
+		}
 		// Begin the first round
 		this.roundSystem.startRound();
 		// Show round indicator

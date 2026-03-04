@@ -171,7 +171,7 @@ export class MobileInputController {
         const absDx = Math.abs(dx);
 
         // Swipe dash
-        if (info.player === "p1" && absDx > this.swipeThreshold && dt < this.swipeTimeLimit) {
+        if (absDx > this.swipeThreshold && dt < this.swipeTimeLimit) {
           const directionKey = dx < 0 ? info.leftKey : info.rightKey;
           const dashKey = info.dashKey;
 
@@ -261,14 +261,14 @@ export class MobileInputController {
     const P2_LEFT = { keyPress: "ArrowLeft", keyRelease: "ArrowLeft" };
     const P2_RIGHT = { keyPress: "ArrowRight", keyRelease: "ArrowRight" };
 
-    if (this.isSinglePlayer) {
-      this.leftButton = addButton(P1_LEFT, { bottom: "30%", left: "20%" }, "<");
-      this.rightButton = addButton(P1_RIGHT, { bottom: "30%", right: "20%" }, ">");
-    } else {
+    if (!this.isSinglePlayer) {
       this.leftButton = addButton(P1_LEFT, { bottom: "30%", left: "20%" }, "<");
       this.rightButton = addButton(P1_RIGHT, { bottom: "30%", left: "40%" }, ">");
       addButton(P2_LEFT, { bottom: "30%", right: "35%" }, "<");
       addButton(P2_RIGHT, { bottom: "30%", right: "15%" }, ">");
+    } else {
+      this.leftButton = addButton(P1_LEFT, { bottom: "30%", left: "20%" }, "<");
+      this.rightButton = addButton(P1_RIGHT, { bottom: "30%", right: "20%" }, ">");
     }
 
     document.body.appendChild(container);

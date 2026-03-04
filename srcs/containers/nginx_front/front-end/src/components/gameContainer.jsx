@@ -18,7 +18,6 @@ export default function GameContainer({ onGameReady }) {
       return;
     }
 
-    console.log("🎮 Initializing game");
 
     const { cleanup } = initGame(containerRef.current, (gameInstance) => {
       if (onGameReadyRef.current) {
@@ -28,8 +27,6 @@ export default function GameContainer({ onGameReady }) {
     cleanupRef.current = cleanup;
 
     return () => {
-      console.log("🧹 GameContainer unmounted – cleaning up game instance");
-
       if (cleanupRef.current) {
         cleanupRef.current();
         cleanupRef.current = null;
