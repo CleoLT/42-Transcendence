@@ -78,6 +78,7 @@ export class Game {
 		this.onBackToMenu = null;
 		this.onGameEnd = null;
 		this.isTouchDevice = false;
+		this.isSinglePlayer = false;
 
 		this.roundTimeOverride = null;
 		this.totalRoundsOverride = null;
@@ -268,11 +269,36 @@ export class Game {
 		this.aiMode = enabled;
 		this.aiDifficulty = difficulty;
 
+		// Keep a simple flag for single-player vs multi-player
+		this.isSinglePlayer = !!enabled;
+
+		// Inform input manager (touch controller) about mode so it can
+		// disable all Player 2 touch input when playing vs AI.
+		if (this.inputManager && typeof this.inputManager.setSinglePlayerMode === 'function') {
+			this.inputManager.setSinglePlayerMode(this.isSinglePlayer);
+		}
+
 		// Create or clear AI controller based on current toggle
 		if (enabled) {
 			this.ai = new AI(this.players[1], difficulty, this.canvas.width, this.canvas.height);
 		} else {
 			this.ai = null;
+		}
+	}
+
+	/**
+	 * Optional hook used by the engine to attach the shared InputManager
+	 * instance so that game mode changes can propagate down to touch input.
+	 *
+	 * @param {InputManager} inputManager
+	 */
+	attachInputManager(inputManager) {
+		this.inputManager = inputManager;
+
+		// Re-apply current mode to input manager (important when AI is
+		// already toggled before the manager is attached).
+		if (inputManager && typeof inputManager.setSinglePlayerMode === 'function') {
+			inputManager.setSinglePlayerMode(this.isSinglePlayer);
 		}
 	}
 
@@ -1023,7 +1049,7 @@ export class Game {
 		// Title: "Round 1" / "Round 2"
 		ctx.fillStyle = ROUND_INDICATOR_TEXT_COLOR;
 		ctx.font = ROUND_INDICATOR_TITLE_FONT;
-		ctx.fillText(`ROUND ${currentRound} ${this.isTouchDevice ? '(Touch)' : '(Mouse)'}`, centerX, centerY + Yoffset);
+		ctx.fillText(`ROUND ${currentRound}`, centerX, centerY + Yoffset);
 		// Subtitle: "1 / 2"
 		ctx.font = ROUND_INDICATOR_SUBTITLE_FONT;
 		ctx.fillText(`${currentRound} / ${this.totalRoundsOverride}`, centerX, centerY + Yoffset + 42);
