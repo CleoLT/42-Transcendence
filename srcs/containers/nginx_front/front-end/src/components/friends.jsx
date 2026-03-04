@@ -17,7 +17,7 @@ import { Sixtyfour, P, H2, H3, LI, UL, CorbenRegular } from "./typography"
     )
 }
 
-function RequestCard({request, buttonText, onDelete, children, onAccept}) {
+function RequestCard({request, onDelete, children, onAccept}) {
   return (
       <div className="p-6 text-center border rounded-xl border-greyish relative ">
        
@@ -37,12 +37,12 @@ function RequestCard({request, buttonText, onDelete, children, onAccept}) {
             </div>
             <div className="flex gap-10 w-56 justify-end">
              <Button
-              text="Accept invitation"
+              text="accept invitation"
               onClick={() => onAccept(friendship.id)}
               src="/validation_icons/V_bold_cut.svg"
              />
             <Button
-              text={buttonText}
+              text="decline invitation"
               onClick={() => onDelete(friendship.id)}
               src="/validation_icons/X_bold_cut.svg"
             />
@@ -54,7 +54,7 @@ function RequestCard({request, buttonText, onDelete, children, onAccept}) {
   )
 }
 
-function PendingCard({pending, buttonText, onDelete, children}) {
+function PendingCard({pending, onDelete, children}) {
   return (
     <div className="p-6 text-center border rounded-xl border-greyish relative ">
         <div className="flex items-center relative w-full justify-center ">
@@ -77,7 +77,7 @@ function PendingCard({pending, buttonText, onDelete, children}) {
               <P className="">{friendship.username}</P>
             </div>
             <Button
-              text={buttonText}
+              text="cancel invitation"
               onClick={() => onDelete(friendship.id)}
               src="/validation_icons/X_bold_cut.svg"
             />
@@ -119,7 +119,7 @@ function FriendsCard({ friends, buttonText, onDelete, children, setScreenProfile
             </div>
             
             <Button
-              text={buttonText}
+              text="delete friendship"
               onClick={() => onDelete(friendship.id)}
               src="/validation_icons/X_bold_cut.svg"
             />
@@ -278,13 +278,13 @@ export function Friends() {
           <IconsOverlayFrame />
       </div>
 
-      <div className="relative grid grid-cols-1 md:grid-cols-2">
+      <div className="flex gap-6">
         <div className="">
-          <RequestCard request={ requests } buttonText="Decline invitation" onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</RequestCard>
-          <PendingCard pending={ pending } buttonText="Cancel invitation" onDelete={deleteFriendship}>Pending</PendingCard>
+          <RequestCard request={ requests } onDelete={deleteFriendship} onAccept={acceptFriend}>Request confirmation</RequestCard>
+          <PendingCard pending={ pending } onDelete={deleteFriendship}>Pending</PendingCard>
         </div>
         <div className="">
-          <FriendsCard friends={ friends } buttonText="Delete friendship" onDelete={deleteFriendship} setScreenProfile={setScreenProfile}>Friends list</FriendsCard>
+          <FriendsCard friends={ friends } onDelete={deleteFriendship} setScreenProfile={setScreenProfile}>Friends list</FriendsCard>
         </div>
         {screenProfile === "addFriend" && (
           <OverlayPage onClose={() => setScreenProfile("profile")}> 
