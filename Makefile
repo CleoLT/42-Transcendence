@@ -1,5 +1,5 @@
 # Default mode
-MODE ?= dev
+MODE ?= prod
 
 # Compose command selector
 ifeq ($(MODE),prod)
