@@ -1,19 +1,16 @@
-FROM node:20.19.6-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install deps first (better cache)
 COPY package*.json ./
-
 RUN npm ci
 
 ENV CHOKIDAR_USEPOLLING=true
-# Nodemon needs file system events: this one makes sure nodemon uses polls, which is necessary with alpine
+
+EXPOSE 3000
 
 COPY ./tools/dev-start.sh /tools/dev-start.sh
 
 RUN chmod 700 /tools/dev-start.sh
-
-EXPOSE 3000
 
 CMD ["/tools/dev-start.sh"]

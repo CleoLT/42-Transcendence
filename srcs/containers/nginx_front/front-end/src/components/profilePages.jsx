@@ -229,7 +229,7 @@ export function ChangeAvatar({setData, setScreenProfile}){
             } else {
                 await uploadAvatar(userId, avatar)
 
-                console.log("AVATAR:", avatar)
+                //console.log("AVATAR:", avatar)
             }
                 
             AlertMessage.fire({
@@ -436,7 +436,9 @@ export function Profile({setScreen}){
         }) ()
     }, [userId])
 
-    if (!data) return <div>Loading...</div>
+
+    if (!data) 
+        return <div>Loading</div>
     
     return(
         <div className="flex flex-col relative w-full h-full justify-center items-center">       

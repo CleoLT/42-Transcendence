@@ -1,16 +1,13 @@
 FROM node:20.19.6-alpine
 
-ARG VITE_BASE_URL
-ENV VITE_BASE_URL=$VITE_BASE_URL
-
-
 WORKDIR /app
 
 # Only dependencies are baked into the image
+# the whole folder will be a bind mount so that we have hot reload -> ./containers/nginx_front/front-end:/app
 COPY front-end/package*.json ./
 RUN npm ci
 
-# EMILIE added for hot reloaded on windows
+# EMILIE added for hot reload on windows
 ENV CHOKIDAR_USEPOLLING=true
 ENV CHOKIDAR_INTERVAL=100
 
@@ -20,6 +17,6 @@ COPY ./tools/dev-start.sh /tools/dev-start.sh
 
 RUN chmod 700 /tools/dev-start.sh
 
-ENTRYPOINT ["/tools/dev-start.sh"]
+CMD ["/tools/dev-start.sh"]
 
 # Source code comes from bind mount

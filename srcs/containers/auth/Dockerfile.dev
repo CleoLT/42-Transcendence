@@ -18,4 +18,4 @@ RUN chmod 700 /tools/dev-start.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["/tools/dev-start.sh"]
+CMD ["/tools/dev-start.sh"]

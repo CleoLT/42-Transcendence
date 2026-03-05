@@ -147,7 +147,7 @@ export async function getUserByUsername(username) {
   })
   const respond = await res.json()
 
-  console.log(respond)
+  //console.log(respond)
   
   if (!res.ok) {
     throw new Error(respond.message)
@@ -225,7 +225,7 @@ export async function uploadAvatarFile(id, formData) {
 
   const respond = await res.json()
 
-  console.log("RESPONSE FROM FILE= ", respond)
+  //console.log("RESPONSE FROM FILE= ", respond)
 
   if (!res.ok) {
     throw new Error(respond.message)
@@ -244,7 +244,7 @@ export async function uploadAvatar(id, avatarPath) {
 
   const respond = await res.json()
 
-  console.log("RESPONSE= ", respond)
+  //console.log("RESPONSE= ", respond)
   
   if (!res.ok) {
     throw new Error(respond.message)

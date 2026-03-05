@@ -16,7 +16,7 @@ COPY ./tools/start.sh /tools/start.sh
 
 RUN chmod 700 /tools/start.sh
 
-ENTRYPOINT ["/tools/start.sh"]
+CMD ["/tools/start.sh"]
 
 # NO es recomandable usar
 # CMD ["npm", "start"] (aunque esté descrito en el package.json)

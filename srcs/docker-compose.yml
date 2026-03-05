@@ -4,14 +4,12 @@ services:
 #GATEWAY
   api_gateway:
     container_name: api_gateway
-    build: ./containers/api_gateway
-    networks:
-      - main
+    build: 
+      context: ./containers/api_gateway
     depends_on:
      - auth-service
      - user-service
      - cert-generator
-    restart: always
     volumes:
       - certs_volume:/certs:ro
     secrets:
@@ -19,6 +17,10 @@ services:
     environment:
       NODE_EXTRA_CA_CERTS: /certs/ca.crt
       API_KEY: /run/secrets/api_key
+    networks:
+      - front
+      - back
+    restart: always
 
 # USER
   user-service:
@@ -27,18 +29,17 @@ services:
       context: ./containers/user/user-service
       dockerfile: Dockerfile.prod
     volumes:
-      - ./containers/nginx_front/front-end/public/uploads/avatars:/uploads/avatars
+      - avatars_volume:/uploads/avatars
       - certs_volume:/certs:ro
     secrets:
-      - db_host
       - db_username
       - db_user_password
       - db_name
       - jwt_secret
       - api_key
+    env_file:
+      - ./.env
     environment: 
-      DB_HOST_FILE: /run/secrets/db_host
-      DB_PORT: 3306
       DB_USER_FILE: /run/secrets/db_username
       DB_PASSWORD_FILE: /run/secrets/db_user_password
       DB_NAME_FILE: /run/secrets/db_name
@@ -46,7 +47,7 @@ services:
       API_KEY: /run/secrets/api_key
       NODE_EXTRA_CA_CERTS: /certs/ca.crt
     networks:
-      - main
+      - back
     restart: always
     depends_on:
       user-db:
@@ -77,14 +78,14 @@ services:
       retries: 10
       start_period: 15s
     networks:
-      - main
+      - back
     restart: always
 
 # AUTH 
   auth-service:
     container_name: auth-service
     build: 
-      context: ./containers/auth/auth-service
+      context: ./containers/auth
       dockerfile: Dockerfile.prod
     environment:
       JWT_SECRET_FILE: /run/secrets/jwt_secret
@@ -102,7 +103,7 @@ services:
     volumes:
       - certs_volume:/certs:ro
     networks:
-      - main
+      - back
     restart: always
     depends_on:
      - cert-generator
@@ -121,13 +122,11 @@ services:
 volumes:
   db_volume:
     driver: local
-  # lo vemos al hacer "docker volume ls" pero no vemos lo que se va guardando en run time en el host
   certs_volume:
+  avatars_volume:
 
 
 secrets:
-  db_host:
-    file: ../secrets/db_host.txt
   db_root_password:
     file: ../secrets/db_root_password.txt
   db_username:
@@ -136,8 +135,6 @@ secrets:
     file: ../secrets/db_user_password.txt
   db_name:
     file: ../secrets/db_name.txt
-  db_port:
-    file: ../secrets/db_port.txt
   jwt_secret:
     file: ../secrets/jwt_secret.txt
   mailer_email:
@@ -150,5 +147,13 @@ secrets:
     file: ../secrets/api_key.txt
 
 networks:
-   main:
-     driver: bridge
+  front:
+    driver: bridge
+  back:
+    driver: bridge
+
+# EXTRA: para que los contenedores no tengan acceso a internet
+# back:
+#   internal: true
+# se checkearia con:
+# "curl google.com" dentro de user-service por ej, y deberia fallar

@@ -25,6 +25,11 @@ export default defineConfig(({ command }) => {
           changeOrigin: true,
           secure: false,
         },
+        "/uploads": {
+          target: "https://api_gateway:3000",
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
   }

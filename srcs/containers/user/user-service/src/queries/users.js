@@ -76,7 +76,7 @@ async function updateUserById(id, modifiedData) {
     }
 
     const keys = Object.keys(modifiedData)
-    console.log(keys)
+    //console.log(keys)
     const setStmt = keys.map(key => `${key} = ?`).join(", ")
     
     const values = keys.map(key => modifiedData[key])

@@ -35,12 +35,10 @@ fastify.register(swaggerUI, {
   uiConfig: { docExpansion: 'list' }
 });
 
-fastify.register(routes)
-
-// Health check
 fastify.get('/health', async () => {
-  return { status: 'ok', service: 'auth-service' };
-});
+  return { service: 'auth', status: 'running' }});
+
+fastify.register(routes)
 
 // Check to avoid leaving sockets open with nodemon
 const start = async () => {

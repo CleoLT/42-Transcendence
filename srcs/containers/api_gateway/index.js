@@ -20,47 +20,19 @@ function readSecret(path) {
 }
 
 app.register(rateLimit, {
-  max: 300,               // máximo 100 requests
-  timeWindow: "1 minute", // por minuto
+  max: 300,               
+  timeWindow: "1 minute",
 });
 
-// 🔐 HTTPS enforcement
-//app.addHook('onRequest', async (req, reply) => {
-//  if (req.protocol !== 'https') {
- //   reply.code(400).send({ error: 'HTTPS required' });
-  //}
-//});
-
-// printf para ver la request en los logs de la api-gateway
 app.addHook('onRequest', async (req) => {
   console.log(`[GATEWAY] ${req.method} ${req.url}`);
 });
+// printf para ver la request en los logs de la api-gateway
 
-//Cross-origin ressource sharing para que el front pueda hacer fetch
-app.register(cors, {
-  origin: "https://localhost:8080",
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
-});
-
-//const allowedOrigins = [
-//  "http://localhost:5173", // dev frontend (Vite)
-//  "https://localhost:8080", // prod frontend (nginx)
-//];
-
-//app.register(cors, {
-//  origin: (origin, cb) => {
-//    // allow requests with no origin (like curl or mobile apps)
-//    if (!origin) return cb(null, true);
-//    if (allowedOrigins.includes(origin)) {
-//      cb(null, true);
-//    } else {
-//      cb(new Error("Not allowed by CORS"));
-//    }
-//  },
-//  methods: ["GET", "POST", "PATCH", "DELETE"],
-//  credentials: true // if you plan to use cookies/auth
-//});
+const internalHttpsOptions = {
+  rejectUnauthorized: true,
+  ca: fs.readFileSync('/certs/ca.crt')
+};
 
 app.register(proxy, {
   upstream: "https://user-service:3000",
@@ -68,16 +40,29 @@ app.register(proxy, {
   rewritePrefix: "/",
   preHandler: async (request, reply) => {
     request.headers['x-api-key'] = readSecret(process.env.API_KEY);
-  }
+  },
+  rewritePrefix: "/",
+  https: internalHttpsOptions
+});
+
+app.register(proxy, {
+  upstream: "https://user-service:3000",
+  prefix: "/uploads",
+  rewritePrefix: "/uploads",
+  preHandler: async (request, reply) => {
+    request.headers['x-api-key'] = readSecret(process.env.API_KEY);
+  },
+  https: internalHttpsOptions
 });
 
 app.register(proxy, {
   upstream: "https://auth-service:3000",
   prefix: "/api/auth/",
-  rewritePrefix: "/"
+  rewritePrefix: "/",
+  https: internalHttpsOptions
 });
 
 app.get("/api/health", async () => {
-  return { ok: true };});
+  return { ok: "service api_gateway is running" };});
 
 app.listen({ port: 3000, host: "0.0.0.0" });

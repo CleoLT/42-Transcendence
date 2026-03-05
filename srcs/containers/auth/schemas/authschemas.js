@@ -155,7 +155,7 @@ const statusSchema = {
   const validateSchema = {
     description: 'Validate session token',
     tags: ['Auth'],
-    summary: 'Check if user session is valid',
+    summary: 'Internal check for cookie update of current session',
     body: {
       type: 'object',
       properties: { lastUserId: { type: 'number' } }

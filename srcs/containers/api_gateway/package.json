@@ -1,6 +1,10 @@
 {
   "name": "api-gateway",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
   "dependencies": {
     "@fastify/cors": "10",
     "@fastify/http-proxy": "^11.4.1",
@@ -8,9 +12,10 @@
     "@fastify/swagger-ui": "5.2.1",
     "fastify": "5.7.3",
     "jsonwebtoken": "9.0.2",
+    "@fastify/reply-from": "12.5.0",
     "@fastify/rate-limit": "10"
   },
   "devDependencies": {
-    "@fastify/reply-from": "12.5.0"
+    "nodemon": "3.0.0"
   }
 }

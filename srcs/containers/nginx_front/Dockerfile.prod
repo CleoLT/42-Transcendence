@@ -1,33 +1,21 @@
 # 1. Build stage
 FROM node:20.19.6-alpine AS build
-
-ARG VITE_BASE_URL
-ENV VITE_BASE_URL=$VITE_BASE_URL
-
 # lo que va detras de 'AS' es el nombre de esa stage del Dockerfile
+
 WORKDIR /app
 
 COPY front-end/package*.json .
 
-# instalamos react y lo que haya en el package.json con el comando:
+# instalamos react y lo que haya en el package.json con el comando ci(clean install), que mirara al package-lock.json:
 RUN npm ci
 
 COPY front-end/ .
 RUN npm run build   
 
-# creates /app/dist + vite converts .jsx to .html, .css $ .js
+# creates /app/dist + vite converts .jsx to .html, .css & .js
 
-# 2. Serve stage
-# en esta stage NO existe node
+# 2. Serve stage: en esta stage NO existe node
 FROM nginx:1.28-alpine-slim
-
-#RUN apk add --no-cache openssl \
-# && mkdir -p /etc/ssl/certs /etc/ssl/private \
-# && openssl req -x509 -nodes -days 365 \
-#    -subj "/CN=transcendence" \
-#    -newkey rsa:2048 \
-#    -keyout /etc/ssl/private/transcendence.key \
-#    -out /etc/ssl/certs/transcendence.crt
 
 COPY --from=build /app/dist /usr/share/nginx/html
 # copiamos los archivos que se han construido en la primera etapa en la carpeta de la que nginx saca los recursos html, etc
@@ -40,4 +28,4 @@ RUN chmod 700 /tools/start.sh
 
 EXPOSE 443
 
-ENTRYPOINT ["/tools/start.sh"]
+CMD ["/tools/start.sh"]

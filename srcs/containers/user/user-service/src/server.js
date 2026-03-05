@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import fastifyStatic from '@fastify/static'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
@@ -73,6 +74,11 @@ fastify.register(swaggerUI, {
   routePrefix: '/docs',
   uiConfig: { docExpansion: 'list' }
 })
+
+fastify.register(fastifyStatic, {
+  root: '/uploads',
+  prefix: '/uploads/',
+});
 
 fastify.register(routes)
 
