@@ -83,13 +83,6 @@ export const BOWL_STROKE_COLOR = '#1a1a1a';
 export const BOWL_LABEL_COLOR = '#f5f5dc';
 export const BOWL_LABEL_FONT = 'bold';
 
-// Paper texture
-export const PAPER_TEXTURE_POINTS = 200;
-export const PAPER_TEXTURE_SIZE_MIN = 1;
-export const PAPER_TEXTURE_SIZE_MAX = 3;
-export const PAPER_TEXTURE_COLOR = 'rgba(139, 115, 85, 0.02)';
-export const PAPER_BACKGROUND_COLOR = 'rgba(255, 254, 240, 0.48)';
-
 // Table rendering (fallback)
 export const TABLE_LEG_HEIGHT_FACTOR = 1.25; // Multiplier of table height
 export const TABLE_LEG_COLOR = 'rgba(12,12,12,0.95)';
@@ -97,21 +90,6 @@ export const TABLE_OUTLINE_COLOR = 'rgba(10,10,10,0.95)';
 export const TABLE_GRAIN_COLOR = 'rgba(0,0,0,0.06)';
 export const TABLE_INK_WASHES = [1, 0.4, 0.2];
 export const TABLE_INK_WASH_COLOR = 'rgba(139, 115, 85, 1)';
-
-// Bamboo separator
-export const BAMBOO_SEPARATOR_WIDTH = 30;
-export const BAMBOO_SEPARATOR_STROKE_WIDTH = 4;
-export const BAMBOO_SEPARATOR_COLOR = '#2a2a2a';
-export const BAMBOO_SEPARATOR_INK_BLEED = 1.5;
-export const BAMBOO_SEPARATOR_SPLOTCH_CHANCE = 0.1;
-export const BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN = 2;
-export const BAMBOO_SEPARATOR_SPLOTCH_SIZE_MAX = 4;
-export const BAMBOO_SEPARATOR_SPLOTCH_COLOR = 'rgba(42, 42, 42, 0.3)';
-export const BAMBOO_SEPARATOR_WASH_COLOR = 'rgba(42, 42, 42, 0.1)';
-export const BAMBOO_SEPARATOR_WASH_WIDTH = 3;
-export const BAMBOO_SEPARATOR_STEP = 8;
-export const BAMBOO_SEPARATOR_VARIATION_FACTOR = 0.03;
-export const BAMBOO_SEPARATOR_WASH_STEP = 20;
 
 // Blossom sprite generation
 export const BLOSSOM_SPRITE_SIZE_NORMAL = 40;

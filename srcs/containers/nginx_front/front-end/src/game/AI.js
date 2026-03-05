@@ -1,95 +1,82 @@
 import { PLAYER_SPEED, BLOSSOM_FALL_SPEED, BLOSSOM_WIND_DRIFT, ABILITY_COSTS } from './Constants.js';
 
-/**
- * Sistema de IA completamente reescrito desde cero.
- * Arquitectura modular basada en Strategy Pattern para diferentes dificultades.
- * 
- * Estructura:
- * - AIStrategy: Clase base abstracta para estrategias de dificultad
- * - EasyStrategy, MediumStrategy, HardStrategy: Implementaciones específicas
- * - AI: Coordinador principal que delega a la estrategia correspondiente
- */
-
-/**
- * Clase base abstracta para estrategias de dificultad de IA.
- * Define la interfaz común que todas las dificultades deben implementar.
- */
 class AIStrategy {
 	/**
-	 * @param {Player} player - El jugador controlado por esta IA
-	 * @param {number} canvasWidth - Ancho del canvas
-	 * @param {number} canvasHeight - Alto del canvas
+	 * @param {Player} player - The player instance that this AI will control
+	 * @param {number} canvasWidth - Width of the game canvas
+	 * @param {number} canvasHeight - Height of the game canvas
 	 */
-	constructor(player, canvasWidth, canvasHeight) {
+	constructor(player, canvasWidth, canvasHeight, isTouchDevice) {
 		this.player = player;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
+		this.isTouchDevice = isTouchDevice;
 	}
 
 	/**
-	 * Calcula la posición objetivo X basada en el estado del juego.
+	 * Calculate the target X position based on the current game state.
 	 * 
-	 * @param {Array<Object>} blossoms - Lista de blossoms activos
-	 * @param {Player} otherPlayer - Jugador oponente
-	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
-	 * @param {WindSystem} windSystem - Sistema de viento (opcional)
-	 * @returns {number|null} Posición X objetivo, o null si no hay objetivo
+	 * @param {Array<Object>} blossoms - List of active blossoms in the game, each with properties like {x, y, golden, active}
+	 * @param {Player} otherPlayer - The opposing player
+	 * @param {LaneSystem} laneSystem - The lane system (optional)
+	 * @param {WindSystem} windSystem - The wind system (optional)
+	 * @returns {number|null} Target X position, or null if no target is available
 	 */
 	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
 		throw new Error('calculateTargetX must be implemented by subclass');
 	}
 
 	/**
-	 * Calcula si debe activarse el push.
+	 * Calculates whether the push should be activated based on the current game state.
 	 * 
-	 * @param {Player} otherPlayer - Jugador oponente
-	 * @param {Array<Object>} blossoms - Lista de blossoms activos
-	 * @returns {boolean} True si debe activarse push
+	 * @param {Player} otherPlayer - The opposing player
+	 * @param {Array<Object>} blossoms - List of active blossoms in the game, each with properties like {x, y, golden, active}
+	 * @returns {boolean} True if push should be activated
 	 */
 	shouldPush(otherPlayer, blossoms) {
 		return false;
 	}
 
 	/**
-	 * Calcula si debe usarse dash.
+	 * Calculates whether dash should be used based on the target position and current blossoms.
 	 * 
-	 * @param {number} targetX - Posición objetivo X
-	 * @param {Array<Object>} blossoms - Lista de blossoms activos
-	 * @returns {boolean} True si debe usarse dash
+	 * @param {number} targetX - Target X position
+	 * @param {Array<Object>} blossoms - List of active blossoms in the game, each with properties like {x, y, golden, active}
+	 * @returns {boolean} True if dash should be used
 	 */
 	shouldDash(targetX, blossoms) {
 		return false;
 	}
 
 	/**
-	 * Calcula qué habilidad debe usarse, si alguna.
+	 * Calculates which ability should be used, if any.
 	 * 
-	 * @param {Player} otherPlayer - Jugador oponente
-	 * @param {Array<Object>} blossoms - Lista de blossoms activos
-	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
-	 * @returns {string|null} Nombre de la habilidad a usar ('reversePush', 'inkFreeze', 'momentumSurge') o null
+	 * @param {Player} otherPlayer - The opposing player
+	 * @param {Array<Object>} blossoms - List of active blossoms in the game, each with properties like {x, y, golden, active}
+	 * @param {LaneSystem} laneSystem - The lane system (optional)
+	 * @returns {string|null} Name of the ability to use ('reversePush', 'inkFreeze', 'momentumSurge') or null
 	 */
 	shouldUseAbility(otherPlayer, blossoms, laneSystem) {
 		return null;
 	}
 
 	/**
-	 * Predice la posición futura de un blossom considerando viento.
+	 * Predicts the future X position of a blossom considering its current velocity and wind effects.
 	 * 
-	 * @param {Object} blossom - Blossom a predecir
-	 * @param {number} timeToReach - Tiempo estimado para alcanzar la altura del jugador
-	 * @param {WindSystem} windSystem - Sistema de viento
-	 * @returns {number} Posición X predicha
+	 * @param {Object} blossom - Blossom to predict
+	 * @param {number} timeToReach - Estimated time to reach the player's height
+	 * @param {WindSystem} windSystem - Wind system
+	 * @returns {number} Predicted X position
 	 */
 	predictBlossomPosition(blossom, timeToReach, windSystem) {
 		let predictedX = blossom.x;
 		
-		// Aplicar velocidad horizontal actual
+		// Applies horizontal velocity if available, otherwise assumes no horizontal movement
 		if (blossom.vx) {
 			predictedX += blossom.vx * timeToReach;
 		}
 		
-		// Aplicar deriva del viento si está activo
+		// Apply wind drift if active
 		if (windSystem && windSystem.isActive()) {
 			const windDirection = windSystem.getDirection();
 			predictedX += windDirection * BLOSSOM_WIND_DRIFT * timeToReach;
@@ -99,14 +86,14 @@ class AIStrategy {
 	}
 
 	/**
-	 * Calcula el tiempo estimado para que un blossom alcance la altura del jugador.
+	 * Calculate the estimated time for a blossom to reach the player's height. Returns Infinity if it's not reachable.
 	 * 
-	 * @param {Object} blossom - Blossom a evaluar
-	 * @returns {number} Tiempo en segundos, o Infinity si no es alcanzable
+	 * @param {Object} blossom - Blossom to evaluate
+	 * @returns {number} Time in seconds, or Infinity if not reachable
 	 */
 	calculateTimeToReach(blossom) {
 		if (blossom.y >= this.player.y) {
-			// El blossom ya está a la altura del jugador o más abajo
+			// The blossom is already at the player's height or below
 			return 0;
 		}
 		
@@ -122,42 +109,42 @@ class AIStrategy {
 }
 
 /**
- * Estrategia Easy: IA básica con limitaciones artificiales.
- * - Delay artificial en reacciones
- * - Errores pequeños en el seguimiento
- * - Sin predicción de movimiento
- * - Velocidad limitada
+ * Easy estrategy: basic AI with artificial limitations.
+ * - Artificial delay in reactions
+ * - Small errors in tracking
+ * - No movement prediction
+ * - Limited speed
  */
 class EasyStrategy extends AIStrategy {
 	constructor(player, canvasWidth, canvasHeight) {
 		super(player, canvasWidth, canvasHeight);
 		
-		// Estado interno para delay artificial
-		this.reactionDelay = 0.5; // segundos de delay (aumentado para hacer más fácil)
+		// Internal state for artificial delay
+		this.reactionDelay = 0.5; // delay seconds (increased to make it easier)
 		this.reactionTimer = 0;
 		this.lastTargetX = null;
 		
-		// Parámetros de error artificial (aumentados para hacer más fácil)
-		this.trackingError = 40; // píxeles de offset máximo (aumentado)
-		this.errorChance = 0.5; // probabilidad de cometer error (aumentado)
+		// Parameters for artificial error (increased to make it easier)
+		this.trackingError = 40; // maximum pixels of offset (increased)
+		this.errorChance = 0.5; // probability of making an error (increased)
 	}
 
 	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
-		// Filtrar blossoms activos y alcanzables
+		// Filter active and reachable blossoms
 		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
 		
 		if (activeBlossoms.length === 0) {
 			return null;
 		}
 
-		// Aplicar delay artificial: solo actualizar objetivo cada cierto tiempo
-		// Nota: el timer se actualiza en AI.update() con deltaTime real
+		// Apply artificial delay: only update target every certain time
+		// Note: the timer is updated in AI.update() with real deltaTime
 		if (this.reactionTimer < this.reactionDelay) {
 			return this.lastTargetX;
 		}
 		this.reactionTimer = 0;
 
-		// Seleccionar el blossom más cercano verticalmente
+		// Select the blossom most closest vertically
 		let bestBlossom = null;
 		let minVerticalDistance = Infinity;
 
@@ -173,10 +160,10 @@ class EasyStrategy extends AIStrategy {
 			return null;
 		}
 
-		// Sin predicción: usar posición actual
+		// without prediction, use the current position of the blossom as the target
 		let targetX = bestBlossom.x;
 
-		// Aplicar error artificial ocasional
+		// Apply artificial error occasionally
 		if (Math.random() < this.errorChance) {
 			const errorOffset = (Math.random() - 0.5) * 2 * this.trackingError;
 			targetX += errorOffset;
@@ -187,7 +174,7 @@ class EasyStrategy extends AIStrategy {
 	}
 
 	shouldPush(otherPlayer, blossoms) {
-		// Easy raramente hace push
+		// Easy doesn't push strategically, just randomly when overlapping
 		return false;
 	}
 
@@ -197,9 +184,9 @@ class EasyStrategy extends AIStrategy {
 			return null;
 		}
 
-		// Solo usar habilidades muy ocasionalmente y sin estrategia (muy raro)
-		if (Math.random() < 0.01) { // 1% de probabilidad por frame (reducido)
-			// Usar la habilidad más barata si está disponible
+		// Abilities are barely used and not based on the game state, just random chance if resources are available
+		if (Math.random() < 0.01) { // 1% chance per frame (reduced)
+			// Use the cheapest ability available (reversePush) if resources allow
 			const cost = ABILITY_COSTS.reversePush;
 			if (this.player.perfectMeter.value >= cost && 
 			    this.player.abilities.reversePush.cooldown <= 0) {
@@ -212,33 +199,34 @@ class EasyStrategy extends AIStrategy {
 }
 
 /**
- * Estrategia Medium: IA intermedia sin limitaciones extremas.
- * - Sin delay artificial
- * - Sigue correctamente el objetivo
- * - Predicción básica (sin viento)
- * - Velocidad normal
- * - Usa habilidades básicamente (sin mucha estrategia)
+ * Medium IA strategy: Intermediate AI without extreme limitations.
+ * - No artificial delay
+ * - Properly tracks the target
+ * - Basic prediction (no wind)
+ * - Normal speed
+ * - Uses abilities basically (without much strategy)
  */
 class MediumStrategy extends AIStrategy {
-	constructor(player, canvasWidth, canvasHeight) {
+	constructor(player, canvasWidth, canvasHeight, isTouchDevice) {
 		super(player, canvasWidth, canvasHeight);
+		this.isTouchDevice = isTouchDevice;
 		this.lastAbilityUse = 0;
-		this.abilityCooldown = 3.0; // Segundos entre usos de habilidades
+		this.abilityCooldown = 3.0; // Seconds between ability uses
 	}
 
 	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
-		// Filtrar blossoms activos y alcanzables
+		// Filter active and reachable blossoms (those that are above the player)
 		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
 		
 		if (activeBlossoms.length === 0) {
 			return null;
 		}
 
-		// Priorizar blossoms dorados
+		// Priority to golden blossoms, but still consider regular ones if no golden are available
 		const goldenBlossoms = activeBlossoms.filter(b => b.golden);
 		const candidates = goldenBlossoms.length > 0 ? goldenBlossoms : activeBlossoms;
 
-		// Seleccionar el mejor blossom basado en distancia y valor
+		// Select the best blossom based on distance and value
 		let bestBlossom = null;
 		let bestScore = Infinity;
 
@@ -249,19 +237,19 @@ class MediumStrategy extends AIStrategy {
 				continue;
 			}
 
-			// Predicción básica: solo posición actual + velocidad horizontal (sin viento)
+			// Without wind prediction, but still considers horizontal velocity if available
 			const predictedX = this.predictBlossomPosition(blossom, timeToReach, null);
 			
-			// Calcular distancia horizontal
+			// Calculate horizontal distance to the predicted position of the blossom
 			const horizontalDistance = Math.abs(predictedX - this.player.x);
 			
-			// Score: distancia vertical + distancia horizontal (normalizada)
+			// Score: vertical distance + horizontal distance (normalized)
 			const score = (this.player.y - blossom.y) + horizontalDistance * 0.5;
 			
-			// Penalizar si el oponente está más cerca (umbral más permisivo para Medium)
+			// Penalize if the opponent is closer (more permissive threshold for Medium)
 			const opponentDistance = Math.abs(predictedX - otherPlayer.x);
 			if (opponentDistance < horizontalDistance * 0.5) {
-				continue; // Oponente mucho más cerca, ignorar este blossom
+				continue; // Skip if opponent is significantly closer to the target
 			}
 
 			if (score < bestScore) {
@@ -279,18 +267,19 @@ class MediumStrategy extends AIStrategy {
 	}
 
 	shouldPush(otherPlayer, blossoms) {
-		// Medium hace push ocasionalmente cuando está superpuesto (menos agresivo)
+		if(!this.isTouchDevice) return false; // No push on touch devices, as it can be disruptive to the player experience
+		// Medium uses push occasionally when overlapping (less aggressive than Hard)
 		if (!this.player.overlaps(otherPlayer)) {
 			return false;
 		}
 
-		// Verificar si hay blossoms cercanos
+		// Verify if there are active blossoms nearby (in the same vertical area) to justify pushing
 		const nearbyBlossoms = blossoms.filter(b => 
 			b.active && 
 			Math.abs(b.y - this.player.y) < 100
 		);
 
-		return nearbyBlossoms.length > 0 && Math.random() < 0.25; // Reducido de 0.4 a 0.25
+		return nearbyBlossoms.length > 0 && Math.random() < 0.25; // Reduced from 0.4 to 0.25
 	}
 
 	shouldDash(targetX, blossoms) {
@@ -299,7 +288,7 @@ class MediumStrategy extends AIStrategy {
 		}
 
 		const distance = Math.abs(targetX - this.player.x);
-		// Dash si el objetivo está lejos y hay un blossom dorado cerca
+		// Dash if the target is far and there is a golden blossom nearby (increased distance threshold)
 		const hasGoldenNearby = blossoms.some(b => 
 			b.active && 
 			b.golden && 
@@ -314,13 +303,12 @@ class MediumStrategy extends AIStrategy {
 			return null;
 		}
 
-		// Medium usa habilidades básicamente cuando tiene recursos suficientes
-		// Sin mucha estrategia, más reactivo que proactivo
-		// Evaluar todas las habilidades y elegir la mejor según la situación
-
+		//Medium uses abilities basically when it has enough resources
+		//Without much strategy, more reactive than proactive
+		//Evaluate all abilities and choose the best one based on the situation
 		const abilityScores = [];
 
-		// 1. Evaluar inkFreeze (la más potente) - prioridad alta
+		// Evaluate inkfreeze (the most powerful) - high priority
 		const inkFreezeCost = ABILITY_COSTS.inkFreeze;
 		if (this.player.perfectMeter.value >= inkFreezeCost && 
 		    this.player.abilities.inkFreeze.cooldown <= 0 &&
@@ -332,13 +320,13 @@ class MediumStrategy extends AIStrategy {
 				const opponentDistance = Math.abs(targetBlossom.x - otherPlayer.x);
 				const myDistance = Math.abs(targetBlossom.x - this.player.x);
 				
-				// Score alto si el oponente está más cerca de un objetivo dorado
+				// High score if the opponent is closer to a golden target and it's within a reasonable distance (increased threshold)
 				if (opponentDistance < myDistance && opponentDistance < 120) {
 					score = 80 + (120 - opponentDistance); // Más cerca = más score
 				}
 			}
 			
-			// También score si el oponente está bloqueando el camino
+			// Also score if the opponent is blocking the path to a target blossom (increased threshold)
 			if (this.player.overlaps(otherPlayer)) {
 				const nearbyBlossoms = blossoms.filter(b => 
 					b.active && 
@@ -349,12 +337,12 @@ class MediumStrategy extends AIStrategy {
 				}
 			}
 			
-			if (score > 0 && Math.random() < 0.4) { // 40% de probabilidad si hay score
+			if (score > 0 && Math.random() < 0.4) { // 40% of probability to use when the situation is favorable (increased from 30%)
 				abilityScores.push({ ability: 'inkFreeze', score });
 			}
 		}
 
-		// 2. Evaluar reversePush
+		// Evaluate reversePush
 		const reversePushCost = ABILITY_COSTS.reversePush;
 		if (this.player.perfectMeter.value >= reversePushCost && 
 		    this.player.abilities.reversePush.cooldown <= 0 &&
@@ -370,18 +358,18 @@ class MediumStrategy extends AIStrategy {
 				score = 30 + (180 - distanceToOpponent) * 0.2;
 			}
 			
-			if (score > 0 && Math.random() < 0.3) { // 30% de probabilidad
+			if (score > 0 && Math.random() < 0.3) { // 30% of probability
 				abilityScores.push({ ability: 'reversePush', score });
 			}
 		}
 
-		// 3. Evaluar momentumSurge
+		// Evaluate momentumSurge
 		const momentumSurgeCost = ABILITY_COSTS.momentumSurge;
 		if (this.player.perfectMeter.value >= momentumSurgeCost && 
 		    this.player.abilities.momentumSurge.cooldown <= 0) {
 			let score = 0;
 			
-			// Score alto si está en situación de push competitiva
+			// Higher score if the player is in a lane with active blossoms and the opponent is in the same lane (if laneSystem exists)
 			if (this.player.overlaps(otherPlayer)) {
 				const nearbyBlossoms = blossoms.filter(b => 
 					b.active && 
@@ -392,12 +380,12 @@ class MediumStrategy extends AIStrategy {
 				}
 			}
 			
-			if (score > 0 && Math.random() < 0.25) { // 25% de probabilidad
+			if (score > 0 && Math.random() < 0.25) { // 25% of probability
 				abilityScores.push({ ability: 'momentumSurge', score });
 			}
 		}
 
-		// Elegir la habilidad con mayor score
+		// Choose the ability with the highest score if there are any viable options
 		if (abilityScores.length > 0) {
 			abilityScores.sort((a, b) => b.score - a.score);
 			return abilityScores[0].ability;
@@ -406,34 +394,33 @@ class MediumStrategy extends AIStrategy {
 		return null;
 	}
 }
-
 /**
- * Estrategia Hard: IA avanzada con predicción completa.
- * - Sin delay
- * - Predice posición futura del objetivo con viento
- * - Reacción inmediata
- * - Usa velocidad máxima
- * - Sin errores artificiales
- * - Usa habilidades de forma estratégica e inteligente
+ * Hard Strategy: Advanced AI with full prediction.
+ * - No delay
+ * - Predicts future target position with wind
+ * - Immediate reaction
+ * - Uses maximum speed
+ * - No artificial mistakes
+ * - Uses abilities strategically and intelligently
  */
 class HardStrategy extends AIStrategy {
-	constructor(player, canvasWidth, canvasHeight) {
-		super(player, canvasWidth, canvasHeight);
+	constructor(player, canvasWidth, canvasHeight, isTouchDevice) {
+		super(player, canvasWidth, canvasHeight, isTouchDevice);
 	}
 
 	calculateTargetX(blossoms, otherPlayer, laneSystem, windSystem) {
-		// Filtrar blossoms activos y alcanzables
+		// Filter active and reachable blossoms
 		const activeBlossoms = blossoms.filter(b => b.active && b.y < this.player.y);
 		
 		if (activeBlossoms.length === 0) {
 			return null;
 		}
 
-		// Priorizar blossoms dorados
+		// Prioritize golden blossoms
 		const goldenBlossoms = activeBlossoms.filter(b => b.golden);
 		const candidates = goldenBlossoms.length > 0 ? goldenBlossoms : activeBlossoms;
 
-		// Evaluar cada candidato con predicción completa
+		// Evaluate each candidate with full prediction
 		let bestBlossom = null;
 		let bestScore = -Infinity;
 
@@ -444,27 +431,27 @@ class HardStrategy extends AIStrategy {
 				continue;
 			}
 
-			// Predicción completa con viento
+			// Full prediction including wind
 			const predictedX = this.predictBlossomPosition(blossom, timeToReach, windSystem);
 			
-			// Calcular si el jugador puede alcanzar esa posición
+			// Calculate if the player can reach that position
 			const horizontalDistance = Math.abs(predictedX - this.player.x);
 			const timeToMove = horizontalDistance / PLAYER_SPEED;
 			
-			// Verificar si es alcanzable
+			// Check if reachable
 			if (timeToMove > timeToReach * 1.1) {
-				continue; // No alcanzable
+				continue; // Not reachable
 			}
 
-			// Calcular score basado en valor y accesibilidad
+			// Calculate score based on value and accessibility
 			let score = 0;
 			
-			// Bonus por blossom dorado
+			// Bonus for golden blossom
 			if (blossom.golden) {
 				score += 200;
 			}
 			
-			// Bonus por perfect catch potencial (si hay laneSystem)
+			// Bonus for potential perfect catch (if laneSystem exists)
 			if (laneSystem) {
 				const laneRegion = laneSystem.getLaneRegionForPoint(predictedX);
 				if (laneRegion >= 0 && laneSystem.isInLaneCenter(predictedX, laneRegion)) {
@@ -472,16 +459,16 @@ class HardStrategy extends AIStrategy {
 				}
 			}
 			
-			// Penalizar por distancia
+			// Penalize distance
 			score -= horizontalDistance * 0.3;
 			
-			// Penalizar si el oponente está más cerca
+			// Penalize if the opponent is closer
 			const opponentDistance = Math.abs(predictedX - otherPlayer.x);
 			if (opponentDistance < horizontalDistance * 0.8) {
 				score -= 50;
 			}
 
-			// Penalizar si el oponente está bloqueando el camino
+			// Penalize if the opponent is blocking the path
 			const isBlocked = (this.player.x < predictedX && otherPlayer.x > this.player.x && otherPlayer.x < predictedX) ||
 			                  (this.player.x > predictedX && otherPlayer.x < this.player.x && otherPlayer.x > predictedX);
 			if (isBlocked && Math.abs(otherPlayer.x - predictedX) < 80) {
@@ -503,11 +490,12 @@ class HardStrategy extends AIStrategy {
 	}
 
 	shouldPush(otherPlayer, blossoms) {
+		if(!this.isTouchDevice) return false; // No push on touch devices, as it can be disruptive to the player experience
 		if (!this.player.overlaps(otherPlayer)) {
 			return false;
 		}
 
-		// Hard hace push estratégicamente cuando hay blossoms cercanos
+		// Hard AI pushes strategically when there are nearby blossoms
 		const nearbyBlossoms = blossoms.filter(b => 
 			b.active && 
 			Math.abs(b.y - this.player.y) < 120
@@ -517,7 +505,7 @@ class HardStrategy extends AIStrategy {
 			return false;
 		}
 
-		// Push si hay un blossom objetivo cerca del oponente
+		// Push if there is a target blossom close to the opponent
 		const targetBlossom = nearbyBlossoms[0];
 		const distanceToBlossom = Math.abs(targetBlossom.x - this.player.x);
 		const opponentDistanceToBlossom = Math.abs(targetBlossom.x - otherPlayer.x);
@@ -532,9 +520,9 @@ class HardStrategy extends AIStrategy {
 
 		const distance = Math.abs(targetX - this.player.x);
 		
-		// Dash si el objetivo está lejos y es alcanzable con dash
+		// Dash if the target is far and reachable with dash
 		if (distance > 120) {
-			// Verificar si hay un blossom dorado como objetivo
+			// Check if there is a golden blossom as target
 			const hasGoldenTarget = blossoms.some(b => 
 				b.active && 
 				b.golden && 
@@ -552,13 +540,13 @@ class HardStrategy extends AIStrategy {
 			return null;
 		}
 
-		// Hard usa habilidades de forma estratégica e inteligente
-		// Evaluar todas las habilidades y elegir la mejor según la situación
-		// Priorizar inkFreeze cuando sea más útil (es la más potente)
+		// Hard AI uses abilities strategically and intelligently
+		// Evaluate all abilities and choose the best one depending on the situation
+		// Prioritize inkFreeze when it is most useful (it is the strongest)
 
 		const abilityScores = [];
 
-		// 1. Evaluar inkFreeze (la más potente) - máxima prioridad
+		// 1. Evaluate inkFreeze (strongest) - highest priority
 		const inkFreezeCost = ABILITY_COSTS.inkFreeze;
 		if (this.player.perfectMeter.value >= inkFreezeCost && 
 		    this.player.abilities.inkFreeze.cooldown <= 0 &&
@@ -574,15 +562,15 @@ class HardStrategy extends AIStrategy {
 				const opponentDistance = Math.abs(predictedX - otherPlayer.x);
 				const myDistance = Math.abs(predictedX - this.player.x);
 				
-				// Score muy alto si el oponente está más cerca y está a punto de alcanzarlo
+				// Very high score if the opponent is closer and about to reach it
 				if (opponentDistance < myDistance && 
 				    opponentDistance < 70 && 
 				    timeToReach < 1.0) {
-					score = 150 + (70 - opponentDistance) * 2; // Score muy alto
+					score = 150 + (70 - opponentDistance) * 2; // Very high score
 				}
 			}
 			
-			// También score alto si el oponente está bloqueando el camino
+			// Also high score if the opponent is blocking the path
 			const tempTargetX = this.calculateTargetX(blossoms, otherPlayer, laneSystem, null);
 			if (tempTargetX !== null) {
 				const isBlocked = (this.player.x < tempTargetX && otherPlayer.x > this.player.x && otherPlayer.x < tempTargetX) ||
@@ -597,7 +585,7 @@ class HardStrategy extends AIStrategy {
 			}
 		}
 
-		// 2. Evaluar reversePush
+		// 2. Evaluate reversePush
 		const reversePushCost = ABILITY_COSTS.reversePush;
 		if (this.player.perfectMeter.value >= reversePushCost && 
 		    this.player.abilities.reversePush.cooldown <= 0 &&
@@ -613,7 +601,7 @@ class HardStrategy extends AIStrategy {
 				const opponentDistance = Math.abs(predictedX - otherPlayer.x);
 				const myDistance = Math.abs(predictedX - this.player.x);
 				
-				// Score si el oponente está más cerca y está a punto de alcanzarlo
+				// Score if the opponent is closer and about to reach it
 				if (opponentDistance < myDistance && 
 				    opponentDistance < 90 && 
 				    timeToReach < 1.2) {
@@ -621,7 +609,7 @@ class HardStrategy extends AIStrategy {
 				}
 			}
 			
-			// También score cuando el oponente está moviéndose activamente
+			// Also score when the opponent is actively moving
 			if (this.player.overlaps(otherPlayer)) {
 				const nearbyBlossoms = blossoms.filter(b => 
 					b.active && 
@@ -637,13 +625,13 @@ class HardStrategy extends AIStrategy {
 			}
 		}
 
-		// 3. Evaluar momentumSurge
+		// 3. Evaluate momentumSurge
 		const momentumSurgeCost = ABILITY_COSTS.momentumSurge;
 		if (this.player.perfectMeter.value >= momentumSurgeCost && 
 		    this.player.abilities.momentumSurge.cooldown <= 0) {
 			let score = 0;
 			
-			// Score alto en situaciones de control de carril
+			// High score in lane control situations
 			if (laneSystem) {
 				const myLane = this.player.getLaneRegion(laneSystem);
 				const opponentLane = otherPlayer.getLaneRegion(laneSystem);
@@ -663,7 +651,7 @@ class HardStrategy extends AIStrategy {
 				}
 			}
 			
-			// También score cuando hay múltiples blossoms dorados
+			// Also score when there are multiple golden blossoms
 			const goldenBlossoms = blossoms.filter(b => b.active && b.golden);
 			if (goldenBlossoms.length >= 2 && this.player.overlaps(otherPlayer)) {
 				score = Math.max(score, 70);
@@ -674,7 +662,7 @@ class HardStrategy extends AIStrategy {
 			}
 		}
 
-		// Elegir la habilidad con mayor score
+		// Choose the ability with the highest score
 		if (abilityScores.length > 0) {
 			abilityScores.sort((a, b) => b.score - a.score);
 			return abilityScores[0].ability;
@@ -685,27 +673,30 @@ class HardStrategy extends AIStrategy {
 }
 
 /**
- * Clase principal de IA que coordina las estrategias de dificultad.
- * Completamente desacoplada del render y basada en lógica determinista.
+ * Main AI class that coordinates difficulty strategies.
+ * Completely decoupled from rendering and based on deterministic logic.
  */
 export class AI {
 	/**
-	 * Crea un controlador de IA que maneja un jugador usando estrategias de dificultad.
+	 * Creates an AI controller that manages a player using difficulty strategies.
 	 * 
-	 * @param {Player} player - Instancia del jugador controlado por esta IA
-	 * @param {'easy' | 'medium' | 'hard'} difficulty - Nivel de dificultad
-	 * @param {number} canvasWidth - Ancho del canvas
-	 * @param {number} canvasHeight - Alto del canvas
+	 * @param {Player} player - Instance of the player controlled by this AI
+	 * @param {'easy' | 'medium' | 'hard'} difficulty - Difficulty level
+	 * @param {number} canvasWidth - Canvas width
+	 * @param {number} canvasHeight - Canvas height
+	 * @param {boolean} isTouchDevice - Whether the device is a touch device
 	 */
-	constructor(player, difficulty = 'easy', canvasWidth, canvasHeight) {
+	constructor(player, difficulty = 'easy', canvasWidth, canvasHeight, isTouchDevice) {
 		this.player = player;
 		this.difficulty = difficulty;
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
-		// Crear estrategia según dificultad
+		this.isTouchDevice = isTouchDevice;
+
+		// Create strategy based on difficulty
 		this.strategy = this.createStrategy(difficulty, player, canvasWidth, canvasHeight);
 		
-		// Estado interno
+		// Internal state
 		this.targetX = null;
 		this.pushActive = false;
 		this.abilityToUse = null;
@@ -715,46 +706,33 @@ export class AI {
 	}
 
 	/**
-	 * Factory method para crear la estrategia apropiada según la dificultad.
-	 * 
-	 * @param {string} difficulty - Nivel de dificultad
-	 * @param {Player} player - Jugador controlado
-	 * @param {number} canvasWidth - Ancho del canvas
-	 * @param {number} canvasHeight - Alto del canvas
-	 * @returns {AIStrategy} Instancia de la estrategia
+	 * Factory method to create the appropriate strategy based on difficulty.
 	 */
 	createStrategy(difficulty, player, canvasWidth, canvasHeight) {
 		switch (difficulty.toLowerCase()) {
 			case 'easy':
 				return new EasyStrategy(player, canvasWidth, canvasHeight);
 			case 'medium':
-			case 'normal': // Compatibilidad con dificultad anterior
-				return new MediumStrategy(player, canvasWidth, canvasHeight);
+			case 'normal': // Compatibility with previous difficulty
+				return new MediumStrategy(player, canvasWidth, canvasHeight, this.isTouchDevice);
 			case 'hard':
-				return new HardStrategy(player, canvasWidth, canvasHeight);
+				return new HardStrategy(player, canvasWidth, canvasHeight, this.isTouchDevice);
 			default:
 				return new EasyStrategy(player, canvasWidth, canvasHeight);
 		}
 	}
 
 	/**
-	 * Actualiza la lógica de IA en cada frame del juego.
-	 * Completamente determinista y desacoplada del render.
-	 * 
-	 * @param {number} deltaTime - Tiempo transcurrido desde el último frame (en segundos)
-	 * @param {Array<Object>} blossoms - Lista actual de blossoms
-	 * @param {Player} otherPlayer - Jugador oponente
-	 * @param {LaneSystem} laneSystem - Sistema de carriles (opcional)
-	 * @param {WindSystem} windSystem - Sistema de viento (opcional)
-	 * @param {InputManager} inputManager - Gestor de entrada (no usado aquí, solo para compatibilidad)
+	 * Updates the AI logic every game frame.
+	 * Completely deterministic and decoupled from rendering.
 	 */
 	update(deltaTime, blossoms, otherPlayer, laneSystem, windSystem, inputManager) {
-		// Actualizar delay timer para Easy (si es necesario)
+		// Update delay timer for Easy (if needed)
 		if (this.strategy instanceof EasyStrategy) {
 			this.strategy.reactionTimer += deltaTime;
 		}
 
-		// Calcular posición objetivo usando la estrategia
+		// Calculate target position using the strategy
 		this.targetX = this.strategy.calculateTargetX(
 			blossoms,
 			otherPlayer,
@@ -762,51 +740,49 @@ export class AI {
 			windSystem
 		);
 
-		// Calcular si debe hacer push
-		this.pushActive = this.strategy.shouldPush(otherPlayer, blossoms);
+		// Calculate if it should push
+		this.pushActive = !this.isTouchDevice && this.strategy.shouldPush(otherPlayer, blossoms);
 		
-		// Calcular qué habilidad usar (si alguna)
+		// Calculate which ability to use (if any)
 		this.abilityToUse = this.strategy.shouldUseAbility(otherPlayer, blossoms, laneSystem);
 		
-		// Guardar blossoms para uso en getMovementInput
+		// Store blossoms for use in getMovementInput
 		this.currentBlossoms = blossoms;
 		this.currentOtherPlayer = otherPlayer;
 		this.currentLaneSystem = laneSystem;
 	}
 
 	/**
-	 * Convierte las decisiones de IA en entradas de teclado simuladas.
-	 * Este método aplica el movimiento calculado por la estrategia.
-	 * 
-	 * @param {InputManager} inputManager - Gestor de entrada para simular teclas
+	 * Converts AI decisions into simulated keyboard inputs.
+	 * This method applies the movement calculated by the strategy.
 	 */
 	getMovementInput(inputManager) {
-		// Obtener mapeo de teclas según el ID del jugador
+		// Get key mapping depending on player ID
 		const keys = this.player.id === 1
 			? { left: 'KeyA', right: 'KeyD', dash: 'Space', push: 'ControlRight' }
 			: { left: 'ArrowLeft', right: 'ArrowRight', dash: 'ShiftRight', push: 'ControlRight' };
 
-		// Limpiar todas las entradas de movimiento primero
+		// Clear all movement inputs first
 		inputManager.simulateKeyRelease(keys.left);
 		inputManager.simulateKeyRelease(keys.right);
 
-		// Si no hay objetivo, no hacer nada
+		// If there is no target, do nothing
 		if (this.targetX === null) {
 			return;
 		}
 
-		// Calcular distancia y dirección al objetivo
+		// Calculate distance and direction to the target
 		const dx = this.targetX - this.player.x;
 		const distance = Math.abs(dx);
 
-		// Si estamos suficientemente cerca, no moverse
-		const stopThreshold = 8; // píxeles
+		// If we are close enough, do not move
+		const stopThreshold = 8; // pixels
 		if (distance < stopThreshold) {
 			return;
 		}
 
-		// Determinar dirección de movimiento
-		const moveThreshold = 3; // píxeles mínimos para iniciar movimiento
+		// Determine movement direction
+		const moveThreshold = 3; // minimum pixels to start movement
 		if (Math.abs(dx) > moveThreshold) {
 			if (dx < 0) {
 				inputManager.simulateKeyPress(keys.left);
@@ -815,7 +791,7 @@ export class AI {
 			}
 		}
 
-		// Evaluar dash según la estrategia
+		// Evaluate dash according to the strategy
 		const blossoms = this.currentBlossoms || [];
 		if (this.strategy.shouldDash(this.targetX, blossoms)) {
 			if (this.player.dashCooldown <= 0 && !this.player.dashing) {
@@ -823,14 +799,14 @@ export class AI {
 			}
 		}
 
-		// Aplicar push si está activo
+		// Apply push if active
 		if (this.pushActive && this.player.pushCooldown <= 0) {
 			inputManager.simulateKeyPress(keys.push);
 		}
 
-		// Usar habilidad si está disponible y la estrategia lo recomienda
+		// Use ability if available and recommended by the strategy
 		if (this.abilityToUse && this.player.abilitiesEnabled) {
-			// Mapeo de habilidades a teclas (jugador 2 usa Numpad)
+			// Ability key mapping (player 2 uses numpad)
 			const abilityKeys = {
 				reversePush: 'Numpad1',
 				inkFreeze: 'Numpad2',
@@ -839,16 +815,17 @@ export class AI {
 
 			const abilityKey = abilityKeys[this.abilityToUse];
 			if (abilityKey) {
-				// Verificar que la habilidad esté disponible con doble verificación
+				// Verify ability availability with double check
 				const ability = this.player.abilities[this.abilityToUse];
 				const requiredCost = ABILITY_COSTS[this.abilityToUse];
 				
-				// Verificar cooldown, recursos y que la habilidad exista
+				// Verify cooldown, resources, and that the ability exists
 				if (ability && 
 				    ability.cooldown <= 0 && 
 				    this.player.perfectMeter.value >= requiredCost &&
 				    !this.player.frozen) {
-					// Simular presión de tecla (edge-triggered)
+
+					// Simulate key press (edge-triggered)
 					if (!inputManager.wasKeyJustPressed(abilityKey)) {
 						inputManager.simulateKeyPress(abilityKey);
 					}

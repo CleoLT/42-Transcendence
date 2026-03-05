@@ -44,16 +44,7 @@ export class InputManager {
 			typeof window !== "undefined" &&
 			("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
-		// if (supportsTouch && this.target) {
-		// 	this.mobileInput = new MobileInputController({
-		// 		targetElement: this.target,
-		// 		isSinglePlayer: this.isSinglePlayer,
-		// 		simulateKeyPress: (code) => this.simulateKeyPress(code),
-		// 		simulateKeyRelease: (code) => this.simulateKeyRelease(code),
-		// 	});
-		// } else {
-			this.mobileInput = null;
-		// }
+		this.mobileInput = null;
 	}
 
 	enableMobileControls() {

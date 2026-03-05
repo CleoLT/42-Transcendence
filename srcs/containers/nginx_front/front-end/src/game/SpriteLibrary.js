@@ -9,7 +9,6 @@ export class SpriteLibrary {
 		this.BlossomSprite = null;
 		this.GoldenBlossomSprite = null;
 		this.BowlSprite = null;
-		this.FillSprite = null;
 		this.snowflakeOverlay = null;
 
 		this.loaded = false;
@@ -42,16 +41,14 @@ export class SpriteLibrary {
 		this.BambooSprite = null;
 		this.BlossomSprite = null;
 		this.GoldenBlossomSprite = null;
-		this.FillSprite = null;
 		this.BowlSprite = null;
 		this.snowflakeOverlay = null;
 
 		const base = this.getSpriteBasePath();
 		const spritePaths = {
-			BambooSprite: `${base}bamboo.png`,
+			BambooSprite: `/images_png/sprites/bamboo.png`,
 			BlossomSprite: `${base}blossom.png`,
 			GoldenBlossomSprite: `${base}golden.png`,
-			FillSprite: `${base}bar.png`,
 			BowlSprite: `${base}bowl.png`,
 			snowflakeOverlay: `${base}snowflake.png`,
 		};
@@ -61,7 +58,6 @@ export class SpriteLibrary {
 			BambooSprite: `${classicBase}bamboo.png`,
 			BlossomSprite: `${classicBase}blossom.png`,
 			GoldenBlossomSprite: `${classicBase}golden.png`,
-			FillSprite: `${classicBase}bar.png`,
 			BowlSprite: `${classicBase}bowl.png`,
 			snowflakeOverlay: `${classicBase}snowflake.png`,
 		};
@@ -107,7 +103,6 @@ export class SpriteLibrary {
 		this.BambooSprite = null;
 		this.BlossomSprite = null;
 		this.GoldenBlossomSprite = null;
-		this.FillSprite = null;
 		this.BowlSprite = null;
 		this.snowflakeOverlay = null;
 		await this.loadSprites();
@@ -173,13 +168,6 @@ export class SpriteLibrary {
 	 */
 	getBowlSprite() {
 		return this.BowlSprite;
-	}
-
-	/**
-	 * Retrieves the fill sprite used for the perfect meter bar.
-	 */
-	getInkFillSprite() {
-		return this.FillSprite;
 	}
 }
 

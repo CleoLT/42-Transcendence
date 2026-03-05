@@ -279,7 +279,7 @@ export class Game {
 
 		// Create or clear AI controller based on current toggle
 		if (enabled) {
-			this.ai = new AI(this.players[1], difficulty, this.canvas.width, this.canvas.height);
+			this.ai = new AI(this.players[1], difficulty, this.canvas.width, this.canvas.height, this.isTouchDevice);
 		} else {
 			this.ai = null;
 		}
@@ -833,7 +833,7 @@ export class Game {
 		});
 
 		if (this.aiMode && this.ai) {
-			this.ai = new AI(this.players[1], this.aiDifficulty, this.canvas.width, this.canvas.height);
+			this.ai = new AI(this.players[1], this.aiDifficulty, this.canvas.width, this.canvas.height, this.isTouchDevice);
 		}
 		// Restore initial lane ownership and tint for the first round
 		this.laneSystem.lanes[0].owner = 1;
@@ -920,9 +920,6 @@ export class Game {
 
 		// Clear to transparent so semi-transparent background reveals what's behind the canvas
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-		// Always draw the background first regardless of game state
-		this.renderer.renderBackground(ctx, this.canvas.width, this.canvas.height);
 
 		if (this.state === 'playing' || this.state === 'paused') {
 

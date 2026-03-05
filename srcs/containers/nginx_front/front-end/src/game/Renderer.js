@@ -17,23 +17,6 @@ import {
 	BLOSSOM_GOLDEN_GLOW_COLOR,
 	BLOSSOM_STROKE_WIDTH_NORMAL,
 	BLOSSOM_STROKE_WIDTH_GOLDEN,
-	PAPER_TEXTURE_POINTS,
-	PAPER_TEXTURE_SIZE_MIN,
-	PAPER_TEXTURE_SIZE_MAX,
-	PAPER_TEXTURE_COLOR,
-	PAPER_BACKGROUND_COLOR,
-	BAMBOO_SEPARATOR_STROKE_WIDTH,
-	BAMBOO_SEPARATOR_COLOR,
-	BAMBOO_SEPARATOR_INK_BLEED,
-	BAMBOO_SEPARATOR_SPLOTCH_CHANCE,
-	BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN,
-	BAMBOO_SEPARATOR_SPLOTCH_SIZE_MAX,
-	BAMBOO_SEPARATOR_SPLOTCH_COLOR,
-	BAMBOO_SEPARATOR_WASH_COLOR,
-	BAMBOO_SEPARATOR_WASH_WIDTH,
-	BAMBOO_SEPARATOR_STEP,
-	BAMBOO_SEPARATOR_VARIATION_FACTOR,
-	BAMBOO_SEPARATOR_WASH_STEP,
 	TABLE_WIDTH_FACTOR,
 	TABLE_HEIGHT_FACTOR,
 	TABLE_INSET_FACTOR,
@@ -83,17 +66,14 @@ export class Renderer {
 	setTheme(theme) {
 		this.theme = theme;
 	
-		// Si laneTint depende del theme
 		if (this.laneTint?.updateForTheme) {
 			this.laneTint.updateForTheme(theme);
 		}
 	
-		// Si tus sprites dependen del theme
 		if (this.spriteLibrary?.updateForTheme) {
 			this.spriteLibrary.updateForTheme(theme);
 		}
 	
-		// Redibuja el canvas si es necesario
 		if (typeof this.render === "function") {
 			this.render();
 		}
@@ -184,31 +164,6 @@ export class Renderer {
 	}
 
 	/**
-	 * Renders the paper-like background with a subtle noise pattern.
-	 *
-	 * @param {CanvasRenderingContext2D} ctx - Drawing context.
-	 * @param {number} width - Target width.
-	 * @param {number} height - Target height.
-	 */
-	renderBackground(ctx, width, height) {
-		// Step 1: Fill with a light cream colour for the base paper
-		ctx.fillStyle = PAPER_BACKGROUND_COLOR;
-		ctx.fillRect(0, 0, width, height);
-
-		// Step 2: Sprinkle a few random specks to suggest paper grain
-		if (!this.paperTextureGenerated) {
-			ctx.fillStyle = PAPER_TEXTURE_COLOR;
-			for (let i = 0; i < PAPER_TEXTURE_POINTS; i++) {
-				const x = Math.random() * width;
-				const y = Math.random() * height;
-				const size = PAPER_TEXTURE_SIZE_MIN + Math.random() * (PAPER_TEXTURE_SIZE_MAX - PAPER_TEXTURE_SIZE_MIN);
-				ctx.fillRect(x, y, size, size);
-			}
-			this.paperTextureGenerated = true;
-		}
-	}
-
-	/**
 	 * Draws lane separators only; overlays are handled elsewhere.
 	 *
 	 * @param {LaneSystem} laneSystem - Lane definition reference.
@@ -242,49 +197,14 @@ export class Renderer {
 			ctx.translate(x, 0);
 			ctx.drawImage(bambooSprite, -spriteWidth / 2, 0, spriteWidth, spriteHeight);
 		} else {
-			//CHANGE
-			// Fallback: vertical, slightly irregular stroke with ink specks
-			ctx.strokeStyle = BAMBOO_SEPARATOR_COLOR;
-			ctx.lineWidth = BAMBOO_SEPARATOR_STROKE_WIDTH;
-			ctx.lineCap = 'round';
-			ctx.lineJoin = 'round';
+			// Simple vertical separator
+			ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+			ctx.lineWidth = 2;
 
-			// Natural, irregular brushstroke
 			ctx.beginPath();
-			let currentX = x;
-			ctx.moveTo(currentX, 0);
-
-			for (let y = 0; y < this.canvasHeight; y += BAMBOO_SEPARATOR_STEP) {
-				// Add natural variation and small ink bleed to the path
-				const variation = (Math.sin(y * BAMBOO_SEPARATOR_VARIATION_FACTOR) + Math.cos(y * 0.05)) * 2;
-				const inkBleed = Math.random() * BAMBOO_SEPARATOR_INK_BLEED;
-				currentX = x + variation + inkBleed;
-
-				ctx.lineTo(currentX, y);
-
-				// Add ink splotches occasionally
-				if (Math.random() < BAMBOO_SEPARATOR_SPLOTCH_CHANCE) {
-					ctx.fillStyle = BAMBOO_SEPARATOR_SPLOTCH_COLOR;
-					ctx.beginPath();
-					ctx.arc(currentX, y, BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN + Math.random() * (BAMBOO_SEPARATOR_SPLOTCH_SIZE_MAX - BAMBOO_SEPARATOR_SPLOTCH_SIZE_MIN), 0, Math.PI * 2);
-					ctx.fill();
-				}
-			}
-
+			ctx.moveTo(x, 0);
+			ctx.lineTo(x, this.canvasHeight);
 			ctx.stroke();
-
-			// Add a faint ink wash around the separator
-			ctx.fillStyle = BAMBOO_SEPARATOR_WASH_COLOR;
-			ctx.beginPath();
-			ctx.moveTo(x - BAMBOO_SEPARATOR_WASH_WIDTH, 0);
-			ctx.lineTo(x + BAMBOO_SEPARATOR_WASH_WIDTH, 0);
-			for (let y = 0; y < this.canvasHeight; y += BAMBOO_SEPARATOR_WASH_STEP) {
-				ctx.lineTo(x + 2 + Math.sin(y * 0.02) * 1, y);
-			}
-			ctx.lineTo(x + BAMBOO_SEPARATOR_WASH_WIDTH, this.canvasHeight);
-			ctx.lineTo(x - BAMBOO_SEPARATOR_WASH_WIDTH, this.canvasHeight);
-			ctx.closePath();
-			ctx.fill();
 		}
 
 		ctx.restore();
@@ -308,7 +228,7 @@ export class Renderer {
 			);
 		}
 	}
-	renderPerfectMeterBackplate(ctx, centerX, y) {
+	renderBackplate(ctx, centerX, y) {
 		const totalWidth = 200;
 		const height = 100;
 
@@ -336,7 +256,7 @@ export class Renderer {
 		const nameX = isLeft
 		? centerX - 700
 		: centerX + 700;
-		this.renderPerfectMeterBackplate(ctx, isLeft ? nameX + 60 : nameX - 60, y + 5);
+		this.renderBackplate(ctx, isLeft ? nameX + 60 : nameX - 60, y + 5);
 		
 		ctx.save();
 		ctx.fillStyle = '#000000';
@@ -517,11 +437,10 @@ export class Renderer {
 			ctx.beginPath();
 		
 			// Simple jagged lightning bolt with lines
-			ctx.moveTo(0, -s);       // top center
-			ctx.lineTo(-s / 2, -s / 4); // middle left
-			ctx.lineTo(s / 4, 0);    // middle right
-			ctx.lineTo(-s / 3, s / 1.5); // bottom left
-			// ctx.lineTo(s / 2, s / 4); // bottom right
+			ctx.moveTo(0, -s);
+			ctx.lineTo(-s / 2, -s / 4);
+			ctx.lineTo(s / 4, 0);
+			ctx.lineTo(-s / 3, s / 1.5);
 		
 			ctx.stroke();
 		}
@@ -901,27 +820,6 @@ export class Renderer {
 		}
 
 		ctx.restore();
-	}
-
-	/**
-	 * Renders a simple expanding ink bloom around a given position.
-	 *
-	 * @param {number} x - Center X of the bloom.
-	 * @param {number} y - Center Y of the bloom.
-	 * @param {number} size - Overall size of the largest ring.
-	 */
-	drawInkBloom(x, y, size) {
-		const inkBloomRings = 3;
-		const inkBloomAlphaBase = 0.3;
-		const ctx = this.ctx;
-		for (let i = inkBloomRings; i > 0; i--) {
-			const radius = size * (i / inkBloomRings);
-			const alpha = inkBloomAlphaBase * (i / inkBloomRings);
-			ctx.fillStyle = `rgba(212, 175, 55, ${alpha})`;
-			ctx.beginPath();
-			ctx.arc(x, y, radius, 0, Math.PI * 2);
-			ctx.fill();
-		}
 	}
 
 	/**
