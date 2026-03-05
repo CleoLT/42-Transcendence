@@ -184,7 +184,7 @@ const statusSchema = {
   const updateUsernameSchema = {
     description: 'Update username',
     tags: ['Auth'],
-    summary: 'Change username and refresh token',
+    summary: 'Refresh token',
     params: {
       type: 'object',
       required: ['username'],
