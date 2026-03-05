@@ -87,7 +87,7 @@ export function Rules() {
 
                 <H4>Claiming a Lane</H4>
                 <P>
-                    Catch 5 blossoms in a row in the same lane to claim it.
+                    Catch 3 blossoms in a row in the same lane to claim it.
                 </P>
                 <P>
                     When you own a lane:
@@ -112,13 +112,13 @@ export function Rules() {
                 
                 <H4>Perfect Meter Abilities</H4>
                 <P>
-                    At 5 Perfects → Reverse Push OR Reverse input. Your opponent’s push turns into a pull for ~1 second OR inputs are reversed, left becomes right and right becomes left. Great for lane steals, repositioning and confusing the opponent.
+                    At 2 Perfects → Reverse Push OR Reverse input. Your opponent’s push turns into a pull for ~1 second OR inputs are reversed, left becomes right and right becomes left. Great for lane steals, repositioning and confusing the opponent.
                 </P>
                 <P>
-                    At 10 Perfects → Ink Freeze. Opponent is unable to move or push for ~0.4 seconds (maybe more). Use it to secure key blossoms or shove them out.
+                    At 4 Perfects → Ink Freeze. Opponent is unable to move or push for ~0.4 seconds (maybe more). Use it to secure key blossoms or shove them out.
                 </P>
                 <P>
-                    At 15 Perfects → Momentum Surge. Your pushing force is doubled for ~1–2 seconds. This lets you dominate contested lanes, especially the middle.
+                    At 6 Perfects → Momentum Surge. Your pushing force is doubled for ~1–2 seconds. This lets you dominate contested lanes, especially the middle.
                 </P>
                 
                 <H4>Contact Mechanics Pushing</H4>

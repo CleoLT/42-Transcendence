@@ -54,7 +54,7 @@ const avatarImages = [
     "/avatars/cat.png",
     "/avatars/butterfly.png",
     "/avatars/dragonfly.png",
-    "/avatars/jellyfish.png",
+    "/avatars/jellyfish_00.png",
     "/avatars/carp_koi_01.png",
     "/avatars/moonfish.png",
     "/avatars/sushi.png",

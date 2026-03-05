@@ -9,7 +9,6 @@ import {
 	ABILITY_COSTS,
 	PERFECT_METER_MAX,
 } from './Constants.js';
-import { Renderer } from './Renderer.js';
 
 export class Player {
 	/**
