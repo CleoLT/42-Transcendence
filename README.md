@@ -5,9 +5,6 @@ _<p align=center> This project has been created as part of the 42 curriculum by 
 # <p align=center> :cherry_blossom: Blossom Clash :cherry_blossom: </p>
 
 ## 1. Description
-> section that clearly presents the project, including its goal and a brief overview.
-
-> should also contain a clear name for the project and its key features.
 
 _**ft_transcendence**_ is a group project with the goal of building a real-world web application that demonstrates our ability to adapt to new technologies, collaborate effectively as a team, and deliver a functional and secure final product.
 
@@ -27,30 +24,32 @@ Anything over 14 points is considered part of the **bonus**.
 <br>
 
 ## 2. Instructions
-> section containing any relevant information about compilation, installation, and/or execution.
 
-> should mention all the needed prerequisites (software, tools, versions, configuration like .env setup, etc.), and step-by-step instructions to run the project.
-
-To run the project, you should follow these steps:  
+To run the project, follow these steps:  
 1. **Make sure you have Docker and Git installed on your machine** :package:
    
 2. **Clone the repository:** 
 
-   `git clone [repository-url]`  
+   `git clone [repository-url] [name-of-the-directory]`  
 
-3. ~~Set up environment variables: Copy `.env.example` to `.env` and fill in the required values.~~ (to be specified)
+3. Set up environment variables:
 
-4. **Build and run the project:**
+   - Use `.env.example` to create a `.env` and fill in the required values.
+     
+   - Copy and fill as well the files in the `secrets.template` folder to create the `secrets` folder.
+   
+
+5. **Build and run the project:**
 
    Execute `make` , `make dev` or `make prod` in the cloned folder.
    
    We have 2 creation modes:
    	- for development -> hot reload on front + back, vite server on 5173 :hammer_and_pick:
-    - for production -> recompilation is necessary to see changes, no node, nginx server on 8080 :shield: (*default*) 
+    - for production -> recompilation is necessary to see changes, nginx server on 8080 :shield: (*default*) 
 
 	See `make help` to get more information about each `make` command
 
-5. **Open your browser and navigate to** `https://localhost:8080` (*prod*) **or**  `https://localhost:5173` (*dev*)
+6. **Open your browser and navigate to** `https://localhost:8080` (*prod*) **or**  `https://localhost:5173` (*dev*)
 
 <br>
 
@@ -98,15 +97,9 @@ She worked closely with Emilie in the frontend to make sure they were on the sam
 <br>
 
 ## 4. Project Management
-> How the team organized the work (task distribution, meetings, etc.).
-
-> Tools used for project management (GitHub Issues, Trello, etc.).
-
-> Communication channels used (Discord, Slack, etc.).
-
 
 Deciding how we were going to divide tasks and the work was difficult because we all had more or less the same level of knowledge.\
-All of us except Cristina(our game developer), who had animation notions, came from different areas of studies and had started 42 at aproximately the same time. Some of us had done *webserver* and *irc*, but no one had a deep understanding of how the web works. This made the task distribution harder beacuse we had to take more time to do research and we did not know how much workload each task really implied.
+All of us except Cristina (our game developer), who had animation notions, came from different areas of studies and had started 42 at aproximately the same time. Some of us had done *webserver* and *irc*, but no one had a deep understanding of how the web works. This made the task distribution harder beacuse we had to take more time to do research and we did not know how much workload each task really implied.
 
 In the end we decided to divide it like so:
 
@@ -133,18 +126,6 @@ This startegy worked pretty well for us.
 <br>
 
 ## 5. Technical Stack
-> Frontend technologies and frameworks used.
-
-> Backend technologies and frameworks used.
-Backend built with Fastify, with Swagger UI for API route documentation.
-
-> Database system and why it was chosen.
-We used MariaDB as our relational database.
-
-> Any other significant technologies or libraries.
-
-> Justification for major technical choices.
-
 
 ### Frontend
 - **React 18** with functional components and hooks
@@ -204,18 +185,12 @@ We used MariaDB as our relational database.
 ### Database system
 
 #### Schema
-![Database](assets/database.png)
+![Database](readme_assets/database.png)
 We have decided to create two tables: one for the user's personal information and another for all friendships.
 The friendship table is related to the user table through two foreign keys referencing the user ID.
 When a user is deleted from the user table, all friendships associated with that user ID are automatically deleted as well (via cascading delete).
 
-> Visual representation or description of the database structure
-
-> Tables/collections and their relationships
-
-> Key fields and data types
 <br>
-
 
 
 ## 6. Modules
@@ -225,7 +200,7 @@ We felt that chosing frameworks would help a lot in the frontend and the backend
 
 ##### Implementation
 For the frontend we chose **React** & for the backend **Fastify**.\
-Emilie designed the frontend having the React components in mind while Cristina worked on the game in the front in pure Javascript. She choose REACT because is the most widely used frontend library in the professional environment and there is many of informations & website with components and specific features, quite easy to use and very reusable system\
+**Emilie** designed the frontend having the React components in mind while **Cristina** worked on the game in the front in pure Javascript. She choose React because is the most widely used frontend library in the professional environment and there is many of informations & website with components and specific features, quite easy to use and very reusable system\
 In the backend, Manu and Cléo both learned how to use Fastify to create and manage the API routes.
 
 <br>
@@ -301,7 +276,7 @@ Nowadays microservices are the obvious choice for most big companies or websites
 Moreover, if any of the services ever crashes, it only affects a part of the website, while the rest can continue working. 
 
 ##### Implementation
-Marta was in charge of creating the set of containers and their correct communication. 
+**Marta** was in charge of creating the set of containers and their correct communication. 
 
 Using Docker and Docker-compose we set up two containers for the front and three in the back.\
 We decided to have an API Gateway with its own container to further tighten security and protect the containers from the front. The Nginx container then only acts as a server of static files and handles the https connection.\
@@ -322,63 +297,65 @@ We implemented a complete Two-Factor Authentication system using email-based ver
 <br>
 
 ### MINOR | Custom-made design system with reusable components (1p)
-Given that we chose the frontend framework module, and Emilie learned how React components work, we thought that designing reusable 10 components was something within our capabilities.
+Given that we chose the frontend framework module, and **Emilie** learned how React components work, we thought that designing reusable 10 components was something within our capabilities.
 
 ##### Implementation
 **Emilie** created a large list of reusable modules for this project, which she believe is the best way to make good use of React and its strengths! She also used this system for the implementation of typography. 
 
-#typography.jsx\
-01.SixtyFour({children, className = "", onClick})\
-02.CorbenBold({children, className = ""})\
-03.CorbenRegular({children, className = "", onClick})\
-04.P({children})\
-05.H4({children})\
-06.H3({children})\
-07.H2({children})\
-08.LI({children})\
+```
+#typography.jsx
+01.SixtyFour({children, className = "", onClick})
+02.CorbenBold({children, className = ""})
+03.CorbenRegular({children, className = "", onClick})
+04.P({children})
+05.H4({children})
+06.H3({children})
+07.H2({children})
+08.LI({children})
 09.UL({children})
 
-#icon.jsx\
+#icon.jsx
 10.Icon(props)
 
-#footer.jsx\
+#footer.jsx
 11.FooterButton({text, onClick})
 
-#circleUtils.jsx\
-12.Circle({children, className=""})\
-13.SmallCircle()\
-14.CenterText({text, onClick, className = "", interactive = true})\
+#circleUtils.jsx
+12.Circle({children, className=""})
+13.SmallCircle()
+14.CenterText({text, onClick, className = "", interactive = true})
 15.PlaceholderInput({placeholder, className = "", value, onChange, type, autoComplete})
 
-#iconUtils.jsx\
-16.IconText({text, className=""})\
-17.Icon(props)\
-18.IconsOverlayFrame()\
-19.ProfilePicture({src, className=""})\
-20.ChopstickButton({text, onClick})\
-21.OverlayPage({children, onClose})\
-22.DisplayDate(string)\
-23.DisplayIcon({children, avatar, setAvatar})\
+#iconUtils.jsx
+16.IconText({text, className=""})
+17.Icon(props)
+18.IconsOverlayFrame()
+19.ProfilePicture({src, className=""})
+20.ChopstickButton({text, onClick})
+21.OverlayPage({children, onClose})
+22.DisplayDate(string)
+23.DisplayIcon({children, avatar, setAvatar})
 24.LargeButton({children, onClick})
 
-#friends.jsx\
-25.Button({text, onClick, src})\
+#friends.jsx
+25.Button({text, onClick, src})
 
--->footer\
--->header\
+-->footer
+-->header
 -->content
+```
 
 For colours, she created variables in the Tailwind index, one part based on colours from the Tailwind range and another part with hexadecimal colour codes.
-
-shell "#FFFEF4" -> CREATED\
-yellowish "#FDD28B" -> CREATED\
-palePink "#E8B0A3" -> CREATED\
-greyish "#C8C6B8" -> CREATED\
+```
+shell "#FFFEF4" -> CREATED
+yellowish "#FDD28B" -> CREATED
+palePink "#E8B0A3" -> CREATED
+greyish "#C8C6B8" -> CREATED
 greenish: "#719a79" -> CREATED
 
-brightRed -> red-600 -> from Tailwind\
+brightRed -> red-600 -> from Tailwind
 darkRed -> red-900 -> from Tailwind
-
+```
 <br>
 
 ### MINOR | A complete notification system for all creation, update, and deletion actions (1p)
@@ -403,29 +380,10 @@ All core features remain fully functional across all supported browsers, ensurin
 ### :green_book: Total point count - 17 points
 With these modules we have the 14 mandatory points and 3 extra, just in case we fail any of them during evaluation.
 
-
 <br>
-
-> List of all chosen modules (Major and Minor)
-
-> Point calculation (Major = 2pts, Minor = 1pt)
-
-> Justification for each module choice, especially for custom "Modules of
-choice"
-
-> How each module was implemented
-
-> Which team member(s) worked on each module
-<br>
-
 
 
 ## 7. Features List 
-> Complete list of implemented features
-
-> Brief description of each feature’s functionality
-<br>
-
 
 We'll start by listing the core gameplay features: 
 
@@ -555,15 +513,6 @@ These are the rest of the features of the project:
 
 ## 8. Individual Contributions
 
-> Detailed breakdown of what each team member contributed
-
-> Which team member(s) worked on each feature
-
-> Specific features, modules, or components implemented by each person
-
-> Any challenges faced and how they were overcome
-
-<br>
 Here you can see who implemented each feature, the issues we faced, and how we solved them:
 
 #### Marta – DevOps & Architecture
@@ -633,13 +582,13 @@ During all the project development, we met every week to ensure good progresses 
 
 Another very important part of the project was managing the responsiveness of the site with Tailwind breakpoints, which is not so easy to do. We chose these four formats for all our tests:
 
-mobile -> 320/375 -> Iphone 12 Pro\
-sm → 640px\
-md → 768px ->Ipad Mini\
-lg → 1024px -> nest Hub\
-xl → 1280px -> nest Hub max (our screen)\
+	 mobile -> 320/375 -> Iphone 12 Pro
+	 sm → 640px
+	 md → 768px ->Ipad Mini
+	 lg → 1024px -> nest Hub
+	 xl → 1280px -> nest Hub max (our screen)
 
---> mobile, md & xl (& lg for personal use)
+	 --> mobile, md & xl (& lg for personal use)
 
 I was especially implicated in the design part, as an ex-fashion designer it was amazing and really important for me to propose a project with a true design vision.
 All the team enjoyed working on this Vintage Japonese Botanical theme and enriched the project with their ideas!
@@ -665,7 +614,7 @@ The biggest challenges were balancing gameplay for fairness, integrating AI beha
 
 <br>
 
-## 9. The game (EXTRA)
+## 9. Game rules (bonus section)
 ### **How to Play**
 Each player controls a brush-like character in a shared falling zone with three lanes:
 
@@ -813,7 +762,6 @@ The player with the highest score wins Blossom Clash.
 
 
 ## 10. Resources
-> section listing classic references related to the topic (documentation, articles, tutorials, etc.), as well as a description of how AI was used — specifying for which tasks and which parts of the project.
 
 This is a list with all the resources we used classified by topics. It contains a mix of websites, tutorials and videos that helped us understand how we should approach the project and helped us learn new tools.\
 At the end of the section, you can find out more about how we approached the use of AI.
@@ -858,4 +806,11 @@ We predominantly used Chatgpt and VS Code's Copilot.
 Despite being great tools, we did not rely on them completely. We used our critical thinking, executed tests and we always made sure to contrast any input given by AI with other teamates and 42 colleagues. In doing so, we were able to make the most informed, efficient and tailored decisions for the project.
   
 <br>
+
+Thanks for making it all the way to the end! 
+
+Enjoy the game ;)
+
+<br>
+
 
