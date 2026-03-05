@@ -5,22 +5,29 @@ export default function Header({screen, setScreen}){
     const {log, logout} = useAuth()
 
     return(
-        <header className="w-full">
-            <button className="w-full pr-[5%]">
-                {log ? (
+        <header className="w-full pr-[5%] text-right">
+            {log ? (
+                <button
+                    onClick={async () => {
+                        await logout()
+                        setScreen("playNC")
+                    }}
+                    className="bg-transparent p-0 m-0 cursor-pointer">
                     <Sixtyfour
-                        onClick={async () => {
-                            await logout()
-                            setScreen("playNC")}}
-                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-red-900">
-                        Log out
+                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-darkRed mobile-landscape:text-xs">
+                            Log out
                     </Sixtyfour>
-                ) : (
-                    <Sixtyfour onClick={() => setScreen("signIn")} className="lg:text-xl sm:text-lg text-xs text-right hover:text-red-900">
-                         Sign in
+                </button>
+            ) : (
+                <button
+                    onClick={() => setScreen("signIn")}
+                    className="bg-transparent p-0 m-0 cursor-pointer">
+                    <Sixtyfour
+                        className="lg:text-xl sm:text-lg text-xs text-right hover:text-darkRed mobile-landscape:text-xs">
+                            Sign in
                     </Sixtyfour>
-                )}
-            </button>
+                </button>
+            )}
         </header>
     )
 }

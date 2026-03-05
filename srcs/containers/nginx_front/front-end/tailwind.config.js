@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import colors from "tailwindcss/colors"
+
 export default {
   content: [
     "./index.html",
@@ -15,8 +17,20 @@ export default {
         yellowish: "#FDD28B",
         palePink: "#E8B0A3",
         greyish: "#C8C6B8",
+        greenish: "#719a79",
+
+        brightRed: colors.red[600],
+        darkRed: colors.red[900],
       },
-    },
+      // screens: {
+      //   'landscape': {'raw': '(orientation: landscape)'},
+      // },
+      screens: {
+        'mobile-landscape': {
+          raw: '(max-width: 900px) and (orientation: landscape)',
+        },
+      },
+    }
   },
   plugins: []
 }

@@ -4,7 +4,6 @@ const userResponse = {
         id: { type: 'number' },
         username: { type: 'string' },
         email: { type: 'string' },
-        //alias: { type: 'string' }, Borrar de la base de datos
         bio: { type: 'string' },
         avatar: { type: 'string' },
         online_status: { type: 'boolean' },
@@ -49,6 +48,18 @@ const email = {
     format: 'email',
     maxLength: 255
 }
+
+const avatarImages = [
+    "/avatars/bird_04.jpg",
+    "/avatars/cat.png",
+    "/avatars/butterfly.png",
+    "/avatars/dragonfly.png",
+    "/avatars/jellyfish.png",
+    "/avatars/carp_koi_01.png",
+    "/avatars/moonfish.png",
+    "/avatars/sushi.png",
+    "/avatars/swan.png"
+]
 
 /*-----------------------SCHEMAS--------------------*/
 
@@ -112,7 +123,7 @@ const getUserById = {
         401: errorResponse,
         404: errorResponse
     }
-};
+}
 
 const getAvatarById = {
     description: 'Get avatar by id',
@@ -158,9 +169,9 @@ const getUserByName = {
 };
 
 const tryLogin = {
-  description: 'Validate user credentials',
+  description: 'Validate user credentials only',
   tags: ['Users'],
-  summary: 'Credentials validation',
+  summary: 'Backend credentials validation only',
 
     body: {
         type: 'object',
@@ -174,6 +185,35 @@ const tryLogin = {
     response: {
         200: {
             description: 'Credentials valid',
+            type: 'object',
+            properties: {
+              valid: { type: 'boolean' },
+              userId: { type: 'number' },
+              email: { type: 'string' }
+            }
+        },
+        401: errorResponse,
+        404: errorResponse
+    }
+}
+
+const tryPassword = {
+  description: 'Validate password',
+  tags: ['Users'],
+  summary: 'Password validation',
+
+    body: {
+        type: 'object',
+        required: ['username', 'password'],
+        properties: {
+          username: { type: 'string' },
+          password: { type: 'string' }
+        }
+    },
+
+    response: {
+        200: {
+            description: 'Password valid',
             type: 'object',
             properties: {
               valid: { type: 'boolean' },
@@ -210,12 +250,12 @@ const logOut = {
     },
     404: errorResponse
   }
-};
+}
 
 const updateUserById = {
     description: 'Partially update user by id',
     tags: ['Users'],
-    summary: 'update user info',
+    summary: 'Update user info',
 
     body: {
         type: 'object',
@@ -224,8 +264,11 @@ const updateUserById = {
             username: username,
             password: password,
             email: email,
-            alias: username,
-            bio: { type: 'string', minLength: 3, maxLength: 200 }
+            avatar: {
+              type: "string",
+              enum: avatarImages
+            },
+            bio: { type: 'string', minLength: 3, maxLength:300 }
         },
         additionalProperties: false
       },
@@ -263,7 +306,7 @@ const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
   consumes: ['multipart/form-data'], // for swagger only
-  summary: 'upload avatar. delete old avatar if exists',
+  summary: 'Upload avatar. Delete old avatar if exists',
 
   params: paramId,
 
@@ -301,6 +344,9 @@ const deleteAvatar = {
 };
 
 const disconnect = {
+  description: 'Sets online_status to 0',
+  tags: ['Users'],
+  summary: 'Sets online_status to 0 in the backend',
   body: {
     type: "object",
     required: ["userId"],
@@ -311,6 +357,9 @@ const disconnect = {
 };
 
 const connect = {
+  description: 'Sets online_status to 1',
+  tags: ['Users'],
+  summary: 'Sets online_status to 1 in the backend',
   body: {
     type: "object",
     required: ["userId"],
@@ -320,18 +369,42 @@ const connect = {
   },
 };
 
+const userMailExists = {
+  description: 'Verifies if email already exists',
+  tags: ['Users'],
+  summary: 'Checks if an email is already registered in the system',
+  params: {
+      type: "object",
+      required: ['userMail'],
+      properties: {
+          userMail: { type: 'string' }
+      }
+  },
+  response: {
+      200: {
+          properties: {
+              exists: { type: 'boolean' }
+          }
+      },
+      400: errorResponse
+  }
+}
+
 export default {
+    avatarImages,
     getAllUsers,
     postUser,
     getUserById,
     getAvatarById,
     getUserByName,
     tryLogin,
+    tryPassword,
     logOut,
     updateUserById,
     deleteUserById,
     uploadAvatar,
     deleteAvatar,
     disconnect,
-    connect
+    connect,
+    userMailExists
 }

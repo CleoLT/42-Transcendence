@@ -10,6 +10,7 @@ export class SpriteLibrary {
 		this.GoldenBlossomSprite = null;
 		this.BowlSprite = null;
 		this.FillSprite = null;
+		this.snowflakeOverlay = null;
 
 		this.loaded = false;
 		this.theme = 'classic';
@@ -32,7 +33,6 @@ export class SpriteLibrary {
 	 * Safe to call multiple times; skips only when already loaded for current theme.
 	 */
 	async loadSprites() {
-		console.log(this.theme);
 		if (this.loaded && this._loadedTheme === this.theme) {
 			return this;
 		}
@@ -44,6 +44,7 @@ export class SpriteLibrary {
 		this.GoldenBlossomSprite = null;
 		this.FillSprite = null;
 		this.BowlSprite = null;
+		this.snowflakeOverlay = null;
 
 		const base = this.getSpriteBasePath();
 		const spritePaths = {
@@ -52,6 +53,7 @@ export class SpriteLibrary {
 			GoldenBlossomSprite: `${base}golden.png`,
 			FillSprite: `${base}bar.png`,
 			BowlSprite: `${base}bowl.png`,
+			snowflakeOverlay: `${base}snowflake.png`,
 		};
 
 		const classicBase = '/images_png/sprites/';
@@ -61,6 +63,7 @@ export class SpriteLibrary {
 			GoldenBlossomSprite: `${classicBase}golden.png`,
 			FillSprite: `${classicBase}bar.png`,
 			BowlSprite: `${classicBase}bowl.png`,
+			snowflakeOverlay: `${classicBase}snowflake.png`,
 		};
 
 		for (const [key, path] of Object.entries(spritePaths)) {
@@ -106,6 +109,7 @@ export class SpriteLibrary {
 		this.GoldenBlossomSprite = null;
 		this.FillSprite = null;
 		this.BowlSprite = null;
+		this.snowflakeOverlay = null;
 		await this.loadSprites();
 	}
 
@@ -141,6 +145,13 @@ export class SpriteLibrary {
 	 */
 	getBambooSprite(index = 0) {
 		return this.BambooSprite;
+	}
+
+	/**
+	 * Retrieves the snowflake overlay sprite.
+	 */
+	getSnowflakeOverlay() {
+		return this.snowflakeOverlay;
 	}
 
 	/**

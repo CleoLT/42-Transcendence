@@ -13,3 +13,5 @@ services:
     networks:
       - main
     restart: always
+    volumes:
+      - certs_volume:/certs:ro

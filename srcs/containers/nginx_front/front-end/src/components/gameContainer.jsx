@@ -1,63 +1,44 @@
 import { useEffect, useRef } from "react";
 import { initGame } from "../main_game";
+import "../style.css";
 
 export default function GameContainer({ onGameReady }) {
   const containerRef = useRef(null);
-  const initializedRef = useRef(false);
   const cleanupRef = useRef(null);
+  const onGameReadyRef = useRef(onGameReady);
+
+  // Keep latest onGameReady in a ref so the init effect
+  // does not need to depend on a changing callback.
+  useEffect(() => {
+    onGameReadyRef.current = onGameReady;
+  }, [onGameReady]);
 
   useEffect(() => {
-    // 🚫 Prevent double initialization (React Strict Mode)
-    if (initializedRef.current) {
-      return;
-    }
-
     if (!containerRef.current) {
       return;
     }
 
-    console.log("🎮 Initializing game");
 
-    // Mark as initialized immediately to prevent double init
-    initializedRef.current = true;
-
-    // Initialize the game using the existing initGame function
-    const { game, cleanup } = initGame(containerRef.current, onGameReady);
-
-    // Store cleanup function
+    const { cleanup } = initGame(containerRef.current, (gameInstance) => {
+      if (onGameReadyRef.current) {
+        onGameReadyRef.current(gameInstance);
+      }
+    });
     cleanupRef.current = cleanup;
 
-    // Handle cleanup on window unload
-    const handleBeforeUnload = () => {
+    return () => {
       if (cleanupRef.current) {
         cleanupRef.current();
         cleanupRef.current = null;
-        initializedRef.current = false;
       }
     };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Cleanup function
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      
-      // React Strict Mode will call cleanup, but we should NOT cleanup during fake unmount
-      // The simplest approach: don't cleanup in the effect return at all
-      // Only cleanup on window unload (handled above) or when component is truly removed
-      // For Strict Mode, we'll let the game persist through the fake unmount
-      console.log("⚠️  Cleanup called (likely Strict Mode - ignoring)");
-      
-      // DO NOT cleanup here - React Strict Mode will fake-unmount
-      // The game will persist and continue running
-      // Real cleanup happens on window unload
-    };
-  }, [onGameReady]);
+  }, []); // run once per mount
 
   return (
     <div
       ref={containerRef}
-      className="flex relative overflow-hidden w-full h-full items-center justify-center" />
+      className="flex relative overflow-hidden w-full h-full items-center justify-center"
+    />
   );
 }
 
@@ -66,7 +47,6 @@ export default function GameContainer({ onGameReady }) {
 
 // import { useEffect, useRef } from 'react';
 // import { initGame } from '../main_game.js';
-import '../style.css';
 
 // /**
 //  * Componente que integra el juego JavaScript vanilla dentro de React.

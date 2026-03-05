@@ -2,13 +2,18 @@ import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import multipart from '@fastify/multipart'
-import cookie from '@fastify/cookie';
+import cookie from '@fastify/cookie'
 import routes from './routes.js'
 import seed from './seedUsers.js'
 import db from './db.js'
+import fs from 'fs';
 
 const fastify = Fastify({
   logger: true,
+  https: {
+    key: fs.readFileSync('/certs/user-service.key'),
+    cert: fs.readFileSync('/certs/user-service.crt')
+  },
   ajv: {
     customOptions: {
       strict: true,
@@ -18,9 +23,25 @@ const fastify = Fastify({
   }
 })
 
+function readSecret(path) {
+  return fs.readFileSync(path, 'utf8').trim()
+}
+
 fastify.register(cookie);
 
-//si hay un error no encontrado fastify devuelve 500 por defecto
+// API key only allows access to api_gateway
+fastify.addHook('onRequest', async (request, reply) => {
+  const publicPaths = ['/health', '/docs', '/api/auth/docs', '/api/users/docs'];
+  if (publicPaths.some(path => request.url.startsWith(path))) return;
+
+  const apiKey = request.headers['x-api-key'];
+  if (!apiKey)
+    reply.code(401).send({ error: '401 Unauthorized' });
+  else if (apiKey !== readSecret(process.env.API_KEY))
+    reply.code(401).send({ error: 'Invalid API key' });
+});
+
+// Default error is 500
 fastify.setErrorHandler((err, req, reply) => {
   reply.code(err.statusCode || 500).send({
     statusCode: err.statusCode || 500,

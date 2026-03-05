@@ -1,21 +1,35 @@
+import { MobileInputController } from "./MobileInputController.js";
+
 export class InputManager {
 	/**
 	 * Tracks keyboard state and exposes helpers for both human and AI input.
 	 * Keys currently held are recorded in `keys`, while `keysPressed` stores
 	 * keys that were pressed since the last frame so you can detect edges.
+	 *
+	 * Touch input is delegated to `MobileInputController`, which is completely
+	 * decoupled from game logic and only talks to this manager via
+	 * `simulateKeyPress` / `simulateKeyRelease`.
+	 *
+	 * @param {HTMLElement|Window} targetElement - Element to listen for input on.
+	 * @param {{ isSinglePlayer?: boolean }} options
 	 */
-	constructor() {
+	constructor(targetElement = window, options = {}) {
 		// Sets of key codes for "held" and "just pressed" states
 		this.keys = new Set();
 		this.keysPressed = new Set();
 
-		// Guardar referencias a los handlers para poder limpiarlos
+		this.target = targetElement;
+		this.isSinglePlayer = Boolean(options.isSinglePlayer);
+
+		// Keyboard handlers
 		this.keydownHandler = (e) => {
+			if (this._isBlockedInSinglePlayer(e.code)) return;
 			this.keys.add(e.code);
 			this.keysPressed.add(e.code);
 		};
 
 		this.keyupHandler = (e) => {
+			if (this._isBlockedInSinglePlayer(e.code)) return;
 			this.keys.delete(e.code);
 		};
 
@@ -24,6 +38,53 @@ export class InputManager {
 
 		// On keyup, remove the key from the held set
 		window.addEventListener('keyup', this.keyupHandler);
+
+		// Touch / mobile controls (only when device actually supports touch)
+		const supportsTouch =
+			typeof window !== "undefined" &&
+			("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+		// if (supportsTouch && this.target) {
+		// 	this.mobileInput = new MobileInputController({
+		// 		targetElement: this.target,
+		// 		isSinglePlayer: this.isSinglePlayer,
+		// 		simulateKeyPress: (code) => this.simulateKeyPress(code),
+		// 		simulateKeyRelease: (code) => this.simulateKeyRelease(code),
+		// 	});
+		// } else {
+			this.mobileInput = null;
+		// }
+	}
+
+	enableMobileControls() {
+		if (!this.mobileInput && this.target) {
+		this.mobileInput = new MobileInputController({
+			targetElement: this.target,
+			isSinglePlayer: this.isSinglePlayer,
+			simulateKeyPress: (code) => this.simulateKeyPress(code),
+			simulateKeyRelease: (code) => this.simulateKeyRelease(code),
+		});
+		}
+	}
+
+	disableMobileControls() {
+		if (this.mobileInput) {
+		this.mobileInput.destroy();
+		this.mobileInput = null;
+		}
+	}
+	
+
+	_isBlockedInSinglePlayer(code) {
+		if (!this.isSinglePlayer) return false;
+
+		this.player2KeySet = new Set([
+			'ArrowLeft',
+			'ArrowRight',
+			'ControlRight',
+			'ShiftRight'
+		]);
+		return this.player2KeySet.has(code);
 	}
 
 	/**
@@ -54,7 +115,8 @@ export class InputManager {
 	}
 
 	/**
-	 * Simulates a key press so AI can use the same input pathways as players.
+	 * Simulates a key press so AI and touch can use the same
+	 * input pathways as players.
 	 *
 	 * @param {string} code - KeyboardEvent.code to simulate.
 	 */
@@ -73,6 +135,20 @@ export class InputManager {
 	}
 
 	/**
+	 * Updates single-player / multi-player touch behaviour.
+	 * When in single-player (vs AI), the full screen controls Player 1 and
+	 * Player 2 never receives touch input.
+	 *
+	 * @param {boolean} isSinglePlayer
+	 */
+	setSinglePlayerMode(isSinglePlayer) {
+		this.isSinglePlayer = Boolean(isSinglePlayer);
+		if (this.mobileInput?.setSinglePlayerMode) {
+			this.mobileInput.setSinglePlayerMode(this.isSinglePlayer);
+		}
+	}
+
+	/**
 	 * Limpia los event listeners para evitar memory leaks.
 	 */
 	cleanup() {
@@ -82,6 +158,12 @@ export class InputManager {
 		if (this.keyupHandler) {
 			window.removeEventListener('keyup', this.keyupHandler);
 		}
+
+		if (this.mobileInput && typeof this.mobileInput.destroy === "function") {
+			this.mobileInput.destroy();
+			this.mobileInput = null;
+		}
+
 		this.keys.clear();
 		this.keysPressed.clear();
 	}

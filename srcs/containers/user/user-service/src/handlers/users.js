@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import { unlink, access, constants } from 'fs/promises'
 import path from 'node:path'
 import { fileTypeFromBuffer } from 'file-type'
-
+import schema from '../schemas/users.js'
 
 export function readSecret(path) {
     return fs.readFileSync(path, 'utf8').trim()
@@ -42,6 +42,7 @@ async function deleteAvatarFile(userId) {
         const oldAvatar = await query.getAvatarByUserId(userId)
 
         if (oldAvatar === null) return
+        if (schema.avatarImages.includes(oldAvatar)) return
 
         await access(oldAvatar.avatar, constants.F_OK)
         await unlink(oldAvatar.avatar)
@@ -80,7 +81,7 @@ async function getUserByName(req, reply) {
 
     try {
         const result = await query.getUserByName(username)
-        if (user === null) userNotFoundError()
+        if (result === null) userNotFoundError()
         reply.code(200).send(result)
     } catch (error) {
         reply.send(error)
@@ -121,7 +122,25 @@ async function tryLogin(req, reply) {
 
         if (user.online_status === 1) userConflictError('You are already logged')
 
-        //await query.updateUserById(user.id, { online_status: 1 });
+        return reply.code(200).send({
+            valid: true,
+            userId: user.id,
+            email: user.email
+        });        
+    } catch (error) {
+        reply.send(error)
+    }
+}
+
+async function tryPassword(req, reply) {
+    try {
+        const { username, password } = req.body;
+
+        const match = await query.tryLogin(username, password)
+        if (!match) invalidCredentialsError()
+
+        const user = await query.getUserByName(username);
+        if (!user || !user.id) userNotFoundError()
 
         return reply.code(200).send({
             valid: true,
@@ -149,10 +168,6 @@ async function logOut(req, reply) {
     }
 }
 
-async function validate(req, reply) {
-    return reply.code(200).send({ valid: true });
-}
-
 async function updateUserById(req, reply) {
     const modifiedData = req.body;
     const { username, email } = req.body
@@ -178,8 +193,7 @@ async function deleteUserById(req, reply) {
     
     try {
         await checkIfUserExists(userId)
-        
-        //poner anonymous los partidos en la database de games de este user ????
+
         await deleteAvatarFile(userId)
         await query.deleteUserById(userId)
         reply.code(204).send('user deleted')
@@ -205,7 +219,7 @@ async function uploadAvatar(req, reply) {
         const type = await fileTypeFromBuffer(buffer)
         if (!type || !['image/png','image/jpeg'].includes(type.mime)) noFileUploadedError('only .jpg and .png images are allowed')
     
-        const uploadDir = path.join('/app', 'uploads', 'avatars');
+        const uploadDir = path.join('/uploads', 'avatars');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -219,18 +233,6 @@ async function uploadAvatar(req, reply) {
         const result = await query.getUserById(userId)
         reply.code(200).send(result)
     } catch(error) {
-        reply.send(error)
-    }
-}
-
-async function getAvatarById(req, reply) {
-    try {
-        const { userId } = req.params
-
-        await checkIfUserExists(userId)
-        const result = await query.getAvatarByUserId(userId)
-        reply.code(201).send({ id: userId, ...result });
-    } catch (error) {
         reply.send(error)
     }
 }
@@ -252,7 +254,7 @@ async function deleteAvatar(req, reply) {
 
 async function disconnect(req, reply) {
     try {
-      const apiKey = req.headers['api-key'];
+      const apiKey = req.headers['x-api-key'];
   
       if (apiKey !== readSecret(process.env.API_KEY)) {
         return reply.code(401).send({ error: "Invalid API key" });
@@ -271,7 +273,7 @@ async function disconnect(req, reply) {
 
 async function connect(req, reply) {
     try {
-      const apiKey = req.headers['api-key'];
+      const apiKey = req.headers['x-api-key'];
   
       if (apiKey !== readSecret(process.env.API_KEY)) {
         return reply.code(401).send({ error: "Invalid API key" });
@@ -288,6 +290,15 @@ async function connect(req, reply) {
     }
 }
 
+async function userMailExists(req, reply) {
+    try {
+      const email = decodeURIComponent(req.params.userMail);
+      const exists = await query.userMailExists(email);
+      reply.send({ exists });
+    } catch (error) {
+      reply.code(500).send({ error: 'Internal server error' });
+    }
+  }
   
 
 export default { 
@@ -297,13 +308,13 @@ export default {
     postUser, 
     getUserByName,
     tryLogin,
+    tryPassword,
     logOut,
-    validate,
     updateUserById,
     deleteUserById,
     uploadAvatar,
-    getAvatarById,
     deleteAvatar,
     disconnect,
-    connect
+    connect,
+    userMailExists
 }

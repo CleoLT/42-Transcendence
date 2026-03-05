@@ -8,7 +8,6 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "nodemon": "3.1.14",
     "fastify": "5.7.3",
     "mariadb": "3.3.0",
     "@fastify/swagger": "9.0.0",
@@ -19,5 +18,8 @@
     "@fastify/cookie": "10.0.1",
     "jsonwebtoken": "9.0.2",
     "file-type": "18.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "3.1.14"
   }
 }

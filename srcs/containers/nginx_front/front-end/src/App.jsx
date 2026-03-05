@@ -1,16 +1,14 @@
 import Content from "./components/content.jsx"
 import Header from "./components/header.jsx"
 import {Footer} from "./components/footer.jsx"
-import {Sixtyfour, CorbenBold, CorbenRegular} from "./components/typography.jsx"
 import {useState, useEffect} from "react"
 import {useAuth} from "./services/authProvider"
 
 export default function App() {
-  const background = "/images_png/ground_00.png"
+  const background = "/images_png/shell_ground_06.jpg"
   const flowerGround = "/images_png/flower_ground.png"
   const {log} = useAuth()
   const [screen, setScreen] = useState("playNC")
-  // const [initialized, setInitialized] = useState(false)
 
   useEffect(() =>
   {
@@ -20,13 +18,6 @@ export default function App() {
       {setScreen("playNC")}
   }, [log])
 
-  // useEffect(() => {
-  //   if (!initialized) {
-  //     setScreen(log ? "homePlay" : "playNC")
-  //     setInitialized(true)
-  //   }
-  // }, [log, initialized])
-  
   return (
     <div
       className="relative flex flex-col h-screen items-center justify-center">
@@ -34,7 +25,7 @@ export default function App() {
         style={{backgroundImage: "url("+ background + ")"}}>
       </div>
       <img src={flowerGround} alt="flower"
-           className="absolute bottom-0 right-0 opacity-50 w-[100vw] md:w-[75vw] lg:w-[50vw]" />
+           className="absolute bottom-0 right-0 opacity-50 w-[100vw] md:w-[75vw] lg:w-[50vw] mobile-landscape:w-[50vw]" />
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
         <Header screen={screen} setScreen={setScreen} />
         <Content screen={screen} setScreen={setScreen} />

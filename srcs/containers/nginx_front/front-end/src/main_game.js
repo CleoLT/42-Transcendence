@@ -48,24 +48,14 @@ export function initGame(container, onGameReady) {
 
   canvas.width = baseWidth;
   canvas.height = baseHeight;
-  
-  console.log('✅ Canvas created and added to container', {
-    containerWidth: container.offsetWidth,
-    containerHeight: container.offsetHeight,
-    canvasWidth: canvas.width,
-    canvasHeight: canvas.height,
-    canvasStyleWidth: canvas.style.width,
-    canvasStyleHeight: canvas.style.height,
-    canvasElement: canvas,
-    containerHasChildren: container.children.length
-  });
-  
+
+
+
   // Immediate test render to verify canvas works
   setTimeout(() => {
     if (ctx && canvas.width > 0 && canvas.height > 0) {
       ctx.fillStyle = '#00ff00'; // Bright green test
       ctx.fillRect(10, 10, 100, 100);
-      console.log('✅ Test rectangle drawn to canvas');
     }
   }, 100);
 
@@ -112,12 +102,6 @@ export function initGame(container, onGameReady) {
   // Initial resize - use requestAnimationFrame to ensure container is laid out
   requestAnimationFrame(() => {
     resizeCanvas();
-    console.log('✅ Canvas resized', {
-      canvasWidth: canvas.style.width,
-      canvasHeight: canvas.style.height,
-      internalWidth: canvas.width,
-      internalHeight: canvas.height
-    });
   });
 
   const resizeObserver = new ResizeObserver(() => {
@@ -128,14 +112,25 @@ export function initGame(container, onGameReady) {
 
   const game = new Game(canvas, ctx);
   game.setRoundIndicatorLayer(blurOverlay, indicatorCanvas);
-  const inputManager = new InputManager();
+
+  
+  const inputManager = new InputManager(canvas);
+  // Link game <-> input so touch controller can react to
+  // single-player vs multi-player mode changes.
+  if (typeof game.attachInputManager === "function") {
+    game.attachInputManager(inputManager);
+  }
 
   let initialized = false;
+  let nav = navigator.userAgent || window.opera;
+  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(nav)) {
+    game.isTouchDevice = true;
+  }
+
 
   // Call onGameReady immediately so React can render the menu
   // The game state is already 'menu' by default
   if (onGameReady) {
-    console.log('📞 Calling onGameReady with game', { gameState: game.state });
     onGameReady(game);
   } else {
     console.warn('⚠️  onGameReady callback not provided');
@@ -144,7 +139,6 @@ export function initGame(container, onGameReady) {
   game.init()
     .then(() => {
       initialized = true;
-      console.log('✅ Game initialized successfully');
     })
     .catch(err => {
       console.error('❌ Game init failed:', err);
@@ -202,7 +196,6 @@ export function initGame(container, onGameReady) {
 
 
   function cleanup() {
-    console.log('🧹 Game cleanup called');
     loopRunning = false;
     
     if (frameId !== null) {

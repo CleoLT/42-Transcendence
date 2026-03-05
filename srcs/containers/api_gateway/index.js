@@ -2,16 +2,25 @@ import Fastify from "fastify";
 import proxy from "@fastify/http-proxy";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
+import fs from 'fs';
 
 const app = Fastify({ 
   logger: true, 
-  trustProxy: true
+  trustProxy: true,
+  https: {
+    key: fs.readFileSync('/certs/api_gateway.key'),
+    cert: fs.readFileSync('/certs/api_gateway.crt')
+  }
 });
 // la opcion 'logger: true' muestra logs de incoming requests, redirecciones y codigos de respuesta 
 // la opcion 'trustproxy: true' confia que el proxy(nginx o vite) viene con https
 
+function readSecret(path) {
+  return fs.readFileSync(path, 'utf8').trim()
+}
+
 app.register(rateLimit, {
-  max: 100,               // máximo 100 requests
+  max: 300,               // máximo 100 requests
   timeWindow: "1 minute", // por minuto
 });
 
@@ -26,7 +35,6 @@ app.register(rateLimit, {
 app.addHook('onRequest', async (req) => {
   console.log(`[GATEWAY] ${req.method} ${req.url}`);
 });
-
 
 //Cross-origin ressource sharing para que el front pueda hacer fetch
 app.register(cors, {
@@ -55,26 +63,21 @@ app.register(cors, {
 //});
 
 app.register(proxy, {
-  upstream: "http://user-service:3000",
+  upstream: "https://user-service:3000",
   prefix: "/api/users",
-  rewritePrefix: "/"
+  rewritePrefix: "/",
+  preHandler: async (request, reply) => {
+    request.headers['x-api-key'] = readSecret(process.env.API_KEY);
+  }
 });
 
 app.register(proxy, {
-  upstream: "http://auth-service:3000",
+  upstream: "https://auth-service:3000",
   prefix: "/api/auth/",
-  rewritePrefix: "/",
-});
-
-app.register(proxy, {
-  upstream: "http://game_history-service:3000",
-  prefix: "/api/game_history/",
-  rewritePrefix: "/",
+  rewritePrefix: "/"
 });
 
 app.get("/api/health", async () => {
   return { ok: true };});
 
 app.listen({ port: 3000, host: "0.0.0.0" });
-
-
