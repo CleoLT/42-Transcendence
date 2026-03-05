@@ -11,7 +11,7 @@ const userResponse = {
     }
 }
 
-const errorResponse = {  //duplicado
+const errorResponse = {
     type: 'object',
     properties: {
         statusCode: { type: 'number' },
@@ -20,7 +20,7 @@ const errorResponse = {  //duplicado
     }
 }
 
-const paramId = {        //duplicado
+const paramId = {
     type: 'object',
       properties: {
         userId: { type: 'number' }
@@ -71,13 +71,7 @@ const getAllUsers = {
             200: {
                 description: 'Users list',
                 type: 'array',
-                items: /*{
-                  type: 'object',
-                  properties: {
-                      id: { type: 'number' },
-                      username: { type: 'string' }
-                  }
-              }*/ userResponse
+                items: userResponse
             }
         }
 }
@@ -109,7 +103,7 @@ const postUser = {
 }
 
 const getUserById = {
-    description: 'Get user by id',
+    description: 'Get user by id, requires an active session',
     tags: ['Users'],
     summary: 'User info',
 
@@ -126,7 +120,7 @@ const getUserById = {
 }
 
 const getAvatarById = {
-    description: 'Get avatar by id',
+    description: 'Get avatar by id, requires an active session',
     tags: ['Users'],
     summary: 'User avatar info',
 
@@ -147,7 +141,7 @@ const getAvatarById = {
 };
 
 const getUserByName = {
-    description: 'Get user by username',
+    description: 'Get user by username, requires an active session',
     tags: ['Users'],
     summary: 'User info by username',
 
@@ -253,7 +247,7 @@ const logOut = {
 }
 
 const updateUserById = {
-    description: 'Partially update user by id',
+    description: 'Partially update user by id, requires an active session for the user ID in the path',
     tags: ['Users'],
     summary: 'Update user info',
 
@@ -289,7 +283,7 @@ const updateUserById = {
 const deleteUserById = {
     description: 'Delete user by id',
     tags: ['Users'],
-    summary: 'Delete all user info and friendships from database. Replace username by anonymous in  ??????',
+    summary: 'Delete all user info and friendships from database, requires an active session for the user ID in the path',
 
     params: paramId,
 
@@ -306,7 +300,7 @@ const uploadAvatar = {
   description: 'Upload user avatar by id',
   tags: ['Users'],
   consumes: ['multipart/form-data'], // for swagger only
-  summary: 'Upload avatar. Delete old avatar if exists',
+  summary: 'Upload avatar. Delete old avatar if exists. Requires an active session for the user ID in the path',
 
   params: paramId,
 
@@ -326,7 +320,7 @@ const uploadAvatar = {
 const deleteAvatar = {
     description: 'Delete avatar by id',
     tags: ['Users'],
-    summary: 'Delete avatar path from database, delete avatar file',
+    summary: 'Delete avatar path from database, delete avatar file, requires an active session for the user ID in the path',
 
     params: paramId,
 

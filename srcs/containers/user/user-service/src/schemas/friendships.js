@@ -1,4 +1,4 @@
-const errorResponse = { //duplicate
+const errorResponse = {
     type: 'object',
     properties: {
         statusCode: { type: 'number' },
@@ -20,7 +20,7 @@ const friendshipResponse = {
   }
 }
 
-const paramId = {  //duplicate
+const paramId = {
   type: 'object',
     properties: {
       userId: { type: 'number' }
@@ -55,7 +55,7 @@ const getAllFriendships = {
 }
 
 const getAllFriendsByUserId = {
-    description: 'Get all friendships by user id',
+    description: 'Get all friendships by user id, requires an active session for the user ID in the path',
     tags: ['Friendships'],
     summary: 'Friendships list for this user',
 
@@ -72,7 +72,7 @@ const getAllFriendsByUserId = {
 }
 
 const getPendingFriendships = {
-    description: 'Get all pending friendships by user id (the other user have to respond)',
+    description: 'Get all pending friendships by user id (the other user have to respond), requires an active session for the user ID in the path',
     tags: ['Friendships'],
     summary: 'Pending friendships list for this user (the other user have to respond)',
 
@@ -89,7 +89,7 @@ const getPendingFriendships = {
 }
 
 const getReceivedFriendRequests = {
-    description: 'Get all pending friendships by user id (the user have to respond)',
+    description: 'Get all pending friendships by user id (the user have to respond), requires an active session for the user ID in the path',
     tags: ['Friendships'],
     summary: 'Pending friendships list for this user (the user have to respond)',
 
@@ -106,7 +106,7 @@ const getReceivedFriendRequests = {
 }
 
 const newFriendship = {
-    description: 'Create a new friendship, (borrar: or accept a pending friendship,) always initiate by id1 ---> to id2',
+    description: 'Create a new friendship, always initiate by id1 ---> to id2, requires an active session for the user1_id provided in the request body',
     tags: ['Friendships'],
     summary: 'Create a new friendship',
 
@@ -124,7 +124,7 @@ const newFriendship = {
 }
 
 const acceptFriendship = {
-    description: 'Accept a pending friendship, always initiate by id1 ---> to id2',
+    description: 'Accept a pending friendship, always initiate by id1 ---> to id2, requires an active session for the user1_id provided in the request body',
     tags: ['Friendships'],
     summary: 'Accept a friendship',
 
@@ -159,7 +159,7 @@ const addAuthorizationToPlay = {
 }
 
 const cancelFriendship = {
-    description: 'delete a friendship, always initiate by id1 ---> to id2',
+    description: 'delete a friendship, always initiate by id1 ---> to id2, requires an active session for the user1_id provided in the request body',
     tags: ['Friendships'],
     summary: 'Delete friendship',
 

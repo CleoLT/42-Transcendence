@@ -7,7 +7,7 @@ import preHandler from './handlers/prehandlers.js'
 
 const routes = async function(fastify, options) {
 
-    fastify.get('/', { schema: userSchema.getAllUsers }, userHandler.getAllUsers)
+    //fastify.get('/', { schema: userSchema.getAllUsers }, userHandler.getAllUsers) //for testing 
     fastify.post('/', { schema: userSchema.postUser }, userHandler.postUser)
     fastify.get('/:userId', { schema: userSchema.getUserById, preHandler: preHandler.verifySession}, userHandler.getUserById)
     fastify.get('/username/:username', { schema: userSchema.getUserByName, preHandler: preHandler.verifySession}, userHandler.getUserByName)
@@ -22,9 +22,9 @@ const routes = async function(fastify, options) {
     fastify.patch('/:userId', { schema: userSchema.updateUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.updateUserById)
     fastify.delete('/:userId', { schema: userSchema.deleteUserById, preHandler: preHandler.verifySessionFromPath }, userHandler.deleteUserById)
     fastify.post('/:userId/avatar/upload', { schema: userSchema.uploadAvatar, preHandler: preHandler.verifySessionFromPath }, userHandler.uploadAvatar)
-    fastify.delete('/:userId/avatar', { schema: userSchema.deleteAvatar },  userHandler.deleteAvatar)
+    fastify.delete('/:userId/avatar', { schema: userSchema.deleteAvatar, preHandler: preHandler.verifySessionFromPath },  userHandler.deleteAvatar)
 
-    fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships) // borrar? solo para tests
+    //fastify.get('/friendships', { schema: friendSchema.getAllFriendships}, friendHandler.getAllFriendships) //for testing
     fastify.get('/:userId/friendships', { schema: friendSchema.getAllFriendsByUserId, preHandler: preHandler.verifySessionFromPath }, friendHandler.getAllFriendsByUserId)
     fastify.get('/:userId/friendships/pending', { schema: friendSchema.getPendingFriendships, preHandler: preHandler.verifySessionFromPath }, friendHandler.getPendingFriendships)
     fastify.get('/:userId/friendships/requests', { schema: friendSchema.getReceivedFriendRequests, preHandler: preHandler.verifySessionFromPath }, friendHandler.getReceivedFriendRequests)
