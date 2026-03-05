@@ -77,9 +77,9 @@ const getAllUsers = {
 }
 
 const postUser = {
-    description: 'Create a new user',
+    description: 'Internal function: creates new user',
     tags: ['Users'],
-    summary: 'Create user',
+    summary: 'Internal function: creates new user',
 
     body: {
       type: 'object',
