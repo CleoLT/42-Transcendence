@@ -1,6 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react"
 import {Login, Login2FA, Logout, Register, Register2FA, deleteUserId, checkActiveCookie} from "./authService"
-import { AlertMessage } from "./alertMessage"
+import { AlertMessage, Alert2FA } from "./alertMessage"
 
 const baseUrl = import.meta.env.VITE_BASE_URL
 const AuthContext = createContext()
@@ -57,15 +57,8 @@ export function AuthProvider({children}){
     const login = async (username, password) => {
         const { email } = await Login(username, password)
         const maskedEmail = email.replace(/^(.).+(@.+)$/, '$1***$2')
-        const { value: code } = await AlertMessage.fire({
-            title: `Introduce the code we sent to ${maskedEmail}:`,
-            input: "text",
-            inputPlaceholder: "Your 2FA Code",
-            showCancelButton: false,
-            confirmButtonText: "Verify",
-            allowOutsideClick: false,
-            allowEscapeKey: true,
-            timer: null
+        const { value: code } = await Alert2FA.fire({
+            text: `Introduce the code we sent to ${maskedEmail}:`,
         })
         if (!code) throw new Error("A code is required")
     
@@ -77,15 +70,8 @@ export function AuthProvider({children}){
     const register = async (username, password, email) => {
         const { email: returnedEmail } = await Register(username, password, email)
         const maskedEmail = returnedEmail.replace(/^(.).+(@.+)$/, '$1***$2')
-        const { value: code } = await AlertMessage.fire({
-            title: `Introduce the code we sent to ${maskedEmail}:`,
-            input: "text",
-            inputPlaceholder: "Your 2FA Code",
-            showCancelButton: false,
-            confirmButtonText: "Verify",
-            allowOutsideClick: false,
-            allowEscapeKey: true,
-            timer: null
+        const { value: code } = await Alert2FA.fire({
+            text: `Introduce the code we sent to ${maskedEmail}:`,
         })
         if (!code) throw new Error("A code is required")
     

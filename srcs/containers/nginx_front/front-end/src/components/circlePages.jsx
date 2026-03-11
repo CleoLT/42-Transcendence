@@ -389,6 +389,8 @@ export function PlayNotConnected({setScreen}){
         </Sixtyfour>
         <CenterText
           text ="PLAY"
+		  onClick={null}
+		  interactive={false}
           className="
             text-5xl
             md:text-7xl
