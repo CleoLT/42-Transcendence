@@ -24,13 +24,13 @@ Anything over 14 points is considered part of the **bonus**.
 <br>
 
 ## 2. Demo
-![Play!](readme_assest/Game_settings.png)
-![3...2...1...GO!](readme_assest/Games_infos.png)
-![The Blossom Clash](readme_assest/Game_fish.png)
-![Profile](readme_assest/Profile_00.png)
-![Friends](readme_assest/Friends.png)
-![Contacts](readme_assest/Contacts.png)
-![Exit](readme_assest/Exit.png)
+![Play!](readme_assets/Game_settings.png)
+![3...2...1...GO!](readme_assets/Games_infos.png)
+![The Blossom Clash](readme_assets/Game_fish.png)
+![Profile](readme_assets/Profile_00.png)
+![Friends](readme_assets/Friends.png)
+![Contacts](readme_assets/Contacts.png)
+![Exit](readme_assets/Exit.png)
 
 
 <br>
