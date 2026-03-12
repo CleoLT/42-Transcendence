@@ -25,7 +25,7 @@ Anything over 14 points is considered part of the **bonus**.
 
 ## 2. Demo
 
-https://github.com/CleoLT/42-/assets/xxxxx/demo.mp4
+https://github.com/CleoLT/42-Transcendence/blob/README/readme_assets/TheBlossonClash.webm
 
 <br>
 
