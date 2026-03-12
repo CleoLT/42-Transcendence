@@ -24,9 +24,14 @@ Anything over 14 points is considered part of the **bonus**.
 <br>
 
 ## 2. Demo
+![Play!](readme_assest/Game_settings.png)
+![3...2...1...GO!](readme_assest/Games_infos.png)
+![The Blossom Clash](readme_assest/Game_fish.png)
+![Profile](readme_assest/Profile_00.png)
+![Friends](readme_assest/Friends.png)
+![Contacts](readme_assest/Contacts.png)
+![Exit](readme_assest/Exit.png)
 
-https://github.com/CleoLT/42-Transcendence/blob/README/readme_assets/TheBlossonClash.webm
-<video src="readme_assets/TheBlossonClash.webm" controls width="600"></video>
 
 <br>
 
