@@ -20,8 +20,8 @@ export default async function seedUsers() {
 
         console.log('Seeded 20 users')
 
-        await usersQueries.addUser("marta", "Marta123@", "martalopezcab@gmail.com")
-        // await usersQueries.addUser("Emilie", "1234Es#", "emiliesellier21@gmail.com")
+        // await usersQueries.addUser("marta", "Marta123@", "martalopezcab@gmail.com")
+        await usersQueries.addUser("Emilie", "1234Es#", "emiliesellier21@gmail.com")
 
 
 
