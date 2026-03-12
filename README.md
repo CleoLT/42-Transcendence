@@ -23,7 +23,13 @@ Anything over 14 points is considered part of the **bonus**.
 
 <br>
 
-## 2. Instructions
+## 2. Demo
+
+https://github.com/CleoLT/42-/assets/xxxxx/demo.mp4
+
+<br>
+
+## 3. Instructions
 
 To run the project, follow these steps:  
 1. **Make sure you have Docker and Git installed on your machine** :package:
@@ -54,7 +60,7 @@ To run the project, follow these steps:
 <br>
 
 
-## 3. The dream team :handshake:
+## 4. The dream team :handshake:
 Our team consists of five members: Cléo Le Tron, Emilie Sellier, Manu Gimon, Cristina Manzanares and Marta López.\
 All of us are *developers* and, on top of that, three of us have other roles as well:
 
@@ -96,7 +102,7 @@ She worked closely with Emilie in the frontend to make sure they were on the sam
 
 <br>
 
-## 4. Project Management
+## 5. Project Management
 
 Deciding how we were going to divide tasks and the work was difficult because we all had more or less the same level of knowledge.\
 All of us except Cristina (our game developer), who had animation notions, came from different areas of studies and had started 42 at aproximately the same time. Some of us had done *webserver* and *irc*, but no one had a deep understanding of how the web works. This made the task distribution harder beacuse we had to take more time to do research and we did not know how much workload each task really implied.
@@ -125,7 +131,7 @@ This startegy worked pretty well for us.
 
 <br>
 
-## 5. Technical Stack
+## 6. Technical Stack
 
 ### Frontend
 - **React 18** with functional components and hooks
@@ -192,7 +198,7 @@ When a user is deleted from the user table, all friendships associated with that
 <br>
 
 
-## 6. Modules
+## 7. Modules
 
 ###  MAJOR | Use a framework for both the frontend and backend (2p)
 We felt that chosing frameworks would help a lot in the frontend and the backend taking into account the architecture of microservices that we wanted to buildand the use of frameworks is strictly necessary in a company environment, so even though they were new to most of us, we felt that it was a good investment.
@@ -382,7 +388,7 @@ With these modules we have the 14 mandatory points and 3 extra, just in case we 
 <br>
 
 
-## 7. Features List 
+## 8. Features List 
 
 We'll start by listing the core gameplay features: 
 
@@ -510,7 +516,7 @@ These are the rest of the features of the project:
 
 <br>
 
-## 8. Individual Contributions
+## 9. Individual Contributions
 
 Here you can see who implemented each feature, the issues we faced, and how we solved them:
 
@@ -617,7 +623,7 @@ The biggest challenges were balancing gameplay for fairness, integrating AI beha
 
 <br>
 
-## 9. Game rules (bonus section)
+## 10. Game rules (bonus section)
 ### **How to Play**
 Each player controls a brush-like character in a shared falling zone with three lanes:
 
@@ -764,7 +770,7 @@ The player with the highest score wins Blossom Clash.
 <br>
 
 
-## 10. Resources
+## 11. Resources
 
 This is a list with all the resources we used classified by topics. It contains a mix of websites, tutorials and videos that helped us understand how we should approach the project and helped us learn new tools.\
 At the end of the section, you can find out more about how we approached the use of AI.
